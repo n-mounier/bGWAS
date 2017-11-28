@@ -4,6 +4,7 @@ Title: Bayesian Genome-Wide Association Study
 Version: 0.1.0
 Author: Ninon Mounier
 Maintainer: Ninon Mounier <mounier.ninon@gmail.com>
+URL: https://github.com/n-mounier/bGWAS
 Description: Package allowing the bayesian...
 License: What license is it under?
 Encoding: UTF-8
