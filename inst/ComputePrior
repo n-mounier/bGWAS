@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Compute the prior
+# needs arguments :
+# 1 : Name of the Z Matrix
+# 2 : Scheme
+# 3 : Name
+# 4 : List of SNPs
+# 5 : GWAS of Interest
+
+# It also needs the regress.and.make.prior.R script
+
+
+which Rscript
+# pb : with the version of RScript installed on the server, some packages can't be downloaded : use the version in ./Scripts...
+
+
+
+  set -o pipefail
+  target=Prior/${1}-scheme-${2}.csv
+  mkdir -p Prior
+  ls -l        ZMatrix/${1}.csv
+  echo ZMatrix/${1}.csv
+  Big=HugeMatrix/ZMatrix_${4}_${3}.csv
+  export Big 
+  echo " =$Big "
+  ls -l  "$Big"
+  export which_studies=SignificantStudies/${1}-scheme-${2}.csv
+  ls -l SignificantStudies/${1}-scheme-${2}.{stdout,coefs.csv,univariate.coefs.csv,removal_reasons.csv}
+  
+  .//Scripts/Rscript Scripts/regress.and.make.prior.R "" "$target".tmp "" "${2}" "${5}" |& tee "$target".stdout.tmp 
+  
+  cp "SignificantStudies/${1}-scheme-${2}.stdout"               "${target%csv}".stdout.ss
+  cp "SignificantStudies/${1}-scheme-${2}.coefs.csv"            "$target".coefs.csv
+  cp "SignificantStudies/${1}-scheme-${2}.univariate.coefs.csv" "$target".univariate-coefs.csv
+  cp "SignificantStudies/${1}-scheme-${2}.removal_reasons.csv"  "$target".removal_reasons.csv
+  mv "${target}"{.stdout.tmp,.stdout.txt}
+  mv "${target%.csv}"{.csv.tmp,}.chrms.with.nz.csv # if INpXXtozero=1 this file does not exist...
+  mv "${target%.csv}"{.csv.tmp,}.coefs.22.csv
+  mv "${target}"{.tmp,}
