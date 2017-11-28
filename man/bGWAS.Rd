@@ -4,7 +4,8 @@
 \alias{bGWAS}
 \title{bGWAS - Main Function}
 \usage{
-bGWAS(Name, GWAS, ExludeFromPrior = NULL, verbose = F)
+bGWAS(Name, GWAS, threshold = NULL, scheme = NULL, ExludeFromPrior = NULL,
+  verbose = F)
 }
 \arguments{
 \item{Name}{character, name of your analysis}
