@@ -4,19 +4,19 @@
 \alias{bGWAS}
 \title{bGWAS - Main Function}
 \usage{
-bGWAS(Name, GWAS, threshold = NULL, scheme = NULL, ExludeFromPrior = NULL,
-  verbose = F)
+bGWAS(Name, GWAS, OutPath = getwd(), threshold = NULL, scheme = NULL,
+  ExludeFromPrior = NULL, verbose = F)
 }
 \arguments{
 \item{Name}{character, name of your analysis}
 
 \item{GWAS}{character, path to your conventionnal GWAS of interest}
 
+\item{OutPath}{character, path to the outputs, by default, current working dictory}
+
 \item{ExludeFromPrior}{vector, list of studies to exclude when creating the prior, see XXX, by default=NULL}
 
 \item{verbose}{boolean}
-
-\item{out.path}{character, path to the outputs, by default, current working dictory}
 
 \item{keepFiles}{?}
 }

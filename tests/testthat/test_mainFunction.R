@@ -2,12 +2,15 @@
 ## main function ##
 
 
-context("Description")  # Describe the file, grouping multiple tests
+context("Test of main function, bGWAS()")  # Describe the file, grouping multiple tests
 
 
 
-test_that("str_length is number of characters", { # A test, grouping multiple expectations
-  expect_equal(length("a"), 1)
+test_that("Handling bad parameters", { # A test, grouping multiple expectations
+  # Require mandatory parameters
+
+  # Name should be a string
+  expect_error(bGWAS(Name=123, GWAS="Test"), "Name : non-character argument", fixed=T)
 })
 
 
