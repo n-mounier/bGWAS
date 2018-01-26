@@ -33,7 +33,7 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
   } else {
     if(grepl("macOS", sessionInfo()$running)) {
       ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")))
-    } } else if(grepl("Linux", sessionInfo()$running)){
+    } else if(grepl("Linux", sessionInfo()$running)){
       ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")))
     } else {
       stop("Only UNIL and MAC OS are supported")
