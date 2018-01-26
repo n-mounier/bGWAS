@@ -2,7 +2,7 @@
 % Please edit documentation in R/StudiesForPrior.R
 \name{listTraits}
 \alias{listTraits}
-\title{listTraits}
+\title{Get traits from studies that can be used to build the prior}
 \usage{
 listTraits(verbose = F)
 }

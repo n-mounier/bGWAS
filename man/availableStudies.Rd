@@ -2,7 +2,7 @@
 % Please edit documentation in R/StudiesForPrior.R
 \name{availableStudies}
 \alias{availableStudies}
-\title{availableStudies}
+\title{Get list of studies that can be used to build the prior}
 \usage{
 availableStudies(verbose = F)
 }

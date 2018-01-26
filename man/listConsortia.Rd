@@ -2,7 +2,7 @@
 % Please edit documentation in R/StudiesForPrior.R
 \name{listConsortia}
 \alias{listConsortia}
-\title{listConsortia}
+\title{Get consortia from studies that can be used to build the prior}
 \usage{
 listConsortia(verbose = F)
 }

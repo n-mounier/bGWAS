@@ -2,9 +2,9 @@
 % Please edit documentation in R/StudiesForPrior.R
 \name{listFiles}
 \alias{listFiles}
-\title{listFiles}
+\title{Get file names of studies that can be used to build the prior}
 \usage{
-listFiles(verbose = F)
+listFiles(IDs = NULL, verbose = F)
 }
 \value{
 List of files

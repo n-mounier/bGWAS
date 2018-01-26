@@ -2,7 +2,7 @@
 
 
 
-#' availableStudies
+#' Get list of studies that can be used to build the prior
 #'
 #' Get list of studies with available GWAS summary statistics
 #' @param verbose boolean, default = FALSE
@@ -15,38 +15,45 @@ availableStudies <- function(verbose=F) {
 }
 
 
-#' listFiles
+#' Get file names of studies that can be used to build the prior
 #'
 #' Get list of studies with available GWAS summary statistics
 #' @return List of files
 #' @export
 
-listFiles <- function(verbose=F) {
-  Files = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "File")
+listFiles <- function(IDs=NULL, verbose=F) {
+  if(is.null(IDs)) {
+    Files = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "File")$File
+  } else {
+    # check that the IDs exists
+    Studies = availableStudies()
+    if(!all(IDs %in% Studies$ID)) print("Please check the IDs, some of them do not match")
+    Files = Studies$File[match(IDs, Studies$ID)]
+  }
   return(Files)
 }
 
 
-#' listTraits
+#' Get traits from studies that can be used to build the prior
 #'
 #' Get list of traits with available GWAS summary statistics
 #' @return List of traits
 #' @export
 
 listTraits <- function(verbose=F) {
-  Traits = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "Trait")
-  return(unique(Traits$Trait))
+  Traits = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "Trait")$Trait
+  return(unique(Traits))
 }
 
 
-#' listConsortia
+#' Get consortia from studies that can be used to build the prior
 #'
 #' Get list of consortia with available GWAS summary statistics
 #' @return List of consortia
 #' @export
 
 listConsortia <- function(verbose=F) {
-  Consortia = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "Consortium")
+  Consortia = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "Consortium")$Consortium
   return(unique(Consortia))
 }
 
@@ -69,15 +76,13 @@ listConsortia <- function(verbose=F) {
 
 
 
-selectStudies <- function(ListOfStudies=NULL, Files=NULL, Traits=NULL, Consortia=NULL, verbose=F) {
+selectStudies <- function(Files=NULL, Traits=NULL, Consortia=NULL, verbose=F) {
   # Check parameters
   if(is.null(c(Files,Traits,Consortia))) stop("You did not specify any criteria for the selection.")
   Studies = availableStudies()
-  if(!all(ListOfStudies %in% Studies$ID)) stop("Some IDs specified in ListOfStudies are not correct")
   if(!all(Files %in% listFiles())) stop("Some files specified in Files are not correct")
   if(!all(Traits %in% listTraits())) stop("Some traits in Traits specified are not correct")
   if(!all(Consortia %in% listConsortia())) stop("Some consortia specified in Consortia are not correct")
-  if(!is.null(ListOfStudies)) Studies = Studies[Studies$ID %in% ListOfStudies,]
   n = nrow(Studies)
   Crit = c()
   # 1st : selection based on Study Name
@@ -165,5 +170,5 @@ excludeStudies <- function(ListOfStudies=NULL, Files=NULL, Traits=NULL, Consorti
     if(verbose) print(paste0(nC, " studies have been removed when selection using Consortia"))
   }
   if(verbose) print(paste0(n, " studies left after selection on ", paste(Crit, collapse=", ")))
-  return(Studies$ID)
+  return(Studies$File)
 }

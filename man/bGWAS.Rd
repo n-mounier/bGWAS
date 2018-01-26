@@ -2,27 +2,71 @@
 % Please edit documentation in R/bGWAS.R
 \name{bGWAS}
 \alias{bGWAS}
-\title{bGWAS - Main Function}
+\title{bGWAS}
 \usage{
-bGWAS(Name, GWAS, OutPath = getwd(), threshold = NULL, scheme = NULL,
-  ExludeFromPrior = NULL, verbose = F)
+bGWAS(Name, GWAS, ZMatrices = NULL, PriorStudies = NULL,
+  ListOfSNPs = NULL, MRthreshold = 1e-05, SignMethod = "p",
+  SignThresh = 1e-07, pruneRes = F, OutPath = getwd(), saveFiles = T,
+  verbose = F)
 }
 \arguments{
-\item{Name}{character, name of your analysis}
+\item{Name}{The name of your analysis (character)}
 
-\item{GWAS}{character, path to your conventionnal GWAS of interest}
+\item{GWAS}{The path to your conventionnal GWAS of interest or ID of the GWAS from the
+list of studies availables (prior GWASs) (character or numeric)}
 
-\item{OutPath}{character, path to the outputs, by default, current working dictory}
+\item{ZMatrices}{The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
+(character)}
 
-\item{ExludeFromPrior}{vector, list of studies to exclude when creating the prior, see XXX, by default=NULL}
+\item{PriorStudies}{The IDs of prior GWASs to use for the analysis, \code{default=NULL},
+will include all the prior GWASs available (numeric vector)}
 
-\item{verbose}{boolean}
+\item{ListOfSNPs, }{The path to a file containing the rsids of the SNPs to use ,
+\code{default=NULL}, will use all the SNPs in  common between prior GWASs and the
+conventionnal GWAS (character)
+      # NOT IMPLEMENTED YET}
 
-\item{keepFiles}{?}
+\item{MRthreshold}{The threshold used to select strong instruments for MR, should be lower
+than 1e-5, \code{default=1e-5} (numeric)}
+
+\item{SignMethod}{The method used to identify significant SNPs, should be \code{"p"} for
+p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)}
+
+\item{SignThresh}{The threshold used to identify significant SNPs, \code{default="5e-8"}
+(numeric)}
+
+\item{pruneRes}{A logical indicating if the results should be pruned (by distance, 500kb),
+\code{default=FALSE}}
+
+\item{OutPath}{character, path to the outputs, needed if saveFiles is TRUE, by default, current working dictory}
+
+\item{saveFiles}{A logical indicating if the results should be saved as files,
+\code{default=FALSE}}
+
+\item{verbose}{A logical indicating if information on progress should be reported,
+\code{default=FALSE}}
 }
 \value{
-Value Resultat
+An object containing the ... + Files created if saveFiles=T
 }
 \description{
-Performs a bayesian GWAS
+Performs a bayesian GWAS from Summary Statistics, using publicly available results
+to calculate the prior effects of the SNPs
+}
+\details{
+\code{Name} and \code{GWAS} are required arguments.
+
+Z-Matrix files, containing Z-scores for all prior GWASs should be downloaded separately
+and stored in the folder specified in \code{ZMatrices}.
+## MORE INFO NEEDED HERE
+
+Use \code{availableStudies()} to see all the prior GWASs available.
+Using one of them as your conventionnal GWAS (\code{GWAS} = numeric ID) will automatically
+remove it from the list of prior GWASs used to build the prior.
+
+Use \code{IncludeStudies()} and \code{ExcludeStudies} to automatically select the studies to be included to build the
+prior ((\code{PriorStudies}).
+}
+\examples{
+
 }

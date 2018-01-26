@@ -4,13 +4,13 @@
 \alias{selectStudies}
 \title{selectStudies}
 \usage{
-selectStudies(ListOfStudies = NULL, Files = NULL, Traits = NULL,
-  Consortia = NULL, verbose = F)
+selectStudies(Files = NULL, Traits = NULL, Consortia = NULL,
+  verbose = F)
 }
 \arguments{
-\item{ListOfStudies}{ID of the studies, by default, use all the studies in availableStudies()}
-
 \item{verbose}{boolean}
+
+\item{ListOfStudies}{ID of the studies, by default, use all the studies in availableStudies()}
 
 \item{File}{list of file names}
 
