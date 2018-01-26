@@ -1,9 +1,9 @@
 
-## bGWAS
+# bGWAS
 [//]:========================================
 
 
-# Overview
+## Overview
 [//]:-------------------------------
 
 bGWAS is an package to perform a bayesian GWAS, using summary statistics. It compares the observed Z-score from a conventional GWAS to a prior z-score, calculated from prior GWASs publicly available (currently, a set of 58 studies, to be updated).
@@ -12,10 +12,9 @@ bGWAS is an package to perform a bayesian GWAS, using summary statistics. It com
 -   `availableStudies()` ...
 -   `selectStudies()` ...
 -   `bGWASfromPrior()` ...
--   `arrange()`...
 
 
-# Installation
+## Installation
 [//]:-------------------------------
 
 * Install R-package
@@ -30,7 +29,7 @@ devtools::install_github("tidyverse/dplyr")
 
 
 ## Usage
-[//]: -------------------------------
+[//]:-------------------------------
 
 
 To run an anlysis :
@@ -46,17 +45,16 @@ Z or BETA & SE :
 
 
 ## Runtime
-[//]: -------------------------------
+[//]:-------------------------------
 
 
 
 ## Improvements to be implemented
-[//]: -------------------------------
+[//]:-------------------------------
 
 
 
 
 
 ## Contact
-[//]: -------------------------------
 <mounier.ninon@gmail.com>

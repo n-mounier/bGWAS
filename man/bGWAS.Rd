@@ -56,6 +56,17 @@ to calculate the prior effects of the SNPs
 \details{
 \code{Name} and \code{GWAS} are required arguments.
 
+If \code{GWAS} is a path to a file, this file should contain columns SNPID, A1, A2 and Z
+(or Beta and SE)
+SNPID should be : \code{rs}, \code{rsid}, \code{snp} ...
+A1 should be : \code{rs}, \code{rsid}, \code{snp} ...
+A2 should be : \code{rs}, \code{rsid}, \code{snp} ...
+Z should be : \code{rs}, \code{rsid}, \code{snp} ...
+If Z is not present, it can be calculated from BETA and SE, in this case, a temporary gzipped
+file is created.
+BETA should be : \code{rs}, \code{rsid}, \code{snp} ...
+SE should be : \code{rs}, \code{rsid}, \code{snp} ...
+
 Z-Matrix files, containing Z-scores for all prior GWASs should be downloaded separately
 and stored in the folder specified in \code{ZMatrices}.
 ## MORE INFO NEEDED HERE
@@ -66,6 +77,9 @@ remove it from the list of prior GWASs used to build the prior.
 
 Use \code{IncludeStudies()} and \code{ExcludeStudies} to automatically select the studies to be included to build the
 prior ((\code{PriorStudies}).
+
+Be careful, in the results, all the GWAS (conventional + prior) have been aligned with UK10K
+data (some swapped alleles from your initial data)
 }
 \examples{
 
