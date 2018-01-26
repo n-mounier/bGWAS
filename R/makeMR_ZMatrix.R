@@ -22,10 +22,24 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
     tmp = paste0("Selecting studies :\n")
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
-    if(grepl("macOS", sessionInfo()$running)) ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=c(1:5, PriorStudies+5))
+    if(grepl("macOS", sessionInfo()$running)){
+      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=c(1:5, PriorStudies+5))
+    } else if(grepl("Linux", sessionInfo()$running)){
+      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=c(1:5, PriorStudies+5))
+    } else {
+      stop("Only UNIL and MAC OS are supported")
+    }
+
   } else {
-    if(grepl("macOS", sessionInfo()$running)) ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")))
-  }
+    if(grepl("macOS", sessionInfo()$running)) {
+      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")))
+    } } else if(grepl("Linux", sessionInfo()$running)){
+      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")))
+    } else {
+      stop("Only UNIL and MAC OS are supported")
+    }
+}
+
   tmp = paste0(ncol(ZMatrix)-5, " studies \n")
   Log = c(Log, tmp)
   if(verbose) cat(tmp)
@@ -86,7 +100,14 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
 
-    if(grepl("macOS", sessionInfo()$running)) GWASData=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5))
+    if(grepl("macOS", sessionInfo()$running)){
+      GWASData=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5))
+    } else if(grepl("Linux", sessionInfo()$running)){
+      GWASData=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5))
+    } else {
+      stop("Only UNIL and MAC OS are supported")
+    }
+
     # no need to check for alignment of alleles, just subset and rename the column
     # keep the SNPs in our pruned matrix and order them correctly
     GWASData = GWASData[match(ZMatrixPruned$rs,GWASData$rs),]

@@ -73,6 +73,8 @@ bGWAS <- function(Name,
   platform = c("Linux", "macOS", "W")[c(grepl("Linux", sessionInfo()$running)
                                            , grepl("macOS", sessionInfo()$running)
                                            , grepl("Windows", sessionInfo()$running))]
+  if(platform=="W") stop("Windows is not supported yet")
+
   # can be useful in the main function ?
   # automatically detected when needed by other sub-functions
 
@@ -149,7 +151,7 @@ bGWAS <- function(Name,
       HeaderGWAS = colnames(data.table::fread(GWAS, nrows = 0))
     } else if(grepl(".gz", GWAS)) {
       # ...if tar.gz
-      HeaderGWAS = colnames(data.table::fread(paste0("zcat < ", GWAS), nrows = 0))
+      if(platform %in% c("Linux", "macOS")) HeaderGWAS = colnames(data.table::fread(paste0("zcat < ", GWAS), nrows = 0))
     }
 
     if(all(!HeaderGWAS %in% c("rsid", "snpid", "snp", "rnpid", "rs"))) stop("GWAS : no SNPID column")
@@ -170,7 +172,7 @@ bGWAS <- function(Name,
           DataGWAS = data.table::fread(GWAS)
         } else if(grepl(".gz", GWAS)) {
           # ...if tar.gz
-          DataGWAS = data.table::fread(paste0("zcat < ", GWAS))
+          if(platform %in% c("Linux", "macOS"))  DataGWAS = data.table::fread(paste0("zcat < ", GWAS))
         }
         # calculate Z
         DataGWAS$Z = DataGWAS[,HeaderGWAS[HeaderGWAS %in% c("b", "beta", "beta1")], with=F] /
@@ -248,7 +250,7 @@ bGWAS <- function(Name,
   }
 
   ## ListOfSNPs
-  # We should have at least XX SNPs
+  # We should have at least XX SNPs / check Linux-MAC for Zcat
   if(!is.null(ListOfSNPs)){
     if(!is.character(ListOfSNPs)) stop("ListOfSNPs : non character")
     OurSNPsMR = data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=1)
