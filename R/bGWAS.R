@@ -148,10 +148,10 @@ bGWAS <- function(Name,
     # Check colnames...
     if(!grepl(".gz", GWAS)){
       # ...if regular file
-      HeaderGWAS = colnames(data.table::fread(GWAS, nrows = 0))
+      HeaderGWAS = colnames(data.table::fread(GWAS, nrows = 0, showProgress = FALSE))
     } else if(grepl(".gz", GWAS)) {
       # ...if tar.gz
-      if(platform %in% c("Linux", "macOS")) HeaderGWAS = colnames(data.table::fread(paste0("zcat < ", GWAS), nrows = 0))
+      if(platform %in% c("Linux", "macOS")) HeaderGWAS = colnames(data.table::fread(paste0("zcat < ", GWAS), nrows = 0, showProgress = FALSE))
     }
 
     if(all(!HeaderGWAS %in% c("rsid", "snpid", "snp", "rnpid", "rs"))) stop("GWAS : no SNPID column")
@@ -169,10 +169,10 @@ bGWAS <- function(Name,
         # if beta + se : read the data
         if(!grepl(".gz", GWAS)){
           # ...if regular file
-          DataGWAS = data.table::fread(GWAS)
+          DataGWAS = data.table::fread(GWAS, showProgress = FALSE)
         } else if(grepl(".gz", GWAS)) {
           # ...if tar.gz
-          if(platform %in% c("Linux", "macOS"))  DataGWAS = data.table::fread(paste0("zcat < ", GWAS))
+          if(platform %in% c("Linux", "macOS"))  DataGWAS = data.table::fread(paste0("zcat < ", GWAS), showProgress = FALSE)
         }
         # calculate Z
         DataGWAS$Z = DataGWAS[,HeaderGWAS[HeaderGWAS %in% c("b", "beta", "beta1")], with=F] /
@@ -253,10 +253,10 @@ bGWAS <- function(Name,
   # We should have at least XX SNPs / check Linux-MAC for Zcat
   if(!is.null(ListOfSNPs)){
     if(!is.character(ListOfSNPs)) stop("ListOfSNPs : non character")
-    OurSNPsMR = data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=1)
+    OurSNPsMR = data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=1, showProgress = FALSE)
     commonMR = table(ListOfSNPs %in% OurSNPsMR$rs)["TRUE"]
     if(commonMR<20) stop("ListOfSNPs : You should provide at least 20 SNPs that can be used as strong instruments for MR")
-    OurSNPsAll = data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=1)
+    OurSNPsAll = data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=1, showProgress = FALSE)
     commonAll = table(ListOfSNPs %in% OurSNPsAll$rs)["TRUE"]
     tmp = paste0(length(ListOfSNPs), " SNPs provided \n")
     tmp = c(tmp, paste0(commonMR, " can be used for MR \n"))
@@ -351,7 +351,7 @@ bGWAS <- function(Name,
   Log = c(Log, tmp)
   if(verbose) cat(tmp)
 
-  PriorWithBF = request_BFandP(Prior$Prior, SignMethod, SignThresh, pruneRes, saveFiles, verbose)
+  PriorWithBF = request_BFandP(Prior$Prior, saveFiles, verbose)
   Log = c(Log, PriorWithBF$Log)
 
 
@@ -371,7 +371,7 @@ bGWAS <- function(Name,
   # 5 : Bayes Factors and p-values
   # save it in ouptut/Name/...
 
-  Results = get_SignificantSNPs(PriorWithBF$SNPs, saveFiles, verbose)
+  Results = get_SignificantSNPs(PriorWithBF$SNPs, SignMethod, SignThresh, pruneRes, saveFiles, verbose)
   Log = c(Log, Results$Log)
 
 

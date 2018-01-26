@@ -36,8 +36,8 @@ compute_Prior <- function(SelectedStudies, MR_ZMatrix, All_ZMatrix, saveFiles=FA
     # i.e. all the studies listed are part of listFiles()
     if(!all(SelectedStudies$study_selected %in% listFiles())) stop("The studies are not in our list")
     SelectedStudies = SelectedStudies$study_selected
-  } else if(is.character(SelectedStudies)){
-    SelectedStudies <- data.table::fread()
+  } else if(is.character(SelectedStudies)){ # TO BE DONE
+    SelectedStudies <- data.table::fread(SelectedStudies,showProgress = FALSE)
     # check that the studies names are part of list file
     if(!all(SelectedStudies %in% listFiles())) stop("The studies are not in our list")
   } else {

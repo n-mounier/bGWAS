@@ -28,9 +28,9 @@ makeFull_ZMatrix <- function(Studies=NULL, GWAS,  ZMatrices="~/ZMatrices", saveF
   Log = c(Log, tmp)
   if(verbose) cat(tmp)
   if(grepl("macOS", sessionInfo()$running)) {
-    ZMatrix=data.table::fread(paste0("zcat < ",paste0(ZMatrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, Studies+5 ))
+    ZMatrix=data.table::fread(paste0("zcat < ",paste0(ZMatrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, Studies+5 ), showProgress = FALSE)
   } else if(grepl("Linux", sessionInfo()$running)){
-    ZMatrix=data.table::fread(paste0("zcat < ",paste0(ZMatrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, Studies+5 ))
+    ZMatrix=data.table::fread(paste0("zcat < ",paste0(ZMatrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, Studies+5 ), showProgress = FALSE)
   } else {
     stop("Only UNIL and MAC OS are supported")
   }
@@ -72,10 +72,10 @@ makeFull_ZMatrix <- function(Studies=NULL, GWAS,  ZMatrices="~/ZMatrices", saveF
     if(verbose) cat(tmp)
 
     if(!grepl(".gz", GWAS)){
-      GWASData = data.table::fread(GWAS)
+      GWASData = data.table::fread(GWAS, showProgress = FALSE)
     } else if(grepl(".gz", GWAS)) {
       # if tar.gz
-      GWASData = data.table::fread(paste0("zcat < ", GWAS))
+      GWASData = data.table::fread(paste0("zcat < ", GWAS), showProgress = FALSE)
     }
 
     rs = match(colnames(GWASData),c("snpid", "snp", "rnpid", "rs", "rsid"))

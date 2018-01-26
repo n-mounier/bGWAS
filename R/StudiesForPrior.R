@@ -10,7 +10,7 @@
 #' @export
 
 availableStudies <- function(verbose=F) {
-  Studies = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"))
+  Studies = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), showProgress = FALSE)
   return(Studies)
 }
 
@@ -23,7 +23,7 @@ availableStudies <- function(verbose=F) {
 
 listFiles <- function(IDs=NULL, verbose=F) {
   if(is.null(IDs)) {
-    Files = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "File")$File
+    Files = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "File", showProgress = FALSE)$File
   } else {
     # check that the IDs exists
     Studies = availableStudies()
@@ -41,7 +41,7 @@ listFiles <- function(IDs=NULL, verbose=F) {
 #' @export
 
 listTraits <- function(verbose=F) {
-  Traits = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "Trait")$Trait
+  Traits = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "Trait", showProgress = FALSE)$Trait
   return(unique(Traits))
 }
 
@@ -53,7 +53,7 @@ listTraits <- function(verbose=F) {
 #' @export
 
 listConsortia <- function(verbose=F) {
-  Consortia = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "Consortium")$Consortium
+  Consortia = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "Consortium", showProgress = FALSE)$Consortium
   return(unique(Consortia))
 }
 

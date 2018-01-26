@@ -23,18 +23,18 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
     if(grepl("macOS", sessionInfo()$running)){
-      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=c(1:5, PriorStudies+5))
+      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=c(1:5, PriorStudies+5), showProgress = FALSE)
     } else if(grepl("Linux", sessionInfo()$running)){
-      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=c(1:5, PriorStudies+5))
+      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=c(1:5, PriorStudies+5), showProgress = FALSE)
     } else {
       stop("Only UNIL and MAC OS are supported")
     }
 
   } else {
     if(grepl("macOS", sessionInfo()$running)) {
-      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")))
+      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), showProgress = FALSE)
     } else if(grepl("Linux", sessionInfo()$running)){
-      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")))
+      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), showProgress = FALSE)
     } else {
       stop("Only UNIL and MAC OS are supported")
     }
@@ -101,9 +101,9 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
     if(verbose) cat(tmp)
 
     if(grepl("macOS", sessionInfo()$running)){
-      GWASData=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5))
+      GWASData=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5), showProgress = FALSE)
     } else if(grepl("Linux", sessionInfo()$running)){
-      GWASData=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5))
+      GWASData=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5), showProgress = FALSE)
     } else {
       stop("Only UNIL and MAC OS are supported")
     }
@@ -123,10 +123,10 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
     if(verbose) cat(tmp)
 
     if(!grepl(".gz", GWAS)){
-      GWASData = data.table::fread(GWAS)
+      GWASData = data.table::fread(GWAS, showProgress = FALSE)
     } else if(grepl(".gz", GWAS)) {
       # if tar.gz
-      GWASData = data.table::fread(paste0("zcat < ", GWAS))
+      GWASData = data.table::fread(paste0("zcat < ", GWAS), showProgress = FALSE)
     }
 
 
