@@ -64,7 +64,7 @@ bGWAS <- function(Name,
                   SignThresh = 10e-8,
                   pruneRes = F,
                   OutPath = getwd(),
-                  saveFiles = T,
+                  saveFiles = F,
                   verbose = F) {
 
 

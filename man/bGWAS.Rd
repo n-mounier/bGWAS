@@ -6,7 +6,7 @@
 \usage{
 bGWAS(Name, GWAS, ZMatrices = NULL, PriorStudies = NULL,
   ListOfSNPs = NULL, MRthreshold = 1e-05, SignMethod = "p",
-  SignThresh = 1e-07, pruneRes = F, OutPath = getwd(), saveFiles = T,
+  SignThresh = 1e-07, pruneRes = F, OutPath = getwd(), saveFiles = F,
   verbose = F)
 }
 \arguments{

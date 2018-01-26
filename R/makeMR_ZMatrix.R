@@ -130,11 +130,11 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
     }
 
 
-    rs = match(colnames(GWASData),c("snpid", "snp", "rnpid", "rs"))
+    rs = match(colnames(GWASData),c("snpid", "snp", "rnpid", "rs", "rsid"))
     rs = which(!is.na(rs))
     alt = match(colnames(GWASData),c("a1", "alts", "alt"))
     alt = which(!is.na(alt))
-    ref = match(colnames(GWASData),c("a2", "ref"))
+    ref = match(colnames(GWASData),c("a2", "ref", "a0"))
     ref = which(!is.na(ref))
     z = match(colnames(GWASData),c("z", "Z"))
     z = which(!is.na(z))
