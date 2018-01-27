@@ -25,7 +25,7 @@ devtools::install_github("n-mounier/bGWAS")
 ```
 
 * Download Z-Matrix files
-`wget https://drive.switch.ch/index.php/s/pxZsWY88RSDsO8K`
+`wget --no-check-certificate https://drive.switch.ch/index.php/s/pxZsWY88RSDsO8K/download ZMatrices.tar.gz`
 `tar xzvf ZMatrices.tar.gz`
 
 ## Usage

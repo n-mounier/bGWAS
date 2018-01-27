@@ -114,7 +114,7 @@ makeFull_ZMatrix <- function(Studies=NULL, GWAS,  ZMatrices="~/ZMatrices", saveF
   ZMatrix = ZMatrix[complete.cases(ZMatrix)]
   tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific=F), " SNPs in common between prior studies and the conventional GWAS")
   Log = c(Log, tmp)
-  if(verbose) print(tmp)
+  if(verbose) cat(tmp)
 
   # write ZMatrix
   # only if write.file=T
@@ -122,7 +122,7 @@ makeFull_ZMatrix <- function(Studies=NULL, GWAS,  ZMatrices="~/ZMatrices", saveF
     write.table(ZMatrix, file= "Full_ZMatrix.csv", sep=",", row.names=F, quote=F)
     tmp = "The file \"Full_ZMatrix.csv\" has been successfully created \n"
     Log = c(Log, tmp)
-    if(verbose) print(tmp)
+    if(verbose) cat(tmp)
   }
 
   res=list()

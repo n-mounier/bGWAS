@@ -343,7 +343,7 @@ bGWAS <- function(Name,
   if(verbose) cat(tmp)
   # the "global z_matrix" for all GWAS should already be done, just select the studies kept for the prior + prune + add the GWAS of interest
   # makeMR_ZMatrix() create a ZMatrix file and returns the log
-  MR_ZMatrix = makeMR_ZMatrix(PriorStudies, GWAS, MRthreshold, ZMatrices, verbose)
+  MR_ZMatrix = makeMR_ZMatrix(PriorStudies, GWAS, MRthreshold, ZMatrices, saveFiles, verbose)
   Log = c(Log, MR_ZMatrix$Log)
 
   Log=c(Log,"")

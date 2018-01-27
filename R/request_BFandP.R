@@ -73,7 +73,7 @@ request_BFandP <- function(Prior, saveFiles=F, verbose=F) {
   	Log = c(Log, tmp)
   	if(verbose) cat(tmp)
 
-  	NUMBER_OF_NULLRUNS = 1000
+  	NUMBER_OF_NULLRUNS = 100
   	full.number.of.nulls.for.comparison = NUMBER_OF_NULLRUNS* N.one.set.of.nulls
 
   	tmp = paste0(NUMBER_OF_NULLRUNS, " random z-scores simulations for the whole set of SNPs (",
@@ -98,8 +98,8 @@ request_BFandP <- function(Prior, saveFiles=F, verbose=F) {
   	    ) , x=Prior$z)
   #	  Prior = Prior[!is.na(Prior$log.bf.null),]
   #	  Prior = Prior[order(-Prior$log.bf.null),]
-
-  	  nullbf = Prior$log.bf.null
+      TempP = Prior[order(-Prior$log.bf.null),]
+  	  nullbf = TempP$log.bf.nul
 
   	  N = length(nullbf)
 

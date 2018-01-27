@@ -38,7 +38,7 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
     } else {
       stop("Only UNIL and MAC OS are supported")
     }
-}
+  }
 
   tmp = paste0(ncol(ZMatrix)-5, " studies \n")
   Log = c(Log, tmp)
@@ -182,7 +182,7 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
 
-    }
+  }
 
 
   ZMatrixPruned = ZMatrixPruned[complete.cases(ZMatrixPruned)]
