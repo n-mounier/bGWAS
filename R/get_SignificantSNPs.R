@@ -96,6 +96,6 @@ get_SignificantSNPs <- function(Prior, SignMethod="p", SignThresh=5e-8, pruneRes
 
   res=list()
   res$Log = Log
-  res$SNPs = PriorT
+  res$SNPs = PriorThr
   return(res)
 }

@@ -21,7 +21,7 @@ bGWAS is an package to perform a bayesian GWAS, using summary statistics. It com
 ``` r
 # Directly install the package from github
 # install.packages("devtools")
-devtools::install_github("tidyverse/dplyr")
+devtools::install_github("n-mounier/bGWAS")
 ```
 
 * Download Z-Matrix files
