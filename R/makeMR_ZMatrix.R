@@ -58,9 +58,11 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
 
     # check that each study have at least one SNP surviving thresholding
     StudiesToKeep = apply(ZMatrix[,-c(1:5)], 2, function(x) any(abs(x)>Zlimit))
-    ZMatrix[,colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep] := NULL]
-    tmp = paste0(paste0(colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after thresholding) \n")
-    Log = c(Log, tmp)
+    if(!all(StudiesToKeep)){
+      ZMatrix[,colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep] := NULL]
+      tmp = paste0(paste0(colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after thresholding) \n")
+      Log = c(Log, tmp)
+    }
     if(verbose) cat(tmp)
     tmp = paste0(ncol(ZMatrix)-5, " studies left after thresholding \n")
     Log = c(Log, tmp)
@@ -100,9 +102,11 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
 
   # check that each study have at least one SNP surviving pruning
   StudiesToKeep = apply(ZMatrixPruned[,-c(1:5)], 2, function(x) any(abs(x)>Zlimit))
-  ZMatrixPruned[,colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep] := NULL]
-  tmp = paste0(paste0(colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after pruning) \n")
-  Log = c(Log, tmp)
+  if(!all(StudiesToKeep)){
+    ZMatrixPruned[,colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep] := NULL]
+    tmp = paste0(paste0(colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after pruning) \n")
+    Log = c(Log, tmp)
+  }
   if(verbose) cat(tmp)
   tmp = paste0(ncol(ZMatrixPruned)-5, " studies left after pruning \n")
   Log = c(Log, tmp)

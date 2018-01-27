@@ -13,6 +13,7 @@
 #' @return Log file + list of studies significant + create files (list them) if saveFiles=T
 #'
 #' @importFrom magrittr "%>%"
+#' @importFrom magrittr "%<>%"
 #'
 #' @export
 
@@ -101,7 +102,7 @@ identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
 
 
   # Compute and save the univariate regressions (used to check directionnality in multivariate regression):
-  tmp = paste0("Univariate regressions for each trait... \n")
+  tmp = paste0("# Univariate regressions for each trait... \n")
   Log = c(Log, tmp)
   if(verbose) cat(tmp)
 
@@ -251,6 +252,7 @@ identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
     tmp = paste0(paste0(studies_to_removeD, collapse=" - "), " : removed because of different directions (univariate vs multivariate) \n")
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
+    significant.studies=significant.studies[!significant.studies %in% studies_to_removeD]
   }
 
 
