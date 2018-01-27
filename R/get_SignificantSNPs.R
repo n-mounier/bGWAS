@@ -26,6 +26,10 @@ get_SignificantSNPs <- function(Prior, SignMethod="p", SignThresh=5e-8, pruneRes
   if(!SignMethod %in% c("p", "fdr")) stop("method not accepted")
   if(!is.numeric(SignThresh)) stop("non numeric threshold")
 
+  tmp = paste0("   Starting with ", format(nrow(Prior), big.mark = ",", scientific = F), " SNPs \n")
+  Log = c(Log, tmp)
+  if(verbose) cat(tmp)
+
   if(SignMethod == "fdr"){
     tmp = "# Selecting significant SNPs according to FDR (Benjamini-Hochberg procedure)... \n"
     Log = c(Log, tmp)
@@ -106,7 +110,7 @@ get_SignificantSNPs <- function(Prior, SignMethod="p", SignThresh=5e-8, pruneRes
   }
 
   # select Significant SNPs
-  SignifSNPs = PriorTh[PriorThr$rs %in% accepted.snps,]
+  SignifSNPs = PriorThr[PriorThr$rs %in% accepted.snps,]
 
   tmp = paste0(format(nrow(SignifSNPs), big.mark = ",", scientific = F), " SNPs left \n")
   Log = c(Log, tmp)
