@@ -1,3 +1,5 @@
+# Files ignored by git
+
 .Rproj.user
 .Rhistory
 .RData

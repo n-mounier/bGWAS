@@ -17,6 +17,12 @@
 
 get_SignificantSNPs <- function(Prior, SignMethod="p", SignThresh=5e-8, pruneRes=T, saveFiles=F, verbose=F) {
   Log = c()
+
+  "%S>%" <- function(x,to.be.ignored){ # like a 'sink' version of magrittr's  %T>%
+    x
+  }
+
+
   if(!SignMethod %in% c("p", "fdr")) stop("method not accepted")
   if(!is.numeric(SignThresh)) stop("non numeric threshold")
 
@@ -27,6 +33,11 @@ get_SignificantSNPs <- function(Prior, SignMethod="p", SignThresh=5e-8, pruneRes
 
     Prior[, fdr := p.adjust(BF_p, method='fdr')]
     PriorThr = Prior[fdr<SignThresh]
+
+    tmp = paste0(format(nrow(PriorThr), big.mark = ",", scientific = F), " SNPs left \n")
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
+
 
     tmp = "Done! \n"
     Log = c(Log, tmp)
@@ -39,6 +50,10 @@ get_SignificantSNPs <- function(Prior, SignMethod="p", SignThresh=5e-8, pruneRes
     if(verbose) cat(tmp)
 
     PriorThr = Prior[BF_p<SignThresh]
+
+    tmp = paste0(format(nrow(PriorThr), big.mark = ",", scientific = F), " SNPs left \n")
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
 
     tmp = "Done! \n"
     Log = c(Log, tmp)
@@ -58,13 +73,13 @@ get_SignificantSNPs <- function(Prior, SignMethod="p", SignThresh=5e-8, pruneRes
       PriorThr[i] -> accepted
       accepted.rs = accepted$rs
 
-      accepted.snps %<>% {c(accepted.snps, accepted.rs)}
+      accepted.snps = c(accepted.snps, accepted.rs)
 
 
       # now, skip on until we find the next one to accept (or we reach the end)
       while(T) {
 
-        i %<>% `+`(1)
+        i = i+1
 
         if(i >  nrow(PriorThr)) {
           break # all done
@@ -87,15 +102,30 @@ get_SignificantSNPs <- function(Prior, SignMethod="p", SignThresh=5e-8, pruneRes
         next
 
       }
-
     }
+  }
 
+  # select Significant SNPs
+  SignifSNPs = PriorTh[PriorThr$rs %in% accepted.snps,]
 
+  tmp = paste0(format(nrow(SignifSNPs), big.mark = ",", scientific = F), " SNPs left \n")
+  Log = c(Log, tmp)
+  if(verbose) cat(tmp)
+
+  tmp = "Done! \n"
+  Log = c(Log, tmp)
+  if(verbose) cat(tmp)
+
+  if(saveFiles){
+    write.table(ZMatrix, file= "SignificantSNPs.csv", sep=",", row.names=F, quote=F)
+    tmp = "The file \"SignificantSNPs.csv\" has been successfully created \n"
+    Log = c(Log, tmp)
+    if(verbose) print(tmp)
   }
 
 
   res=list()
   res$Log = Log
-  res$SNPs = PriorThr
+  res$SNPs = SignifSNPs
   return(res)
 }

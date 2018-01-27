@@ -6,13 +6,12 @@
 \usage{
 bGWAS(Name, GWAS, ZMatrices = NULL, PriorStudies = NULL,
   ListOfSNPs = NULL, MRthreshold = 1e-05, SignMethod = "p",
-  SignThresh = 1e-07, pruneRes = F, OutPath = getwd(), saveFiles = F,
-  verbose = F)
+  SignThresh = 1e-07, pruneRes = F, saveFiles = F, verbose = F)
 }
 \arguments{
-\item{Name}{The name of your analysis (character)}
+\item{Name}{The name of the analysis (character)}
 
-\item{GWAS}{The path to your conventionnal GWAS of interest or ID of the GWAS from the
+\item{GWAS}{The path to the conventionnal GWAS of interest or ID of the GWAS from the
 list of studies availables (prior GWASs) (character or numeric)}
 
 \item{ZMatrices}{The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
@@ -22,7 +21,7 @@ list of studies availables (prior GWASs) (character or numeric)}
 will include all the prior GWASs available (numeric vector)}
 
 \item{ListOfSNPs, }{The path to a file containing the rsids of the SNPs to use ,
-\code{default=NULL}, will use all the SNPs in  common between prior GWASs and the
+\code{default=NULL}, will use all the SNPs in common between prior GWASs and the
 conventionnal GWAS (character)
       # NOT IMPLEMENTED YET}
 
@@ -38,8 +37,6 @@ p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)
 \item{pruneRes}{A logical indicating if the results should be pruned (by distance, 500kb),
 \code{default=FALSE}}
 
-\item{OutPath}{character, path to the outputs, needed if saveFiles is TRUE, by default, current working dictory}
-
 \item{saveFiles}{A logical indicating if the results should be saved as files,
 \code{default=FALSE}}
 
@@ -47,40 +44,56 @@ p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)
 \code{default=FALSE}}
 }
 \value{
-An object containing the ... + Files created if saveFiles=T
+An object containing the significant SNPs + Files created if saveFiles=T
+## DESCRIBE THE FILES
 }
 \description{
 Performs a bayesian GWAS from Summary Statistics, using publicly available results
-to calculate the prior effects of the SNPs
+to calculate the prior effects of the SNPs and compare it to observed z-scores
 }
 \details{
 \code{Name} and \code{GWAS} are required arguments.
 
-If \code{GWAS} is a path to a file, this file should contain columns SNPID, A1, A2 and Z
-(or Beta and SE)
-SNPID should be : \code{rs}, \code{rsid}, \code{snp} ...
-A1 should be : \code{rs}, \code{rsid}, \code{snp} ...
-A2 should be : \code{rs}, \code{rsid}, \code{snp} ...
-Z should be : \code{rs}, \code{rsid}, \code{snp} ...
-If Z is not present, it can be calculated from BETA and SE, in this case, a temporary gzipped
-file is created.
-BETA should be : \code{rs}, \code{rsid}, \code{snp} ...
-SE should be : \code{rs}, \code{rsid}, \code{snp} ...
+If \code{GWAS} is a path to a file (regular or .gz), this file should contain the following
+columns :
+SNPID (rs numbers) should be : \code{rs}, \code{rsid}, \code{snp}, \code{snpid}, \code{rnpid}
+A1 should be : \code{a1}, \code{alt}, \code{alts}
+A2 should be : \code{a2}, \code{a0}, \code{ref}
+Z should be : \code{z}, \code{Z}, \code{zscore}
+If Z is not present, it can be calculated from BETA and SE, in this case, a temporary
+gzipped file is created and removed after the analysis.
+BETA should be : \code{b}, \code{beta}, \code{beta1}
+SE should be : \code{se}, \code{std}
 
 Z-Matrix files, containing Z-scores for all prior GWASs should be downloaded separately
-and stored in the folder specified in \code{ZMatrices}.
-## MORE INFO NEEDED HERE
+and stored in \code{"~/ZMatrices"} or in the folder specified in \code{ZMatrices}.
+## MORE INFO NEEDED HERE / HOW TO DOWNLOAD ID (see README)
 
 Use \code{availableStudies()} to see all the prior GWASs available.
 Using one of them as your conventionnal GWAS (\code{GWAS} = numeric ID) will automatically
 remove it from the list of prior GWASs used to build the prior.
 
-Use \code{IncludeStudies()} and \code{ExcludeStudies} to automatically select the studies to be included to build the
-prior ((\code{PriorStudies}).
+Use \code{IncludeStudies()} and \code{ExcludeStudies} to automatically select the studies to
+be included to build the prior ((\code{PriorStudies}).
 
 Be careful, in the results, all the GWAS (conventional + prior) have been aligned with UK10K
-data (some swapped alleles from your initial data)
+data (some alleles might be swapped when comparing with the initial data)
 }
 \examples{
-
+# Permorm bGWAS, using a conventional GWAS from the list of prior GWASs
+MyGWAS = 1
+listFiles(MyGWAS)
+\dontrun{
+A = bGWAS(Name = "Test_UsingGWASfromList",
+         GWAS = MyGWAS
+         verbose=T)
+         }
+# Permorm bGWAS, using a small conventional GWAS included in data and selecting a subset of
+# studies for the prior
+MyGWAS = ""
+\dontrun{
+B = bGWAS(Name = "Test_UsingSmallGWAS",
+         GWAS = MyGWAS
+         verbose=T)
+         }
 }

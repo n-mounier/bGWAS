@@ -84,7 +84,7 @@ makeFull_ZMatrix <- function(Studies=NULL, GWAS,  ZMatrices="~/ZMatrices", saveF
     alt = which(!is.na(alt))
     ref = match(colnames(GWASData),c("a2", "ref", "a0"))
     ref = which(!is.na(ref))
-    z = match(colnames(GWASData),c("z", "Z"))
+    z = match(colnames(GWASData),c("z", "Z", "zscore"))
     z = which(!is.na(z))
 
     #zed = c("z", "Z")[z[!is.na(z)]]
@@ -121,8 +121,8 @@ makeFull_ZMatrix <- function(Studies=NULL, GWAS,  ZMatrices="~/ZMatrices", saveF
   if(saveFiles){
     write.table(ZMatrix, file= "Full_ZMatrix.csv", sep=",", row.names=F, quote=F)
     tmp = "The file \"Full_ZMatrix.csv\" has been successfully created \n"
-  Log = c(Log, tmp)
-  if(verbose) print(tmp)
+    Log = c(Log, tmp)
+    if(verbose) print(tmp)
   }
 
   res=list()

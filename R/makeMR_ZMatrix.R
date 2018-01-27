@@ -55,9 +55,17 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
     Zlimit = qnorm(MRthreshold, lower.tail = F)
     SNPsToKeep = apply(ZMatrix[,-c(1:5)], 1, function(x) any(abs(x)>Zlimit))
     ZMatrix=ZMatrix[SNPsToKeep,]
+
+    # check that each study have at least one SNP surviving thresholding
+    StudiesToKeep = apply(ZMatrix[,-c(1:5)], 2, function(x) any(abs(x)>Zlimit))
+    ZMatrix[,colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep] := NULL]
+    tmp = paste0(paste0(colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after thresholding) \n")
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
     tmp = paste0(ncol(ZMatrix)-5, " studies left after thresholding \n")
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
+
     tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific = F), " SNPs left after thresholding \n")
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
@@ -90,6 +98,16 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
     ZMatrixPruned = prune_ZMatrix(ZMatrix, prune.dist = dist, r2.limit=r2)
   }
 
+  # check that each study have at least one SNP surviving pruning
+  StudiesToKeep = apply(ZMatrixPruned[,-c(1:5)], 2, function(x) any(abs(x)>Zlimit))
+  ZMatrixPruned[,colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep] := NULL]
+  tmp = paste0(paste0(colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after pruning) \n")
+  Log = c(Log, tmp)
+  if(verbose) cat(tmp)
+  tmp = paste0(ncol(ZMatrixPruned)-5, " studies left after pruning \n")
+  Log = c(Log, tmp)
+  if(verbose) cat(tmp)
+
   tmp = paste0(format(nrow(ZMatrixPruned), big.mark = ",", scientific = F), " SNPs left after pruning \n")
   Log = c(Log, tmp)
   if(verbose) cat(tmp)
@@ -105,7 +123,7 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
     } else if(grepl("Linux", sessionInfo()$running)){
       GWASData=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5), showProgress = FALSE)
     } else {
-      stop("Only UNIL and MAC OS are supported")
+      stop("Only UNIX and MAC OS are supported")
     }
 
     # no need to check for alignment of alleles, just subset and rename the column
@@ -136,7 +154,7 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
     alt = which(!is.na(alt))
     ref = match(colnames(GWASData),c("a2", "ref", "a0"))
     ref = which(!is.na(ref))
-    z = match(colnames(GWASData),c("z", "Z"))
+    z = match(colnames(GWASData),c("z", "Z", "zscore"))
     z = which(!is.na(z))
 
 

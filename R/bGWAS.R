@@ -5,18 +5,18 @@
 #' bGWAS
 #'
 #' Performs a bayesian GWAS from Summary Statistics, using publicly available results
-#' to calculate the prior effects of the SNPs
+#' to calculate the prior effects of the SNPs and compare it to observed z-scores
 #'
 #'
-#' @param Name The name of your analysis (character)
-#' @param GWAS The path to your conventionnal GWAS of interest or ID of the GWAS from the
+#' @param Name The name of the analysis (character)
+#' @param GWAS The path to the conventionnal GWAS of interest or ID of the GWAS from the
 #'        list of studies availables (prior GWASs) (character or numeric)
 #' @param ZMatrices The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
 #'        (character)
 #' @param PriorStudies The IDs of prior GWASs to use for the analysis, \code{default=NULL},
 #'        will include all the prior GWASs available (numeric vector)
 #' @param ListOfSNPs, The path to a file containing the rsids of the SNPs to use ,
-#'        \code{default=NULL}, will use all the SNPs in  common between prior GWASs and the
+#'        \code{default=NULL}, will use all the SNPs in common between prior GWASs and the
 #'        conventionnal GWAS (character)
 #'              # NOT IMPLEMENTED YET
 #' @param MRthreshold The threshold used to select strong instruments for MR, should be lower
@@ -29,41 +29,59 @@
 #'        \code{default=FALSE}
 #' @param saveFiles A logical indicating if the results should be saved as files,
 #'        \code{default=FALSE}
-#' @param OutPath character, path to the outputs, needed if saveFiles is TRUE, by default, current working dictory
+# #' @param OutPath character, path to the outputs, needed if saveFiles is TRUE, by default,
+# #' current working dictory
 #' @param verbose  A logical indicating if information on progress should be reported,
 #'        \code{default=FALSE}
 #' @details
 #' \code{Name} and \code{GWAS} are required arguments.
 #'
-#' If \code{GWAS} is a path to a file, this file should contain columns SNPID, A1, A2 and Z
-#' (or Beta and SE)
-#' SNPID should be : \code{rs}, \code{rsid}, \code{snp} ...
-#' A1 should be : \code{rs}, \code{rsid}, \code{snp} ...
-#' A2 should be : \code{rs}, \code{rsid}, \code{snp} ...
-#' Z should be : \code{rs}, \code{rsid}, \code{snp} ...
-#' If Z is not present, it can be calculated from BETA and SE, in this case, a temporary gzipped
-#' file is created.
-#' BETA should be : \code{rs}, \code{rsid}, \code{snp} ...
-#' SE should be : \code{rs}, \code{rsid}, \code{snp} ...
+#' If \code{GWAS} is a path to a file (regular or .gz), this file should contain the following
+#' columns :
+#' SNPID (rs numbers) should be : \code{rs}, \code{rsid}, \code{snp}, \code{snpid}, \code{rnpid}
+#' A1 should be : \code{a1}, \code{alt}, \code{alts}
+#' A2 should be : \code{a2}, \code{a0}, \code{ref}
+#' Z should be : \code{z}, \code{Z}, \code{zscore}
+#' If Z is not present, it can be calculated from BETA and SE, in this case, a temporary
+#' gzipped file is created and removed after the analysis.
+#' BETA should be : \code{b}, \code{beta}, \code{beta1}
+#' SE should be : \code{se}, \code{std}
 #'
 #' Z-Matrix files, containing Z-scores for all prior GWASs should be downloaded separately
-#' and stored in the folder specified in \code{ZMatrices}.
-#' ## MORE INFO NEEDED HERE
+#' and stored in \code{"~/ZMatrices"} or in the folder specified in \code{ZMatrices}.
+#' ## MORE INFO NEEDED HERE / HOW TO DOWNLOAD ID (see README)
 #'
 #' Use \code{availableStudies()} to see all the prior GWASs available.
 #' Using one of them as your conventionnal GWAS (\code{GWAS} = numeric ID) will automatically
 #' remove it from the list of prior GWASs used to build the prior.
 #'
-#' Use \code{IncludeStudies()} and \code{ExcludeStudies} to automatically select the studies to be included to build the
-#' prior ((\code{PriorStudies}).
+#' Use \code{IncludeStudies()} and \code{ExcludeStudies} to automatically select the studies to
+#' be included to build the prior ((\code{PriorStudies}).
 #'
 #' Be careful, in the results, all the GWAS (conventional + prior) have been aligned with UK10K
-#' data (some swapped alleles from your initial data)
+#' data (some alleles might be swapped when comparing with the initial data)
 #'
-#' @return An object containing the ... + Files created if saveFiles=T
+#' @return An object containing the significant SNPs + Files created if saveFiles=T
+#' ## DESCRIBE THE FILES
 #'
 #' @examples
-#'
+#' # Permorm bGWAS, using a conventional GWAS from the list of prior GWASs
+#' MyGWAS = 1
+#' listFiles(MyGWAS)
+#' \dontrun{
+#' A = bGWAS(Name = "Test_UsingGWASfromList",
+#'          GWAS = MyGWAS
+#'          verbose=T)
+#'          }
+### TO BE DONE
+#'# Permorm bGWAS, using a small conventional GWAS included in data and selecting a subset of
+#'# studies for the prior
+#' MyGWAS = ""
+#' \dontrun{
+#' B = bGWAS(Name = "Test_UsingSmallGWAS",
+#'          GWAS = MyGWAS
+#'          verbose=T)
+#'          }
 #' @export
 
 
@@ -77,21 +95,27 @@ bGWAS <- function(Name,
                   SignMethod = "p",
                   SignThresh = 10e-8,
                   pruneRes = F,
-                  OutPath = getwd(),
+#                  OutPath = getwd(),
                   saveFiles = F,
                   verbose = F) {
 
 
   InitPath = getwd()
+### TO BE DONE
+  OutPath = getwd() # to be cleaned
+  # depends if we allow the user to run the analysis in another directory
+  # of if we force the use of getwd()
+
   StartTime =  proc.time()
+
+  # used in the main function
+  # automatically re-detected when needed by other sub-functions
   platform = c("Linux", "macOS", "W")[c(grepl("Linux", sessionInfo()$running)
                                            , grepl("macOS", sessionInfo()$running)
                                            , grepl("Windows", sessionInfo()$running))]
   if(platform=="W") stop("Windows is not supported yet")
 
-  # can be useful in the main function ?
-  # automatically detected when needed by other sub-functions
-
+  # initialization of log file
   Log = c()
 
   tmp = paste0("<<< Preparation of analysis >>> \n")
@@ -172,12 +196,12 @@ bGWAS <- function(Name,
     # how to deal with multiple rsid / snpid columns ???
     # here, we don't care, we need at least one
     tmp = paste0("   SNPID column, ok")
-    if(all(!HeaderGWAS %in% c("a1", "alts"))) stop("GWAS : no ALT column")
+    if(all(!HeaderGWAS %in% c("a1", "alts", "alt"))) stop("GWAS : no ALT column")
     tmp = c(tmp, paste0("ALT column, ok"))
     if(all(!HeaderGWAS %in% c("a2", "a0", "ref"))) stop("GWAS : no REF column")
     tmp = c(tmp, paste0("REF column, ok"))
     TMP_FILE = F # flag : is a temporary file with Z-scores created ??
-    if(all(!HeaderGWAS %in% c("z", "Z"))){
+    if(all(!HeaderGWAS %in% c("z", "Z", "zscore"))){
       # allow for beta + se to calculate Z ???
       if(!all(!HeaderGWAS %in% c("b", "beta", "beta1")) & !all(!HeaderGWAS %in% c("se", "std"))){
         # if beta + se : read the data
@@ -205,7 +229,7 @@ bGWAS <- function(Name,
         GWAS = TMP_Name
         # flag the created file
         TMP_FILE = T
-        tmp = c(tmp, paste0("Z column, created"))
+        tmp = c(tmp, paste0("Z column, created \n"))
       } else {
         stop("GWAS : no Z-SCORE column")
       }
@@ -263,8 +287,10 @@ bGWAS <- function(Name,
      if(verbose) cat(tmp)
   }
 
+### TO BE DONE
   ## ListOfSNPs
   # We should have at least XX SNPs / check Linux-MAC for Zcat
+  # Also check the number or SNPs in common in the file if ListOfSNPs not specified ?
   if(!is.null(ListOfSNPs)){
     if(!is.character(ListOfSNPs)) stop("ListOfSNPs : non character")
     OurSNPsMR = data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=1, showProgress = FALSE)
@@ -283,9 +309,6 @@ bGWAS <- function(Name,
 
   # Go into the analysis' directory
   setwd(Dir)
-
-
-
 
 
   ### 1 : create "Summarize_file" ###
@@ -401,9 +424,11 @@ bGWAS <- function(Name,
   rm(ZMatrix, envir = .GlobalEnv)
   # if saveFiles=F, remove all the created files (normally no file created) but temporary folder !
   if(!saveFiles)  system(paste0("rm -rf ", Name))
-  if(saveFiles & TMP_FILE){
-    system(paste0("rm ",
-                 strsplit(GWAS, "/")[[1]][length(strsplit(GWAS, "/")[[1]])]))
+  if(TMP_FILE){
+    system(paste0("rm ", GWAS))
+    tmp = paste0("The temporary file \"", GWAS, "\" has been deleted \n")
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
   }
 
   ### write Log File ###
