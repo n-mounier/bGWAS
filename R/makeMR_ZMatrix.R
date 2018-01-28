@@ -12,7 +12,8 @@
 #' @return Log file and pruned Z-Matrix of MR instrument + create a file if saveFiles=T
 #' @export
 
-makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/ZMatrices", saveFiles=F, verbose=F) {
+makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
+                           MRthreshold=10e-5, path="~/ZMatrices", saveFiles=F, verbose=F) {
   Log = c()
   tmp = paste0("# Loading the ZMatrix... \n")
   Log = c(Log, tmp)
@@ -47,11 +48,12 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS, MRthreshold=10e-5, path="~/Z
   Log = c(Log, tmp)
   if(verbose) cat(tmp)
 
-  # select based on threshold if different from 1e- 5and removed rows without any Z-Score ok
-  if(MRthreshold != 10e-5 ){
+  # select based on threshold if different from 1e-5 and removed rows without any Z-Score ok
+  if(MRthreshold != 1e-5 ){
     tmp = paste0("# Thresholding... \n")
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
+
     Zlimit = qnorm(MRthreshold, lower.tail = F)
     SNPsToKeep = apply(ZMatrix[,-c(1:5)], 1, function(x) any(abs(x)>Zlimit))
     ZMatrix=ZMatrix[SNPsToKeep,]

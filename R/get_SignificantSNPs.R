@@ -10,7 +10,7 @@
 #' @param Prior from the function request_BFandP()
 #'
 #' @return Log + data.table containing rs-chr-pos-alt-ref-obs-fit-se-...
-#'
+#' @export
 # Function not exported, no need of extended documentation?
 
 
