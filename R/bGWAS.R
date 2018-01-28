@@ -111,8 +111,8 @@ bGWAS <- function(Name,
   # used in the main function
   # automatically re-detected when needed by other sub-functions
   platform = c("Linux", "macOS", "W")[c(grepl("Linux", sessionInfo()$running)
-                                           , grepl("macOS", sessionInfo()$running)
-                                           , grepl("Windows", sessionInfo()$running))]
+                                        , grepl("macOS", sessionInfo()$running)
+                                        , grepl("Windows", sessionInfo()$running))]
   if(platform=="W") stop("Windows is not supported yet")
 
   # initialization of log file
@@ -126,6 +126,8 @@ bGWAS <- function(Name,
   tmp = paste0("> Checking parameters \n")
   Log = c(Log, tmp)
   if(verbose) cat(tmp)
+
+  if(!is.logical(verbose)) stop("verbose : should be logical")
 
 
   ## Name of analysis
@@ -218,6 +220,8 @@ bGWAS <- function(Name,
         # keep only relevant column to save space
         DataGWAS = DataGWAS[,c(HeaderGWAS[HeaderGWAS %in% c("rsid", "snpid", "snp", "rnpid", "rs")][1], # SNPID, order by relevance :
                                # if there is an "rsid" and a "snpid" -> choose "rsid" !
+                               # order potential column names from the most likely to
+                               # the least likely, so we chose the "right one" here
                                HeaderGWAS[HeaderGWAS %in% c("a1", "alts")], # ALT
                                HeaderGWAS[HeaderGWAS %in% c("a2", "a0", "ref")], # REF
                                "Z"), # Z
@@ -247,6 +251,8 @@ bGWAS <- function(Name,
       if(verbose) cat(tmp)
     }
   }
+
+### TO BE DONE
   ## OutPath, check that the directory exist. Create it if necessary ?
   if(is.null(OutPath)) OutPath = getwd()
   if(!dir.exists(OutPath)) stop("OutPath : the directory does not exist")
@@ -255,6 +261,7 @@ bGWAS <- function(Name,
   Log = c(Log, tmp)
   if(verbose) cat(tmp)
 
+  ## saveFiles
   if(!is.logical(saveFiles)) stop("saveFiles should be logical")
   if(saveFiles){
     tmp = paste0("Files will be saved in: \"", OutPath, "/", Name, "\".  \n")
@@ -266,26 +273,7 @@ bGWAS <- function(Name,
     if(verbose) cat(tmp)
   }
 
-  ## MRthreshold -> should not be larger than 10-5, can only be more stringent
-  if(!is.numeric(MRthreshold)) stop("MRthreshold : non-numeric argument")
-  if(MRthreshold>10^5) stop("MRthreshold : superior to the threshold limit (10^-5)")
 
-  tmp = paste0("The p-value threshold used for selecting MR instruments is: ", format(MRthreshold, scientific = T), ".  \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
-
-  ## PriorStudies
-  # check that all the files required exist in our list of studies
-  # should be specified as "File ID"
-  if(is.null(PriorStudies)) PriorStudies = c(1:length(listFiles()))
-  if(!all(PriorStudies %in% c(1:length(listFiles())))) stop("PriorStudies : all the IDs provided should belong to the ones available")
-  # if GWAS from data, make sure to remove it
-  if(is.numeric(GWAS) && GWAS %in% PriorStudies){
-     PriorStudies = PriorStudies[-GWAS]
-     tmp = paste0("The study ", listFiles(ID=GWAS), " (ID=", GWAS, ") has been removed from the studies used to build the prior since it is used as conventionnal GWAS. \n")
-     Log = c(Log, tmp)
-     if(verbose) cat(tmp)
-  }
 
 ### TO BE DONE
   ## ListOfSNPs
@@ -303,8 +291,61 @@ bGWAS <- function(Name,
     tmp = c(tmp, paste0(commonAll, " can be used to compute prior \n"))
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
-    }
+  }
 
+
+  ## PriorStudies
+  # check that all the files required exist in our list of studies
+  # should be specified as "File ID"
+  if(is.null(PriorStudies)) PriorStudies = c(1:length(listFiles()))
+  if(!all(PriorStudies %in% c(1:length(listFiles())))) stop("PriorStudies : all the IDs provided should belong to the ones available")
+  # if GWAS from data, make sure to remove it
+  if(is.numeric(GWAS) && GWAS %in% PriorStudies){
+    PriorStudies = PriorStudies[-GWAS]
+    tmp = paste0("The study ", listFiles(ID=GWAS), " (ID=", GWAS, ") has been removed from the studies used to build the prior since it is used as conventionnal GWAS. \n")
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
+### TO BE DONE
+    # check that the user did not use exactly the same study for GWAS and for Prior,
+    # in this case the prior study is removed here...
+  }
+
+
+  ## MRthreshold -> should not be larger than 10-5, can only be more stringent
+  if(!is.numeric(MRthreshold)) stop("MRthreshold : non-numeric argument")
+  if(MRthreshold>10^5) stop("MRthreshold : superior to the threshold limit (10^-5)")
+
+  tmp = paste0("The p-value threshold used for selecting MR instruments is: ", format(MRthreshold, scientific = T), ".  \n")
+  Log = c(Log, tmp)
+  if(verbose) cat(tmp)
+
+
+  ## SignMethod -> should not be "p" or "fdr"
+  if(!SignMethod %in% c("p", "fdr")) stop("SignMethod : method not accepted, should be p or fdr")
+
+  ## SignThresh -> should be numeric and lower (or equal) to 1
+  if(!is.numeric(SignThresh)) stop("SignThresh : non numeric threshold")
+  if(SignThresh>1) stop("SignThresh : a threshold higher than 1 does not make sense")
+
+  if(SignMethod=="p"){
+    tmp = paste0("Significant SNPs will be identified according to p-value. The threshold used is :",
+                 format(SignThresh, scientific = T), ".  \n")
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
+  } elseif(SignMethod=="fdr"){
+    tmp = paste0("Significant SNPs will be identified according to FDR. The threshold used is :",
+                 format(SignThresh, scientific = T), ".  \n")
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
+  }
+
+  ## pruneRes
+  if(is.logical(pruneRes)) stop("pruneRes : should be logical")
+  if(logical){
+    tmp = "Significant SNPs will be pruned (distance pruning, 500kb) \n"
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
+  }
 
 
   # Go into the analysis' directory
