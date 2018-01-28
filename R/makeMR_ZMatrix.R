@@ -49,12 +49,13 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
   if(verbose) cat(tmp)
 
   # select based on threshold if different from 1e-5 and removed rows without any Z-Score ok
+  Zlimit = qnorm(MRthreshold, lower.tail = F)
+
   if(MRthreshold != 1e-5 ){
     tmp = paste0("# Thresholding... \n")
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
 
-    Zlimit = qnorm(MRthreshold, lower.tail = F)
     SNPsToKeep = apply(ZMatrix[,-c(1:5)], 1, function(x) any(abs(x)>Zlimit))
     ZMatrix=ZMatrix[SNPsToKeep,]
 
@@ -74,6 +75,7 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
   } else {
+
     tmp = paste0("No thresholding needed... \n")
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
