@@ -23,7 +23,7 @@
 #'        than 1e-5, \code{default=1e-5} (numeric)
 #' @param SignMethod The method used to identify significant SNPs, should be \code{"p"} for
 #'        p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)
-#' @param SignThresh The threshold used to identify significant SNPs, \code{default="5e-8"}
+#' @param SignThresh The threshold used to identify significant SNPs, \code{default="5.10e-8"}
 #'        (numeric)
 #' @param pruneRes A logical indicating if the results should be pruned (by distance, 500kb),
 #'        \code{default=FALSE}
@@ -77,6 +77,7 @@
 #'# Permorm bGWAS, using a small conventional GWAS included in data and selecting a subset of
 #'# studies for the prior
 #' MyGWAS = ""
+#' MyStudies = selectStudies()
 #' \dontrun{
 #' B = bGWAS(Name = "Test_UsingSmallGWAS",
 #'          GWAS = MyGWAS
@@ -93,7 +94,7 @@ bGWAS <- function(Name,
                   ListOfSNPs = NULL,
                   MRthreshold = 1e-5,
                   SignMethod = "p",
-                  SignThresh = 10e-8,
+                  SignThresh = 5*10e-8,
                   pruneRes = F,
 #                  OutPath = getwd(),
                   saveFiles = F,
@@ -332,7 +333,7 @@ bGWAS <- function(Name,
                  format(SignThresh, scientific = T), ".  \n")
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
-  } elseif(SignMethod=="fdr"){
+  } else if(SignMethod=="fdr"){
     tmp = paste0("Significant SNPs will be identified according to FDR. The threshold used is :",
                  format(SignThresh, scientific = T), ".  \n")
     Log = c(Log, tmp)

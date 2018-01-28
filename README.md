@@ -6,7 +6,9 @@
 ## Overview
 [//]:-------------------------------
 
-bGWAS is an package to perform a bayesian GWAS, using summary statistics. It compares the observed Z-score from a conventional GWAS to a prior z-score, calculated from prior GWASs publicly available (currently, a set of 58 studies, to be updated).
+bGWAS is ann R-package to perform a bayesian GWAS, using summary statistics. It compares the observed Z-score from a conventional GWAS to a prior z-score, calculated from prior GWASs publicly available (currently, a set of 58 studies, to be updated).   
+Observed Z-scores and priors are compared using Bayes Factors, and empirical p-values are calculated using a permutation approach.   
+
 
 -   `bGWAS()` ...
 -   `availableStudies()` ...

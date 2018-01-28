@@ -4,29 +4,36 @@
 \alias{selectStudies}
 \title{selectStudies}
 \usage{
-selectStudies(Files = NULL, Traits = NULL, Consortia = NULL,
-  verbose = F)
+selectStudies(includeFiles = NULL, includeTraits = NULL,
+  includeConsortia = NULL, excludeFiles = NULL, excludeTraits = NULL,
+  excludeConsortia = NULL, verbose = F)
 }
 \arguments{
+\item{includeFiles}{list of file names}
+
+\item{includeTraits}{list of trait}
+
+\item{excludeFiles}{list of file names}
+
+\item{excludeTraits}{list of trait}
+
 \item{verbose}{boolean}
 
-\item{ListOfStudies}{ID of the studies, by default, use all the studies in availableStudies()}
+\item{includeConsortium}{vector, list of consortium ### TO BE DONE}
 
-\item{File}{list of file names}
-
-\item{Trait}{list of trait}
-
-\item{Consortium}{vector, list of consortium}
+\item{excludeConsortium}{vector, list of consortium ### TO BE DONE}
 }
 \value{
-List of studies that meet the criteria
+IDs of studies that meet the criteria
 }
 \description{
-Allow the quick selection of a subset of studies for prior based on 3 criteria
+Allow the quick selection of a subset of studies for prior based on 3 criteria. First, include all the files
+specified (if all including parameters are NULL, include all studies), and then remove all the files specified
+(if all excluding parameters are NULL, keep all studies included at the step before)
 }
 \examples{
   AllStudies = availableStudies()
   listTraits()
-  MyStudies = selectStudies(Traits=c("Heart Rate", "Body mass index", "Smoking"))
-  AllStudies[AllStudies$ID == MyStudies, ]
+  MyStudies = selectStudies(includeTraits=c("Heart Rate", "Body mass index", "Smoking"))
+  #AllStudies[AllStudies$ID == MyStudies, ]
 }

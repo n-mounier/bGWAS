@@ -13,7 +13,7 @@ get_SignificantSNPs(Prior, SignMethod = "p", SignThresh = 5e-08,
 \item{SignMethod}{The method used to identify significant SNPs, should be \code{"p"} for
 p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)}
 
-\item{SignThresh}{The threshold used to identify significant SNPs, \code{default="5e-8"}
+\item{SignThresh}{The threshold used to identify significant SNPs, \code{default="5.10e-8"}
 (numeric)}
 
 \item{pruneRes}{A logical indicating if the results should be pruned (by distance, 500kb),

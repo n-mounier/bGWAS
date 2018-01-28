@@ -6,6 +6,9 @@
 \usage{
 listFiles(IDs = NULL, verbose = F)
 }
+\arguments{
+\item{IDs}{The IDs of the files to be listed, by default=NULL, list all files (numeric)}
+}
 \value{
 List of files
 }

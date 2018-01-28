@@ -6,7 +6,7 @@
 \usage{
 bGWAS(Name, GWAS, ZMatrices = NULL, PriorStudies = NULL,
   ListOfSNPs = NULL, MRthreshold = 1e-05, SignMethod = "p",
-  SignThresh = 1e-07, pruneRes = F, saveFiles = F, verbose = F)
+  SignThresh = 5 * 1e-07, pruneRes = F, saveFiles = F, verbose = F)
 }
 \arguments{
 \item{Name}{The name of the analysis (character)}
@@ -31,7 +31,7 @@ than 1e-5, \code{default=1e-5} (numeric)}
 \item{SignMethod}{The method used to identify significant SNPs, should be \code{"p"} for
 p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)}
 
-\item{SignThresh}{The threshold used to identify significant SNPs, \code{default="5e-8"}
+\item{SignThresh}{The threshold used to identify significant SNPs, \code{default="5.10e-8"}
 (numeric)}
 
 \item{pruneRes}{A logical indicating if the results should be pruned (by distance, 500kb),
@@ -91,6 +91,7 @@ A = bGWAS(Name = "Test_UsingGWASfromList",
 # Permorm bGWAS, using a small conventional GWAS included in data and selecting a subset of
 # studies for the prior
 MyGWAS = ""
+MyStudies = selectStudies()
 \dontrun{
 B = bGWAS(Name = "Test_UsingSmallGWAS",
          GWAS = MyGWAS
