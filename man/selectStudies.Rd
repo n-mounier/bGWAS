@@ -35,5 +35,5 @@ specified (if all including parameters are NULL, include all studies), and then 
   AllStudies = availableStudies()
   listTraits()
   MyStudies = selectStudies(includeTraits=c("Heart Rate", "Body mass index", "Smoking"))
-  #AllStudies[AllStudies$ID == MyStudies, ]
+  #AllStudies[AllStudies$ID \%in\% MyStudies, ]
 }

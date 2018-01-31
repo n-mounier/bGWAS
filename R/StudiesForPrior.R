@@ -76,7 +76,7 @@ listConsortia <- function(verbose=F) {
 #'   AllStudies = availableStudies()
 #'   listTraits()
 #'   MyStudies = selectStudies(includeTraits=c("Heart Rate", "Body mass index", "Smoking"))
-#'   #AllStudies[AllStudies$ID == MyStudies, ]
+#'   #AllStudies[AllStudies$ID %in% MyStudies, ]
 #' @export
 
 

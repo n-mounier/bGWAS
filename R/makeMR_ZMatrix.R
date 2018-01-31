@@ -13,7 +13,7 @@
 #' @export
 
 makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
-                           MRthreshold=10e-5, path="~/ZMatrices", saveFiles=F, verbose=F) {
+                           MRthreshold=1e-5, path="~/ZMatrices", saveFiles=F, verbose=F) {
   Log = c()
   tmp = paste0("# Loading the ZMatrix... \n")
   Log = c(Log, tmp)
@@ -62,8 +62,8 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
     # check that each study have at least one SNP surviving thresholding
     StudiesToKeep = apply(ZMatrix[,-c(1:5)], 2, function(x) any(abs(x)>Zlimit))
     if(!all(StudiesToKeep)){
-      ZMatrix[,colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep] := NULL]
       tmp = paste0(paste0(colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after thresholding) \n")
+      ZMatrix[,colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep] := NULL]
       Log = c(Log, tmp)
     }
     if(verbose) cat(tmp)
@@ -104,11 +104,11 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
     ZMatrixPruned = prune_ZMatrix(ZMatrix, prune.dist = dist, r2.limit=r2)
   }
 
-  # check that each study have at least one SNP surviving pruning
+    # check that each study have at least one SNP surviving pruning
   StudiesToKeep = apply(ZMatrixPruned[,-c(1:5)], 2, function(x) any(abs(x)>Zlimit))
   if(!all(StudiesToKeep)){
-    ZMatrixPruned[,colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep] := NULL]
     tmp = paste0(paste0(colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after pruning) \n")
+    ZMatrixPruned[,colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep] := NULL]
     Log = c(Log, tmp)
   }
   if(verbose) cat(tmp)
@@ -193,6 +193,20 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
   tmp = paste0(format(nrow(ZMatrixPruned), big.mark = ",", scientific=F), " SNPs in common between prior studies and the conventional GWAS \n")
   Log = c(Log, tmp)
   if(verbose) cat(tmp)
+
+  StudiesToKeep = apply(ZMatrixPruned[,-c(1:5)], 2, function(x) any(abs(x)>Zlimit))
+  # always keep the conventionnal GWAS no matter the values
+  StudiesToKeep[length(StudiesToKeep)]=TRUE
+  if(!all(StudiesToKeep)){
+    tmp = paste0(paste0(colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument in common) \n")
+    ZMatrixPruned[,colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep] := NULL]
+    Log = c(Log, tmp)
+  }
+  if(verbose) cat(tmp)
+  tmp = paste0(ncol(ZMatrixPruned)-6, " studies left after combining with conventional GWAS \n")
+  Log = c(Log, tmp)
+  if(verbose) cat(tmp)
+
 
   # write Pruned ZMatrix
   if(saveFiles){

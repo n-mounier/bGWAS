@@ -6,7 +6,8 @@
 \usage{
 bGWAS(Name, GWAS, ZMatrices = NULL, PriorStudies = NULL,
   ListOfSNPs = NULL, MRthreshold = 1e-05, SignMethod = "p",
-  SignThresh = 5 * 1e-07, pruneRes = F, saveFiles = F, verbose = F)
+  SignThresh = 5 * 1e-07, pruneRes = FALSE, saveFiles = FALSE,
+  verbose = FALSE)
 }
 \arguments{
 \item{Name}{The name of the analysis (character)}
@@ -55,29 +56,30 @@ to calculate the prior effects of the SNPs and compare it to observed z-scores
 \code{Name} and \code{GWAS} are required arguments.
 
 If \code{GWAS} is a path to a file (regular or .gz), this file should contain the following
-columns :
-SNPID (rs numbers) should be : \code{rs}, \code{rsid}, \code{snp}, \code{snpid}, \code{rnpid}
-A1 should be : \code{a1}, \code{alt}, \code{alts}
-A2 should be : \code{a2}, \code{a0}, \code{ref}
-Z should be : \code{z}, \code{Z}, \code{zscore}
+columns : \cr
+SNPID (rs numbers) should be : \code{rs}, \code{rsid}, \code{snp}, \code{snpid}, \code{rnpid} \cr
+A1 should be : \code{a1}, \code{alt}, \code{alts} \cr
+A2 should be : \code{a2}, \code{a0}, \code{ref} \cr
+Z should be : \code{z}, \code{Z}, \code{zscore} \cr
 If Z is not present, it can be calculated from BETA and SE, in this case, a temporary
-gzipped file is created and removed after the analysis.
-BETA should be : \code{b}, \code{beta}, \code{beta1}
-SE should be : \code{se}, \code{std}
+gzipped file is created and removed after the analysis. \cr
+BETA should be : \code{b}, \code{beta}, \code{beta1} \cr
+SE should be : \code{se}, \code{std} \cr
 
 Z-Matrix files, containing Z-scores for all prior GWASs should be downloaded separately
-and stored in \code{"~/ZMatrices"} or in the folder specified in \code{ZMatrices}.
-## MORE INFO NEEDED HERE / HOW TO DOWNLOAD ID (see README)
+and stored in \code{"~/ZMatrices"} or in the folder specified with the argument
+\code{ZMatrices}. \cr
+## MORE INFO NEEDED HERE / HOW TO DOWNLOAD ID (see GitHub README)
 
-Use \code{availableStudies()} to see all the prior GWASs available.
-Using one of them as your conventionnal GWAS (\code{GWAS} = numeric ID) will automatically
+Use \code{\link{availableStudies}()} to see all the prior GWASs available.
+Using one of them as your conventionnal GWAS (argument \code{GWAS} = numeric ID) will automatically
 remove it from the list of prior GWASs used to build the prior.
 
-Use \code{IncludeStudies()} and \code{ExcludeStudies} to automatically select the studies to
-be included to build the prior ((\code{PriorStudies}).
+Use \code{\link{selectStudies}()} to automatically select the studies to
+be included/excluded when building the prior (argument \code{PriorStudies}).
 
-Be careful, in the results, all the GWAS (conventional + prior) have been aligned with UK10K
-data (some alleles might be swapped when comparing with the initial data)
+Be careful, in the results, all the GWAS (conventional + prior) are aligned with UK10K
+data for the analysis (some alleles might be swapped when comparing with the initial data)
 }
 \examples{
 # Permorm bGWAS, using a conventional GWAS from the list of prior GWASs
@@ -90,11 +92,13 @@ A = bGWAS(Name = "Test_UsingGWASfromList",
          }
 # Permorm bGWAS, using a small conventional GWAS included in data and selecting a subset of
 # studies for the prior
-MyGWAS = ""
-MyStudies = selectStudies()
+MyGWAS = system.file("Data/SmallGWAS_Pilling2017.csv", package="bGWAS")
+MyStudies = selectStudies(includeTraits=c("Type 2 diabetes", "Smoking"),
+                         includeFiles=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
 \dontrun{
 B = bGWAS(Name = "Test_UsingSmallGWAS",
-         GWAS = MyGWAS
+         GWAS = MyGWAS,
+         PriorStudies=MyStudies,
          verbose=T)
          }
 }

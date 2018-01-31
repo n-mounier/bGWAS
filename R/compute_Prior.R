@@ -115,6 +115,14 @@ compute_Prior <- function(SelectedStudies, MR_ZMatrix, All_ZMatrix, saveFiles=FA
     tmp = paste0("   Chromosome ", chrm, "\n")
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
+
+    if(is.na(table(All_ZMatrix$chrm)[chrm])){
+      tmp = "No SNP on this chromosome \n"
+      Log = c(Log, tmp)
+      if(verbose) cat(tmp)
+      next
+    }
+
     # create the dataset without this chromosome
     train    =   MR_ZMatrix$chrm != chrm
     d_masked = MR_ZMatrix[train,,drop=F]

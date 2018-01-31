@@ -4,7 +4,7 @@
 \alias{makeMR_ZMatrix}
 \title{Create pruned Z-matrix of MR instruments}
 \usage{
-makeMR_ZMatrix(PriorStudies = NULL, GWAS, MRthreshold = 1e-04,
+makeMR_ZMatrix(PriorStudies = NULL, GWAS, MRthreshold = 1e-05,
   path = "~/ZMatrices", saveFiles = F, verbose = F)
 }
 \arguments{
