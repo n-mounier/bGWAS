@@ -107,18 +107,22 @@ get_SignificantSNPs <- function(Prior, SignMethod="p", SignThresh=5e-8, pruneRes
 
       }
     }
+    # select Significant SNPs
+    SignifSNPs = PriorThr[PriorThr$rs %in% accepted.snps,]
+
+    tmp = paste0(format(nrow(SignifSNPs), big.mark = ",", scientific = F), " SNPs left \n")
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
+
+    tmp = "Done! \n"
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
+  } else {
+    SignifSNPs = PriorThr
   }
 
-  # select Significant SNPs
-  SignifSNPs = PriorThr[PriorThr$rs %in% accepted.snps,]
 
-  tmp = paste0(format(nrow(SignifSNPs), big.mark = ",", scientific = F), " SNPs left \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
 
-  tmp = "Done! \n"
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
 
   if(saveFiles){
     write.table(ZMatrix, file= "SignificantSNPs.csv", sep=",", row.names=F, quote=F)

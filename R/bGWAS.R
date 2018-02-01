@@ -240,7 +240,6 @@ bGWAS <- function(Name,
         GWAS = TMP_Name
         # flag the created file
         TMP_FILE = T
-        tmp = c(tmp, paste0("Z column, created \n"))
       } else {
         stop("GWAS : no Z-SCORE column")
       }
