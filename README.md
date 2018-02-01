@@ -72,7 +72,8 @@ A = bGWAS(Name = "Test_UsingGWASfromList",
 # Using a small GWAS (400,00 SNPs, Pilling et al data)
 # Using only specific traits / files (resulting in 9 GWASs included)
 MyGWAS = system.file("Data/SmallGWAS_Pilling2017.csv", package="bGWAS")
-MyStudies = selectStudies(includeTraits=c("Type 2 diabetes", "Smoking"),                  includeFiles=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
+MyStudies = selectStudies(includeTraits=c("Type 2 diabetes", "Smoking"),    
+                          includeFiles=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
 listFiles(MyStudies)
  
 B = bGWAS(Name = "Test_UsingSmallGWAS",
