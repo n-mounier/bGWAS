@@ -56,13 +56,16 @@
 #' Using one of them as your conventionnal GWAS (argument \code{GWAS} = numeric ID) will automatically
 #' remove it from the list of prior GWASs used to build the prior.
 #'
-#' Use \code{\link{selectStudies}()} to automatically select the studies to
+#' Usec\link{selectStudies}()} to automatically select the studies to
 #' be included/excluded when building the prior (argument \code{PriorStudies}).
 #'
 #' Be careful, in the results, all the GWAS (conventional + prior) are aligned with UK10K
 #' data for the analysis (some alleles might be swapped when comparing with the initial data)
 #'
-#' @return An object containing the significant SNPs + Files created if saveFiles=T
+#' @return An data.table containing the significant SNPs (...) + log file saved in working directory
+#' if saveFiles=T, additional files containing the Z-Matrices used (for MR / to build the prior), the
+#' coefficents from the regression, the BF and p-values estimated for all SNPs / subset for significant
+#' SNPs are created
 #' ## DESCRIBE THE FILES
 #'
 #'
@@ -142,13 +145,16 @@ bGWAS <- function(Name,
   Log = c(Log, tmp)
   if(verbose) cat(tmp)
   ### create the directory to store the results ###
+
   Dir = file.path(OutPath, Name)
+
   #  if the directory already exists : error
   if(file.exists(file.path(OutPath, paste0(Name, ".Log")))) stop("You already run an analysis with the same name in that directory,
                                                     please specify another name or choose another directory to run the analysis")
-  ifelse(!dir.exists(Dir), dir.create(Dir), stop("You already run an analysis with the same name in that directory,
+  if(saveFiles){
+    ifelse(!dir.exists(Dir), dir.create(Dir), stop("You already run an analysis with the same name in that directory,
                                                  please specify another name or choose another directory to run the analysis"))
-
+  }
 
 
   ## ZMatrices
@@ -234,7 +240,6 @@ bGWAS <- function(Name,
         # write the data (as tar.gz) and change GWAS name to the created file
         # but save it in the current folder, no initial one
         TMP_Name = paste0(gsub(".gz", "",  paste0(getwd(), "/", strsplit(GWAS, "/")[[1]][length(strsplit(GWAS, "/")[[1]])])), "_withZ.gz")
-        print(TMP_Name)
         write.table(DataGWAS, file=gzfile(TMP_Name), sep="\t",
                     quote=F, row.names=F)
         GWAS = TMP_Name
@@ -313,7 +318,7 @@ bGWAS <- function(Name,
     if(verbose) cat(tmp)
 ### TO BE DONE
     # check that the user did not use exactly the same study for GWAS and for Prior,
-    # in this case the prior study is removed here...
+    # in this case the prior study is removed here... and we don't have any study left
   }
 
 
@@ -355,26 +360,29 @@ bGWAS <- function(Name,
 
 
   # Go into the analysis' directory
-  setwd(Dir)
-
+  if(saveFiles){
+    setwd(Dir)
+  }
 
   ### 1 : create "Summarize_file" ###
 
-  tmp = paste0("# Removing unused GWAS (if necessary?) and reading the summary information files of the studies used  \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  if(saveFiles){
+    tmp = paste0("# Removing unused GWAS (if necessary?) and reading the summary information files of the studies used  \n")
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
 
-  Files_Info = availableStudies()
-  Files_Info = Files_Info[Files_Info$ID %in% PriorStudies, ]
+    Files_Info = availableStudies()
+    Files_Info = Files_Info[Files_Info$ID %in% PriorStudies, ]
 
-  write.table(Files_Info, file=paste0(Dir, "/Summarize_file.csv"), sep=",", quote=F, row.names=F )
-  # -> make it nicer, reusable by the user
-  # wait to write it and add info ?
-  # one column name / one column trait / one column Ref / one column Cohort ?
+    write.table(Files_Info, file=paste0(Dir, "/Summarize_file.csv"), sep=",", quote=F, row.names=F )
+    # -> make it nicer, reusable by the user
+    # wait to write it and add info ?
+    # one column name / one column trait / one column Ref / one column Cohort ?
 
-  tmp = paste0("List of files : ", Dir, "/SummarizeFiles.csv has been successfully created.  \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+    tmp = paste0("List of files : ", Dir, "/SummarizeFiles.csv has been successfully created.  \n")
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
+  }
 
   # 2 : Z-Matrix for MR
   Log = c(Log, "", "")
@@ -466,11 +474,11 @@ bGWAS <- function(Name,
   Log = c(Log, tmp)
   if(verbose) cat(tmp)
 
-
-  setwd(InitPath)
+  if(saveFiles){
+    setwd(InitPath)
+  }
   rm(ZMatrix, envir = .GlobalEnv)
-  # if saveFiles=F, remove all the created files (normally no file created) but temporary folder !
-  if(!saveFiles)  system(paste0("rm -rf ", Name))
+
   if(TMP_FILE){
     system(paste0("rm ", GWAS))
     tmp = paste0("The temporary file \"", GWAS, "\" has been deleted \n")

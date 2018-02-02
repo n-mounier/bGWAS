@@ -19,6 +19,13 @@ Observed Z-scores and priors are compared using Bayes Factors, and empirical p-v
 ## Installation
 [//]:-------------------------------
 
+
+* Download Z-Matrix files : 
+`wget --no-check-certificate https://drive.switch.ch/index.php/s/pxZsWY88RSDsO8K/download -O ZMatrices.tar.gz`    
+`tar xzvf ZMatrices.tar.gz`
+Size ~ 2.09 GB   
+  
+
 * Install R-package
 ``` r
 # Directly install the package from github
@@ -26,9 +33,6 @@ Observed Z-scores and priors are compared using Bayes Factors, and empirical p-v
 devtools::install_github("n-mounier/bGWAS")
 ```
 
-* Download Z-Matrix files   
-`wget --no-check-certificate https://drive.switch.ch/index.php/s/pxZsWY88RSDsO8K/download -O ZMatrices.tar.gz`    
-`tar xzvf ZMatrices.tar.gz`
 
 ## Usage
 [//]:-------------------------------
@@ -86,20 +90,23 @@ B = bGWAS(Name = "Test_UsingSmallGWAS",
 ## Runtime
 [//]:-------------------------------
 
-Analysis using all the 58 prior GWASs available, for a conventionnal GWAS containing ~7M SNPs in common with the prior studies : 145 minutes.
+Analysis using all the 58 prior GWASs available, for a conventionnal GWAS containing ~7M SNPs in common with the prior studies ~ 145 minutes.
 
-Analysis using 9 prior GWASs, for a conventionnal GWAS containtin 400,000 SNPs in commons with prior studies (example B) : 9 minutes
+Analysis using 9 prior GWASs, for a conventionnal GWAS containtin 400,000 SNPs in commons with prior studies (example B) ~ 8 minutes
 
 
 ## Improvements to be implemented
 [//]:-------------------------------
 
 document results files    
+
 bGWASfromPrior()    
+
 selection from consortium    
 use of a subset of SNPs   
 use of re-imputed studies for prior   
 use of additional studies for prior   
+
 optimize null-BF calculation
 
 

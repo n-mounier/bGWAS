@@ -45,41 +45,15 @@ p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)
 \code{default=FALSE}}
 }
 \value{
-An object containing the significant SNPs + Files created if saveFiles=T
+An data.table containing the significant SNPs (...) + log file saved in working directory
+if saveFiles=T, additional files containing the Z-Matrices used (for MR / to build the prior), the
+coefficents from the regression, the BF and p-values estimated for all SNPs / subset for significant
+SNPs are created
 ## DESCRIBE THE FILES
 }
 \description{
 Performs a bayesian GWAS from Summary Statistics, using publicly available results
 to calculate the prior effects of the SNPs and compare it to observed z-scores
-}
-\details{
-\code{Name} and \code{GWAS} are required arguments.
-
-If \code{GWAS} is a path to a file (regular or .gz), this file should contain the following
-columns : \cr
-SNPID (rs numbers) should be : \code{rs}, \code{rsid}, \code{snp}, \code{snpid}, \code{rnpid} \cr
-A1 should be : \code{a1}, \code{alt}, \code{alts} \cr
-A2 should be : \code{a2}, \code{a0}, \code{ref} \cr
-Z should be : \code{z}, \code{Z}, \code{zscore} \cr
-If Z is not present, it can be calculated from BETA and SE, in this case, a temporary
-gzipped file is created and removed after the analysis. \cr
-BETA should be : \code{b}, \code{beta}, \code{beta1} \cr
-SE should be : \code{se}, \code{std} \cr
-
-Z-Matrix files, containing Z-scores for all prior GWASs should be downloaded separately
-and stored in \code{"~/ZMatrices"} or in the folder specified with the argument
-\code{ZMatrices}. \cr
-## MORE INFO NEEDED HERE / HOW TO DOWNLOAD ID (see GitHub README)
-
-Use \code{\link{availableStudies}()} to see all the prior GWASs available.
-Using one of them as your conventionnal GWAS (argument \code{GWAS} = numeric ID) will automatically
-remove it from the list of prior GWASs used to build the prior.
-
-Use \code{\link{selectStudies}()} to automatically select the studies to
-be included/excluded when building the prior (argument \code{PriorStudies}).
-
-Be careful, in the results, all the GWAS (conventional + prior) are aligned with UK10K
-data for the analysis (some alleles might be swapped when comparing with the initial data)
 }
 \examples{
 # Permorm bGWAS, using a conventional GWAS from the list of prior GWASs

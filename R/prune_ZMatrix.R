@@ -24,21 +24,10 @@ prune_ZMatrix <- function(ZMatrix, prune.dist=500000, r2.limit=1.1, verbose=F) {
     do.call(y,list(substitute(x)),envir=parent.frame()) # just right
   }
 
-  # 1st, format the Z-Matrix : add chrm, position
- # pos.file <- data.table::fread(system.file("Data/SNPsInfo.TWINSUKALSPAC", package="bGWAS"))
-
- # ZMatrix[,c("chrm", "pos") := pos.file[match(ZMatrix$rs, pos.file$rs) , c("chr", "pos.b19") ]]
- # ZMatrix
-
-  # reorder columns : rs | chr | pos| Z_Trait1 | Z_Trait2 ...
-  #data.table::setcolorder(ZMatrix, names(ZMatrix) %>% {.[order(! . %in% c("rs", "chrm", "pos"))]})
 
   # remove non-numeric columns
   ZMatrix[,!(colnames(ZMatrix) %in% c('chrm','rs','pos', 'alt', 'ref')),with=F] -> ZMatrix.justZMatrix
-  #pp(names(ZMatrix.justZMatrix))
 
-#  print(dim(ZMatrix))
- # print(dim(ZMatrix.justZMatrix))
 
   # get the largest Z for each SNP
   apply(ZMatrix.justZMatrix, 1, function(ZMatrix){
@@ -48,7 +37,6 @@ prune_ZMatrix <- function(ZMatrix, prune.dist=500000, r2.limit=1.1, verbose=F) {
   # convert it to log-p to compare SNPs (calculated directly from z-scores)
   log(2.0)+pnorm(-abs(max.ZMatrix), log=T)    -> logps
 
-#  print(head(logps))
 
   # order the log-p to start pruning by looking at the most significant SNPs
   order(logps) -> order.logps
@@ -138,10 +126,8 @@ prune_ZMatrix <- function(ZMatrix, prune.dist=500000, r2.limit=1.1, verbose=F) {
         # might have to apply LD-based pruning
         r2 <- NULL
         if(r2.limit != 1.1) {
-          #catn("what's the LD between ", chrm, pos, ZMatrix$pos[current])
           many.rs[current-lb+1] -> r
           na.fail(r)
-          #PP(chrm, pos, ZMatrix$pos[current], r)
           r2 <- r*r
         } else { # if distance pruning
           r2 <- -0.1234 # just for pretend
@@ -157,12 +143,9 @@ prune_ZMatrix <- function(ZMatrix, prune.dist=500000, r2.limit=1.1, verbose=F) {
       }
       current = current+1
     }
-   # PP(count_them)
     logps[i] %|%na.fail # make sure I haven't deleted 'myself'
   }
-#  PP(sum(is.na(logps)))
-#  PP(sum(!is.na(logps)))
-#  PP(incrementer) # 3761 prunings in 100 seconds
+
 
   stopifnot(length(logps) == nrow(ZMatrix))
   ZMatrix    = ZMatrix   [!is.na(logps),,drop=F]
@@ -172,7 +155,6 @@ prune_ZMatrix <- function(ZMatrix, prune.dist=500000, r2.limit=1.1, verbose=F) {
   ZMatrix$ref[ZMatrix$ref==TRUE]="T"
 
 
-#  write_csv( path=output.matrix, ZMatrix )
   return(ZMatrix)
 
   }
