@@ -75,7 +75,7 @@
 #' listFiles(MyGWAS)
 #' \dontrun{
 #' A = bGWAS(Name = "Test_UsingGWASfromList",
-#'          GWAS = MyGWAS
+#'          GWAS = MyGWAS,
 #'          verbose=T)
 #'          }
 ### TO BE DONE
