@@ -2,27 +2,34 @@
 # bGWAS
 [//]:========================================
 
+:information_source: package under development
 
 ## Overview
 [//]:-------------------------------
 
-bGWAS is an R-package to perform a bayesian GWAS, using summary statistics. It compares the observed Z-score from a conventional GWAS to a prior z-score, calculated from prior GWASs publicly available (currently, a set of 58 studies, to be updated).   
-Observed Z-scores and priors are compared using Bayes Factors, and empirical p-values are calculated using a permutation approach.   
+bGWAS is an R-package to perform a Bayesian GWAS, using summary statistics as input. Briefly, it compares the observed Z-score from a conventional GWAS to a prior Z-score, calculated from publicly available GWASs (currently, a set of 58 studies, last update dd-mm-yyyy - hereinafter referred to as "prior GWASs"). Only GWASs having a significant influence on the conventional GWAS (identified using a multivariate Mendelian Randomization (MR) approach) are used to calculate the prior Z-scores.          
+Observed and prior Z-scores are compared using Bayes Factors, and empirical p-values are calculated using a permutation approach.   
 
-
--   `bGWAS()` ...
--   `availableStudies()` ...
--   `selectStudies()` ...
--   `bGWASfromPrior()`  # NOT IMPLEMENTED YET
++The main functions are:
+-   `bGWAS()` -  core function that will return 
+-   `availableStudies()` will directly return the available GWASs that are available as priors
+-   `selectStudies()` allows a quick selection of GWASs as priors
+-   `bGWASfromPrior()` does ... # NOT IMPLEMENTED YET
 
 
 ## Installation
 [//]:-------------------------------
 
 
-* Download Z-Matrix files : 
+* Download Z-Matrix files :   
+These files contains the Z-scores for all prior GWASs (before and after imputation) and were created ... 
+Z-scores before imputation are used for multivariate MR.  
+Z-scores after imputation are used to calculate the prior Z-scores. 
+
 `wget --no-check-certificate https://drive.switch.ch/index.php/s/pxZsWY88RSDsO8K/download -O ZMatrices.tar.gz`    
+
 `tar xzvf ZMatrices.tar.gz`
+
 Size ~ 2.09 GB   
   
 
@@ -37,19 +44,23 @@ devtools::install_github("n-mounier/bGWAS")
 ## Usage
 [//]:-------------------------------
 
-To run an anlysis :
+To run the analysis with `bGWAS` two inputs are needed:
 
-- GWAS file, can be a regular (space/tab/comma-separated) file or a gzipped file (.gz), must contain the columns   
-SNPID : rs, rsid, snp, snpid, rnpid    
-ALT : a1, alt, alts    
-REF : a2, a0, ref    
-Z : z, Z, zscore    
-If Z is not present, can be calculated from effect size and standard error  
-BETA : b, beta, beta1    
-SE : se, std   
+1. The *GWAS* results to be tested   
+Can be a regular (space/tab/comma-separated) file or a gzipped file (.gz), must contain the following columns, which can have alternative names.  
+SNP-identifier:  `rs` or `rsid`, `snp`, `snpid`, `rnpid`    
+Alternate allele:  `a1` or `alt`, `alts`    
+Reference allele: `a2` or `a0`, `ref`    
+Z-statistics: `z` or `Z`, `zscore`      
+If the Z-statistics is not present, it can be calculated from effect size and standard error, in which case the following columns should be provided:
+Effect-size: `b` or `beta`, `beta1`    
+Standard error:  `se` or `std`     
 
-- ZMatrices    
-Matrix files, containing Z-scores for all prior GWASs should be downloaded separately and stored in "~/ZMatrices" or in the folder specified when launching the analysis.
+2. Prior *GWASs* (downloaded above)   
+Matrix files, containing Z-scores for all prior GWASs should be downloaded separately and stored in `~/ZMatrices` or in the folder specified when launching the analysis.
+ 
+<!---  Format?
+Can I add one more?--->
 
 
 ### Study Selection
@@ -73,7 +84,7 @@ A = bGWAS(Name = "Test_UsingGWASfromList",
          
 
 ## Example B
-# Using a small GWAS (400,00 SNPs, Pilling et al data)
+# Using a small GWAS (400,000 SNPs, Pilling et al data)
 # Using only specific traits / files (resulting in 9 GWASs included)
 MyGWAS = system.file("Data/SmallGWAS_Pilling2017.csv", package="bGWAS")
 MyStudies = selectStudies(includeTraits=c("Type 2 diabetes", "Smoking"),    
@@ -90,9 +101,9 @@ B = bGWAS(Name = "Test_UsingSmallGWAS",
 ## Runtime
 [//]:-------------------------------
 
-Analysis using all the 58 prior GWASs available, for a conventionnal GWAS containing ~7M SNPs in common with the prior studies ~ 145 minutes.
+Analysis using all the 58 prior GWASs available, for a conventional GWAS containing ~7M SNPs in common with the prior studies ~ 145 minutes.
 
-Analysis using 9 prior GWASs, for a conventionnal GWAS containtin 400,000 SNPs in commons with prior studies (example B) ~ 8 minutes
+Analysis using 9 prior GWASs, for a conventional GWAS containing 400,000 SNPs in common with prior studies (see example B) ~ 8 minutes
 
 
 ## Improvements to be implemented
