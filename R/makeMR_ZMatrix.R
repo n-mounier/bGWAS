@@ -49,7 +49,7 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
   if(verbose) cat(tmp)
 
   # select based on threshold if different from 1e-5 and removed rows without any Z-Score ok
-  Zlimit = qnorm(MRthreshold, lower.tail = F)
+  Zlimit = qnorm(MRthreshold/2, lower.tail = F)
 
   if(MRthreshold != 1e-5 ){
     tmp = paste0("# Thresholding... \n")
