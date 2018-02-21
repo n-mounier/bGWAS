@@ -9,8 +9,8 @@
 #'
 #'
 #' @param Name The name of the analysis (character)
-#' @param GWAS The path to the conventionnal GWAS of interest or ID of the GWAS from the
-#'        list of studies availables (prior GWASs) (character or numeric)
+#' @param GWAS The path to the conventionnal GWAS of interest, the ID of the GWAS from the
+#'        list of studies availables (prior GWASs), or a data.frame (character, numeric or data.frame)
 #' @param ZMatrices The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
 #'        (character)
 #' @param PriorStudies The IDs of prior GWASs to use for the analysis, \code{default=NULL},
@@ -36,7 +36,7 @@
 #' @details
 #' \code{Name} and \code{GWAS} are required arguments.
 #'
-#' If \code{GWAS} is a path to a file (regular or .gz), this file should contain the following
+#' If \code{GWAS} is a path to a file (regular or .gz) or a data.frame, it should contain the following
 #' columns : \cr
 #' SNPID (rs numbers) should be : \code{rs}, \code{rsid}, \code{snp}, \code{snpid}, \code{rnpid} \cr
 #' A1 should be : \code{a1}, \code{alt}, \code{alts} \cr
@@ -78,18 +78,31 @@
 #'          GWAS = MyGWAS,
 #'          verbose=T)
 #'          }
-### TO BE DONE
-#'# Permorm bGWAS, using a small conventional GWAS included in data and selecting a subset of
+#'
+#'# Permorm bGWAS, using a small conventional GWAS included in data (file) and selecting a subset of
 #'# studies for the prior
 #' MyGWAS = system.file("Data/SmallGWAS_Pilling2017.csv", package="bGWAS")
 #' MyStudies = selectStudies(includeTraits=c("Type 2 diabetes", "Smoking"),
 #'                          includeFiles=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
 #' \dontrun{
 #' B = bGWAS(Name = "Test_UsingSmallGWAS",
-#'          GWAS = MyGWAS,
-#'          PriorStudies=MyStudies,
-#'          verbose=T)
+#'           GWAS = MyGWAS,
+#'           PriorStudies=MyStudies,
+#'           verbose=T)
 #'          }
+#'
+#'#'# Permorm bGWAS, using a small conventional GWAS included in data (data.frame) and selecting a subset of
+#'# studies for the prior
+#'\dontrun{
+#' data("SmallGWAS_Pilling2017")
+#' C = bGWAS(Name="Test_UsingSmallDataFrame",
+#'           GWAS = SmallGWAS_Pilling2017,
+#'           verbose=T,
+#'           saveFiles=T)
+#'           }
+#'
+#'# Note that B and C are using the same data (stored differently) and give the same results.
+
 #' @export
 
 
@@ -177,9 +190,10 @@ bGWAS <- function(Name,
 
 
 
-  ## GWAS of interest, should be a path to a GWAS file (format ? .tar.gz or file ?) or an ID
-  if(is.numeric(GWAS) && !GWAS %in% c(1:length(listFiles()))) { # if it is an ID
-    stop("The ID specified as a conventional GWAS is not in the list")
+  ## GWAS of interest, should be a path to a GWAS file (format ? .tar.gz or file ?), a data.frame or an ID
+  TMP_FILE = F # flag : is a temporary file with Z-scores created ??
+   if(is.numeric(GWAS)) { # if it is an ID
+    if(!GWAS %in% c(1:length(listFiles()))) stop("The ID specified as a conventional GWAS is not in the list")
     tmp = paste0("The conventional GWAS used as input is:",
                  listFiles(IDs=GWAS), " (ID = ",  GWAS,").  \n")
     Log = c(Log, tmp)
@@ -213,7 +227,6 @@ bGWAS <- function(Name,
     tmp = c(tmp, paste0("ALT column, ok"))
     if(all(!HeaderGWAS %in% c("a2", "a0", "ref"))) stop("GWAS : no REF column")
     tmp = c(tmp, paste0("REF column, ok"))
-    TMP_FILE = F # flag : is a temporary file with Z-scores created ??
     if(all(!HeaderGWAS %in% c("z", "Z", "zscore"))){
       # allow for beta + se to calculate Z ???
       if(!all(!HeaderGWAS %in% c("b", "beta", "beta1")) & !all(!HeaderGWAS %in% c("se", "std"))){
@@ -261,7 +274,42 @@ bGWAS <- function(Name,
       Log = c(Log, tmp)
       if(verbose) cat(tmp)
     }
-  }
+  } else if(is.data.frame(GWAS)){ # if data.frame
+    # add attribute GName to the data.frame, to be re-used in other subfunctions
+    attributes(GWAS)$GName =  deparse(substitute(GWAS)) # get the "name" of the object used as an argument in the function
+    # transform into data.table (needed when creating ZMat for data manipulation)
+    GWAS = data.table::as.data.table(GWAS)
+    tmp = paste0("The conventional GWAS used as input the object: \"",
+                attributes(GWAS)$GName, "\".  \n")
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
+
+    HeaderGWAS = colnames(GWAS)
+    if(all(!HeaderGWAS %in% c("rsid", "snpid", "snp", "rnpid", "rs"))) stop("GWAS : no SNPID column")
+    # how to deal with multiple rsid / snpid columns ???
+    # here, we don't care, we need at least one
+    tmp = paste0("   SNPID column, ok")
+    if(all(!HeaderGWAS %in% c("a1", "alts", "alt"))) stop("GWAS : no ALT column")
+    tmp = c(tmp, paste0("ALT column, ok"))
+    if(all(!HeaderGWAS %in% c("a2", "a0", "ref"))) stop("GWAS : no REF column")
+    tmp = c(tmp, paste0("REF column, ok"))
+    if(all(!HeaderGWAS %in% c("z", "Z", "zscore"))){
+      # allow for beta + se to calculate Z
+      if(!all(!HeaderGWAS %in% c("b", "beta", "beta1")) & !all(!HeaderGWAS %in% c("se", "std"))){
+        # if beta + se : calculate Z
+        GWAS$Z = GWAS[,HeaderGWAS[HeaderGWAS %in% c("b", "beta", "beta1")], with=F] /
+          GWAS[,HeaderGWAS[HeaderGWAS %in% c("se", "std")], with=F]
+      } else {
+        stop("GWAS : no Z-SCORE column")
+      }
+    } else {
+      tmp = c(tmp, paste0("Z column, ok  \n"))
+    }
+    tmp = paste(tmp, collapse= " - ")
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
+  } else stop("GWAS : unrecognized format")
+
 
 ### TO BE DONE
   ## OutPath, check that the directory exist. Create it if necessary ?
@@ -401,6 +449,7 @@ bGWAS <- function(Name,
   MR_ZMatrix = makeMR_ZMatrix(PriorStudies, GWAS, MRthreshold, ZMatrices, saveFiles, verbose)
   Log = c(Log, MR_ZMatrix$Log)
 
+
   Log=c(Log,"")
   tmp = paste0("> Performing MR  \n")
   Log = c(Log, tmp)
@@ -428,6 +477,7 @@ bGWAS <- function(Name,
 
   Prior = compute_Prior(MR_Res$Studies, MR_ZMatrix$Mat, Full_ZMatrix$Mat, saveFiles, verbose)
   Log = c(Log, Prior$Log)
+
 
   ##### COMPUTE THE BAYES FACTOR AND THE P-VALUE #####
   Log = c(Log, "", "")

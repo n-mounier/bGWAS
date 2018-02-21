@@ -6,14 +6,14 @@
 \usage{
 bGWAS(Name, GWAS, ZMatrices = NULL, PriorStudies = NULL,
   ListOfSNPs = NULL, MRthreshold = 1e-05, SignMethod = "p",
-  SignThresh = 5 * 1e-07, pruneRes = FALSE, saveFiles = FALSE,
+  SignThresh = 5 * 1e-08, pruneRes = FALSE, saveFiles = FALSE,
   verbose = FALSE)
 }
 \arguments{
 \item{Name}{The name of the analysis (character)}
 
-\item{GWAS}{The path to the conventionnal GWAS of interest or ID of the GWAS from the
-list of studies availables (prior GWASs) (character or numeric)}
+\item{GWAS}{The path to the conventionnal GWAS of interest, the ID of the GWAS from the
+list of studies availables (prior GWASs), or a data.frame (character, numeric or data.frame)}
 
 \item{ZMatrices}{The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
 (character)}
@@ -61,18 +61,31 @@ MyGWAS = 1
 listFiles(MyGWAS)
 \dontrun{
 A = bGWAS(Name = "Test_UsingGWASfromList",
-         GWAS = MyGWAS
+         GWAS = MyGWAS,
          verbose=T)
          }
-# Permorm bGWAS, using a small conventional GWAS included in data and selecting a subset of
+
+# Permorm bGWAS, using a small conventional GWAS included in data (file) and selecting a subset of
 # studies for the prior
 MyGWAS = system.file("Data/SmallGWAS_Pilling2017.csv", package="bGWAS")
 MyStudies = selectStudies(includeTraits=c("Type 2 diabetes", "Smoking"),
                          includeFiles=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
 \dontrun{
 B = bGWAS(Name = "Test_UsingSmallGWAS",
-         GWAS = MyGWAS,
-         PriorStudies=MyStudies,
-         verbose=T)
+          GWAS = MyGWAS,
+          PriorStudies=MyStudies,
+          verbose=T)
          }
+
+#'# Permorm bGWAS, using a small conventional GWAS included in data (data.frame) and selecting a subset of
+# studies for the prior
+\dontrun{
+data("SmallGWAS_Pilling2017")
+C = bGWAS(Name="Test_UsingSmallDataFrame",
+          GWAS = SmallGWAS_Pilling2017,
+          verbose=T,
+          saveFiles=T)
+          }
+
+# Note that B and C are using the same data (stored differently) and give the same results.
 }

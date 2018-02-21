@@ -11,8 +11,8 @@ makeFull_ZMatrix(Studies = NULL, GWAS, ZMatrices = "~/ZMatrices",
 \item{Studies}{The IDs of the significant studies selected by \code{identify_StudiesMR()}
 (numeric vector)}
 
-\item{GWAS}{The path to the conventionnal GWAS of interest or ID of the GWAS from the
-list of studies availables (prior GWASs) (character or numeric)}
+\item{GWAS}{The path to the conventionnal GWAS of interest, the ID of the GWAS from the
+list of studies availables (prior GWASs), or a data.frame (character, numeric or data.frame)}
 
 \item{ZMatrices}{The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
 (character)}

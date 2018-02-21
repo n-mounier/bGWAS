@@ -11,8 +11,8 @@ makeMR_ZMatrix(PriorStudies = NULL, GWAS, MRthreshold = 1e-05,
 \item{PriorStudies}{The IDs of prior GWASs to use for the analysis, \code{default=NULL},
 will include all the prior GWASs available (numeric vector)}
 
-\item{GWAS}{The path to the conventionnal GWAS of interest or ID of the GWAS from the
-list of studies availables (prior GWASs) (character or numeric)}
+\item{GWAS}{The path to the conventionnal GWAS of interest, the ID of the GWAS from the
+list of studies availables (prior GWASs), or a data.frame (character, numeric or data.frame)}
 
 \item{MRthreshold}{The threshold used to select strong instruments for MR, should be lower
 than 1e-5, \code{default=1e-5} (numeric)}

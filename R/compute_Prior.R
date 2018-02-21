@@ -54,10 +54,8 @@ compute_Prior <- function(SelectedStudies, MR_ZMatrix, All_ZMatrix, saveFiles=FA
     studies.here = names(d)
     studies.here = studies.here[!studies.here %in% c("rs","chrm","pos","alt","ref")]
     for(n in studies.here) {
-      #pp(minmax(d[[n]]),n)
       d[[n]] [ d[[n]] < -max.allowed.z ] <- -max.allowed.z
       d[[n]] [ d[[n]] >  max.allowed.z ] <-  max.allowed.z
-      #pp(minmax(d[[n]]),n)
     }
     d
   }
@@ -136,10 +134,20 @@ compute_Prior <- function(SelectedStudies, MR_ZMatrix, All_ZMatrix, saveFiles=FA
     ) -> fit_masked # fit, without one chromosome
     coefs <- data.frame(coef(summary(fit_masked)))
 
-    stopifnot(length(dynamic.study.names) ==  nrow(coefs))
-
+   # stopifnot(length(dynamic.study.names) ==  nrow(coefs))
+     ## this can happen, if all non-0 Z-score of a study are one the same chromosome
+     ## but this should not be a problem
+    # just add some warning message here :
+    if(length(dynamic.study.names) !=  nrow(coefs)){
+      missingSt = dynamic.study.names[!dynamic.study.names %in% rownames(coefs)]
+      tmp = paste0("No effect estimate when masking this chromosome for : ",
+                  paste0(missingSt, collapse=" - "),
+                  " (all SNPs having non-0 Z-scores are on this chromosome) \n")
+      Log = c(Log, tmp)
+      if(verbose) cat(tmp)
+    }
     coefs = coefs[order(-coefs$Pr...t..),,drop=F]
-    stopifnot(length(dynamic.study.names) ==  nrow(coefs))
+  # stopifnot(length(dynamic.study.names) ==  nrow(coefs))
 
     stopifnot(nrow(coefs) >= 1)
 

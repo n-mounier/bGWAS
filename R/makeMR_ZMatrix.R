@@ -143,7 +143,7 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
 
-  } else if(is.character(GWAS)){  # if external GWAS
+  } else if(is.character(GWAS)){  # if GWAS is a file
     tmp = paste0("# Adding data from the conventional GWAS : \n \"", GWAS, "\" \n")
     Log = c(Log, tmp)
     if(verbose) cat(tmp)
@@ -173,14 +173,52 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
                       GWASData[,..ref, with=F] == ZMatrixPruned$ref)
     swapped = which(GWASData[,..ref, with=F] == ZMatrixPruned$alt &
                       GWASData[,..alt, with=F] == ZMatrixPruned$ref)
-    weird = c(1:nrow(GWASData))[!c(1:nrow(GWASData)) %in% c(aligned, swapped)]
+   # weird = c(1:nrow(GWASData))[!c(1:nrow(GWASData)) %in% c(aligned, swapped)]
 
+    GWASData[, myZ:= numeric()]
     GWASData[aligned, myZ:= GWASData[aligned, ..z, with=F]]
     GWASData[swapped, myZ:= -GWASData[swapped, ..z, with=F]]
-    GWASData[weird, myZ:= NA]
+
 
 
     ZMatrixPruned[, strsplit(GWAS, "/")[[1]][ length(strsplit(GWAS, "/")[[1]])]] = GWASData$myZ
+
+    tmp = "Done! \n"
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
+
+  } else if(is.data.frame(GWAS)){  # if GWAS is data.frame
+    GName = attributes(GWAS)$GName
+    tmp = paste0("# Adding data from the conventional GWAS : \n \"", GName,
+                 "\" \n")
+    Log = c(Log, tmp)
+    if(verbose) cat(tmp)
+
+    rs = match(colnames(GWAS),c("snpid", "snp", "rnpid", "rs", "rsid"))
+    rs = which(!is.na(rs))
+    alt = match(colnames(GWAS),c("a1", "alts", "alt"))
+    alt = which(!is.na(alt))
+    ref = match(colnames(GWAS),c("a2", "ref", "a0"))
+    ref = which(!is.na(ref))
+    z = match(colnames(GWAS),c("z", "Z", "zscore"))
+    z = which(!is.na(z))
+
+    # keep the SNPs in our pruned matrix and order them correctly
+    GWAS = GWAS[match(ZMatrixPruned$rs, unlist(GWAS[,..rs])),]
+    # check alignment
+    aligned = which(GWAS[,..alt, with=F] == ZMatrixPruned$alt &
+                      GWAS[,..ref, with=F] == ZMatrixPruned$ref)
+    swapped = which(GWAS[,..ref, with=F] == ZMatrixPruned$alt &
+                      GWAS[,..alt, with=F] == ZMatrixPruned$ref)
+  #  weird = c(1:nrow(GWAS))[!c(1:nrow(GWAS)) %in% c(aligned, swapped)]
+
+    GWAS[, myZ:= numeric()]
+    GWAS[aligned, myZ:= GWAS[aligned, ..z, with=F]]
+    GWAS[swapped, myZ:= -GWAS[swapped, ..z, with=F]]
+
+
+
+    ZMatrixPruned[, GName] = GWAS$myZ
 
     tmp = "Done! \n"
     Log = c(Log, tmp)

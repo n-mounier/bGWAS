@@ -84,17 +84,36 @@ A = bGWAS(Name = "Test_UsingGWASfromList",
          
 
 ## Example B
-# Using a small GWAS (400,000 SNPs, Pilling et al data)
+# Using a small GWAS (400,000 SNPs, Pilling et al data - file)
 # Using only specific traits / files (resulting in 9 GWASs included)
 MyGWAS = system.file("Data/SmallGWAS_Pilling2017.csv", package="bGWAS")
-MyStudies = selectStudies(includeTraits=c("Type 2 diabetes", "Smoking"),    
+MyStudies = selectStudies(includeTraits=c("Type 2 diabetes", "Smoking"),
                           includeFiles=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
 listFiles(MyStudies)
  
 B = bGWAS(Name = "Test_UsingSmallGWAS",
          GWAS = MyGWAS,
          PriorStudies=MyStudies,
-         verbose=T)        
+         verbose=T) 
+    
+         
+## Example C
+# Using a small GWAS (400,000 SNPs, Pilling et al data - data.frame)
+# Using only specific traits / files (resulting in 9 GWASs included)
+data("SmallGWAS_Pilling2017")
+MyStudies = selectStudies(includeTraits=c("Type 2 diabetes", "Smoking"),
+                          includeFiles=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
+
+C = bGWAS(Name="Test_UsingSmallDataFrame",
+         GWAS = SmallGWAS_Pilling2017,
+         PriorStudies=MyStudies,
+         verbose=T,
+         saveFiles=T)
+         
+         
+# Note that B and C are using the same data (stored differently) and give the same results.
+
+         
 ```
 
 
