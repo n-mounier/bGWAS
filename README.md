@@ -10,11 +10,12 @@
 bGWAS is an R-package to perform a Bayesian GWAS, using summary statistics as input. Briefly, it compares the observed Z-score from a conventional GWAS to a prior Z-score, calculated from publicly available GWASs (currently, a set of 58 studies, last update dd-mm-yyyy - hereinafter referred to as "prior GWASs"). Only prior GWASs having a significant influence on the conventional GWAS (identified using a multivariate Mendelian Randomization (MR) approach) are used to calculate the prior Z-scores.          
 Observed and prior Z-scores are compared using Bayes Factors, and empirical p-values are calculated using a permutation approach.   
 
-+The main functions are:
--   `bGWAS()` -  core function that will return 
--   `availableStudies()` will directly return the available prior GWASs that can be used to calculate prior Z-scores
--   `selectStudies()` allows a quick selection of prior GWASs (to include/exclude specific studies when calculating prior Z-scores)
--   `bGWASfromPrior()` compare prior Z-scores pre-calculated by the user to observed Z-scores # NOT IMPLEMENTED YET
+The main functions are:   
+-   `bGWAS()` -  core function that will return a data.frame containing significant   
+<!--- returns an object of class `bGWAS-class`. See the vignette: vignette('vcf_data')  ---> 
+-   `availableStudies()` will directly return the available prior GWASs that can be used to calculate prior Z-scores   
+-   `selectStudies()` allows a quick selection of prior GWASs (to include/exclude specific studies when calculating prior Z-scores)   
+-   `bGWASfromPrior()` compare prior Z-scores pre-calculated by the user to observed Z-scores # NOT IMPLEMENTED YET   
 
 
 ## Installation

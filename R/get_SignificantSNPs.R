@@ -125,7 +125,7 @@ get_SignificantSNPs <- function(Prior, SignMethod="p", SignThresh=5e-8, pruneRes
 
 
   if(saveFiles){
-    write.table(ZMatrix, file= "SignificantSNPs.csv", sep=",", row.names=F, quote=F)
+    write.table(SignifSNPs, file= "SignificantSNPs.csv", sep=",", row.names=F, quote=F)
     tmp = "The file \"SignificantSNPs.csv\" has been successfully created \n"
     Log = c(Log, tmp)
     if(verbose) print(tmp)
