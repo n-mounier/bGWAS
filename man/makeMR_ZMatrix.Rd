@@ -4,20 +4,20 @@
 \alias{makeMR_ZMatrix}
 \title{Create pruned Z-matrix of MR instruments}
 \usage{
-makeMR_ZMatrix(PriorStudies = NULL, GWAS, MRthreshold = 1e-05,
-  path = "~/ZMatrices", saveFiles = F, verbose = F)
+makeMR_ZMatrix(prior_studies = NULL, GWAS, MR_threshold = 1e-05,
+  path = "~/ZMatrices", save_files = F, verbose = F)
 }
 \arguments{
-\item{PriorStudies}{The IDs of prior GWASs to use for the analysis, \code{default=NULL},
+\item{prior_studies}{The IDs of prior GWASs to use for the analysis, \code{default=NULL},
 will include all the prior GWASs available (numeric vector)}
 
 \item{GWAS}{The path to the conventionnal GWAS of interest, the ID of the GWAS from the
 list of studies availables (prior GWASs), or a data.frame (character, numeric or data.frame)}
 
-\item{MRthreshold}{The threshold used to select strong instruments for MR, should be lower
+\item{MR_threshold}{The threshold used to select strong instruments for MR, should be lower
 than 1e-5, \code{default=1e-5} (numeric)}
 
-\item{saveFiles}{A logical indicating if the results should be saved as files,
+\item{save_files}{A logical indicating if the results should be saved as files,
 \code{default=FALSE}}
 
 \item{verbose}{A logical indicating if information on progress should be reported,

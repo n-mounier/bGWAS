@@ -16,11 +16,11 @@
 
 
 
-request_BFandP <- function(Prior, saveFiles=F, verbose=F) {
+request_BFandP <- function(Prior, save_files=F, verbose=F) {
   Log = c()
   tmp = paste0("# Computing observed Bayes Factor for all SNPs... \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
+
 
 
   # The true one : calculate BF
@@ -35,8 +35,8 @@ request_BFandP <- function(Prior, saveFiles=F, verbose=F) {
 
 
   tmp = "Done! \n"
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
+
   # true Z = just rs + log.bf
 
 #trueZ[, !is.unsorted(-log.bf)] %|%stopifnot # should be sorted, why test again we just did it !!!
@@ -70,22 +70,22 @@ request_BFandP <- function(Prior, saveFiles=F, verbose=F) {
   	running.total = rep.int(0 , nrow(Prior))
 
   	tmp = "# Computing null Bayes Factors (needed to compute empirical p-values)... \n"
-  	Log = c(Log, tmp)
-  	if(verbose) cat(tmp)
+  	Log = update_log(Log, tmp, verbose)
+
 
   	NUMBER_OF_NULLRUNS = 1000
   	full.number.of.nulls.for.comparison = NUMBER_OF_NULLRUNS* N.one.set.of.nulls
 
   	tmp = paste0(NUMBER_OF_NULLRUNS, " random z-scores simulations for the whole set of SNPs (",
   	             format(nrow(Prior), big.mark = ",", scientific = F), ") : ", format(full.number.of.nulls.for.comparison, big.mark = ",", scientific = F), " null BFs are calculated \n")
-  	Log = c(Log, tmp)
-  	if(verbose) cat(tmp)
+  	Log = update_log(Log, tmp, verbose)
+
   	for( i in 1:NUMBER_OF_NULLRUNS ) {
   	  # null bf
   	  if(i %% 20 == 1){
   	    tmp = paste0("Simulation ",i, "... \n")
-  	    Log = c(Log, tmp)
-  	    if(verbose) cat(tmp)
+  	    Log = update_log(Log, tmp, verbose)
+
   	  }
 
   	  Prior$z <-   rnorm(nrow(Prior), 0, 1)
@@ -112,12 +112,12 @@ request_BFandP <- function(Prior, saveFiles=F, verbose=F) {
   	}
 
   	tmp = "Done! \n"
-  	Log = c(Log, tmp)
-  	if(verbose) cat(tmp)
+  	Log = update_log(Log, tmp, verbose)
+
 
   	tmp = "# Computing empirical p-values... \n"
-  	Log = c(Log, tmp)
-  	if(verbose) cat(tmp)
+  	Log = update_log(Log, tmp, verbose)
+
 
   	Prior[, z := NULL]
   	Prior[, log.bf.null := NULL]
@@ -127,21 +127,21 @@ request_BFandP <- function(Prior, saveFiles=F, verbose=F) {
   	Prior[, BF_p := (running.total+1) / full.number.of.nulls.for.comparison ]
 
 
-  	if(saveFiles){
+  	if(save_files){
       system("rm Prior.csv")
   	  readr::write_csv(Prior, "PriorBFp.csv")
   	  tmp = "The file Prior.csv has been updated into Prior_BFp.csv \n"
-  	  Log = c(Log, tmp)
-  	  if(verbose) cat(tmp)
+  	  Log = update_log(Log, tmp, verbose)
+
   	}
 
   	tmp = "Done! \n"
-  	Log = c(Log, tmp)
-  	if(verbose) cat(tmp)
+  	Log = update_log(Log, tmp, verbose)
+
 
 
   	res=list()
-  	res$Log = Log
+  	res$log_info = Log
   	res$SNPs = Prior
   	return(res)
 }

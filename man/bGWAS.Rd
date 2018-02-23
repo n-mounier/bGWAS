@@ -4,63 +4,100 @@
 \alias{bGWAS}
 \title{bGWAS}
 \usage{
-bGWAS(Name, GWAS, ZMatrices = NULL, PriorStudies = NULL,
-  ListOfSNPs = NULL, MRthreshold = 1e-05, SignMethod = "p",
-  SignThresh = 5 * 1e-08, pruneRes = FALSE, saveFiles = FALSE,
+bGWAS(name, GWAS, Z_matrices = NULL, prior_studies = NULL,
+  SNPs_list = NULL, MR_threshold = 1e-05, sign_method = "p",
+  sign_thresh = 5e-08, prune_res = FALSE, save_files = FALSE,
   verbose = FALSE)
 }
 \arguments{
-\item{Name}{The name of the analysis (character)}
+\item{name}{The name of the analysis (character)}
 
 \item{GWAS}{The path to the conventionnal GWAS of interest, the ID of the GWAS from the
 list of studies availables (prior GWASs), or a data.frame (character, numeric or data.frame)}
 
-\item{ZMatrices}{The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
+\item{Z_matrices}{The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
 (character)}
 
-\item{PriorStudies}{The IDs of prior GWASs to use for the analysis, \code{default=NULL},
+\item{prior_studies}{The IDs of prior GWASs to use for the analysis, \code{default=NULL},
 will include all the prior GWASs available (numeric vector)}
 
-\item{ListOfSNPs, }{The path to a file containing the rsids of the SNPs to use ,
+\item{SNPs_list, }{The path to a file containing the rsids of the SNPs to use ,
 \code{default=NULL}, will use all the SNPs in common between prior GWASs and the
 conventionnal GWAS (character)
       # NOT IMPLEMENTED YET}
 
-\item{MRthreshold}{The threshold used to select strong instruments for MR, should be lower
+\item{MR_threshold}{The threshold used to select strong instruments for MR, should be lower
 than 1e-5, \code{default=1e-5} (numeric)}
 
-\item{SignMethod}{The method used to identify significant SNPs, should be \code{"p"} for
+\item{sign_method}{The method used to identify significant SNPs, should be \code{"p"} for
 p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)}
 
-\item{SignThresh}{The threshold used to identify significant SNPs, \code{default="5.10e-8"}
+\item{sign_thresh}{The threshold used to identify significant SNPs, \code{default="5.10e-8"}
 (numeric)}
 
-\item{pruneRes}{A logical indicating if the results should be pruned (by distance, 500kb),
+\item{prune_res}{A logical indicating if the results should be pruned (by distance, 500kb),
 \code{default=FALSE}}
 
-\item{saveFiles}{A logical indicating if the results should be saved as files,
+\item{save_files}{A logical indicating if the results should be saved as files,
 \code{default=FALSE}}
 
 \item{verbose}{A logical indicating if information on progress should be reported,
 \code{default=FALSE}}
 }
 \value{
-An data.table containing the significant SNPs (...) + log file saved in working directory
-if saveFiles=T, additional files containing the Z-Matrices used (for MR / to build the prior), the
-coefficents from the regression, the BF and p-values estimated for all SNPs / subset for significant
-SNPs are created
-## DESCRIBE THE FILES
+\code{bGWAS}() returns an object of class "bGWAS". \cr
+Aditionnaly, if \code{save_files=T}, several files are created... \cr
+... in your working directory :
+\itemize{
+\item  "\code{name}.log" - log file
+}
+... in the folder \code{./name/} :
+\itemize{
+\item "PriorGWASs.tsv" - contains Prior GWASs information
+(general info + status (used/removed) + MR coefficients)
+\item "CoefficientsByChromosome.csv" - contains the MR estimates when masking the focal
+chromosome (22 coefficients / study)
+\item "PriorBFp.csv" - contains BF and p-values estimated for all SNPs
+\item "SignificantSNPs.csv" - contains BF and p-values estimated for a subset of SNPs
+}
 }
 \description{
 Performs a bayesian GWAS from Summary Statistics, using publicly available results
 to calculate the prior effects of the SNPs and compare it to observed z-scores
 }
+\details{
+\code{Name} and \code{GWAS} are required arguments.
+If \code{GWAS} is a path to a file (regular or .gz) or a data.frame, it should contain the following
+columns : \cr
+SNPID (rs numbers) should be : \code{rs}, \code{rsid}, \code{snp}, \code{snpid}, \code{rnpid} \cr
+A1 should be : \code{a1}, \code{alt}, \code{alts} \cr
+A2 should be : \code{a2}, \code{a0}, \code{ref} \cr
+Z should be : \code{z}, \code{Z}, \code{zscore} \cr
+If Z is not present, it can be calculated from BETA and SE, in this case, a temporary
+gzipped file is created and removed after the analysis. \cr
+BETA should be : \code{b}, \code{beta}, \code{beta1} \cr
+SE should be : \code{se}, \code{std} \cr
+Z-Matrix files, containing Z-scores for all prior GWASs should be downloaded separately
+and stored in \code{"~/ZMatrices"} or in the folder specified with the argument
+\code{Z_matrices}. \cr
+## MORE INFO NEEDED HERE / HOW TO DOWNLOAD ID (see GitHub README)
+
+Use \code{\link{list_priorGWASs}()} to see all the prior GWASs available.
+Using one of them as your conventionnal GWAS (argument \code{GWAS} = numeric ID) will automatically
+remove it from the list of prior GWASs used to build the prior.
+
+Use \link{select_priorGWASs}() to automatically select the studies to
+be included/excluded when building the prior (argument \code{prior_studies}).
+
+Be careful, in the results, all the GWAS (conventional + prior) are aligned with UK10K
+data for the analysis (some alleles might be swapped when comparing with the initial data)
+}
 \examples{
 # Permorm bGWAS, using a conventional GWAS from the list of prior GWASs
 MyGWAS = 1
-listFiles(MyGWAS)
+list_files(MyGWAS)
 \dontrun{
-A = bGWAS(Name = "Test_UsingGWASfromList",
+A = bGWAS(name = "Test_UsingGWASfromList",
          GWAS = MyGWAS,
          verbose=T)
          }
@@ -68,12 +105,12 @@ A = bGWAS(Name = "Test_UsingGWASfromList",
 # Permorm bGWAS, using a small conventional GWAS included in data (file) and selecting a subset of
 # studies for the prior
 MyGWAS = system.file("Data/SmallGWAS_Pilling2017.csv", package="bGWAS")
-MyStudies = selectStudies(includeTraits=c("Type 2 diabetes", "Smoking"),
-                         includeFiles=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
+MyStudies = select_priorGWASs(include_traits=c("Type 2 diabetes", "Smoking"),
+                         include_files=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
 \dontrun{
-B = bGWAS(Name = "Test_UsingSmallGWAS",
+B = bGWAS(name = "Test_UsingSmallGWAS",
           GWAS = MyGWAS,
-          PriorStudies=MyStudies,
+          prior_studies=MyStudies,
           verbose=T)
          }
 
@@ -81,8 +118,9 @@ B = bGWAS(Name = "Test_UsingSmallGWAS",
 # studies for the prior
 \dontrun{
 data("SmallGWAS_Pilling2017")
-C = bGWAS(Name="Test_UsingSmallDataFrame",
+C = bGWAS(name="Test_UsingSmallDataFrame",
           GWAS = SmallGWAS_Pilling2017,
+          prior_studies=MyStudies,
           verbose=T,
           saveFiles=T)
           }

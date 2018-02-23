@@ -9,14 +9,14 @@
 #' significant studies (from \code{makeFull_ZMatrix()}), compute the prior
 #'
 #' @inheritParams bGWAS
-#' @param SelectedStudies data table
+#' @param selected_studies data table
 #' @param MR_ZMatrix data table
 #' @param All_ZMatrix data table
 #'
 #  Function not exported, no need of extended documentation?
 
 
-compute_Prior <- function(SelectedStudies, MR_ZMatrix, All_ZMatrix, saveFiles=FALSE, verbose=FALSE){
+compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, save_files=FALSE, verbose=FALSE){
 
   Log = c()
 
@@ -32,22 +32,22 @@ compute_Prior <- function(SelectedStudies, MR_ZMatrix, All_ZMatrix, saveFiles=FA
 
   # In the pipeline, should always be a data.table/vector ???,
   # but for other cases, allow the use of a file
-  if(data.table::is.data.table(SelectedStudies)){ # ok, but still need to check that the format is ok
-    # i.e. all the studies listed are part of listFiles()
-    if(!all(SelectedStudies$study_selected %in% listFiles())) stop("The studies are not in our list")
-    SelectedStudies = SelectedStudies$study_selected
-  } else if(is.character(SelectedStudies)){ # TO BE DONE
-    SelectedStudies <- data.table::fread(SelectedStudies,showProgress = FALSE)
+  if(data.table::is.data.table(selected_studies)){ # ok, but still need to check that the format is ok
+    # i.e. all the studies listed are part of list_files()
+    if(!all(selected_studies$study_selected %in% list_files())) stop("The studies are not in our list")
+    selected_studies = selected_studies$study_selected
+  } else if(is.character(selected_studies)){ # TO BE DONE
+    selected_studies <- data.table::fread(selected_studies,showProgress = FALSE)
     # check that the studies names are part of list file
-    if(!all(SelectedStudies %in% listFiles())) stop("The studies are not in our list")
+    if(!all(selected_studies %in% list_files())) stop("The studies are not in our list")
   } else {
     stop("Selected Studies provided not correct")
   }
 
 
   tmp = paste0("# Preparation of the data... \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
+
 
   push.extreme.zs.back.a.little.towards.zero <- function(d) { # Some z-scores are just too far from zero
     max.allowed.z = abs(qnorm(1e-300 / 2)) # p=1e-300 is the max allowed now, truncate z-scores accordingly
@@ -64,7 +64,7 @@ compute_Prior <- function(SelectedStudies, MR_ZMatrix, All_ZMatrix, saveFiles=FA
   All_ZMatrix = push.extreme.zs.back.a.little.towards.zero(All_ZMatrix)
   # Set the z-scores to 0 for the regression if too low
   if(scheme_INpXXtozero < 1.0) {
-    for(column_of_zs in SelectedStudies) {
+    for(column_of_zs in selected_studies) {
       threshold = abs(qnorm(scheme_INpXXtozero/2))
       MR_ZMatrix[c(abs(MR_ZMatrix[,..column_of_zs]) < threshold) , column_of_zs] <- 0
     }
@@ -74,17 +74,17 @@ compute_Prior <- function(SelectedStudies, MR_ZMatrix, All_ZMatrix, saveFiles=FA
 
     # check how many chromosomes have non-zero zs
     # is that really interesting??
-    data.table::rbindlist(lapply(SelectedStudies, function(column_of_zs) {
+    data.table::rbindlist(lapply(selected_studies, function(column_of_zs) {
       MR_ZMatrix[ , .(study_name = column_of_zs, nz=sum(.SD[[column_of_zs]] != 0)) , by=chrm]
     })) -> counts.by.chrm
     counts.by.chrm[,.(chrms.with.nz=sum(nz!=0)), by=study_name] [order(-chrms.with.nz)] -> chrms.with.nz
-#    if(saveFiles){
+#    if(save_files){
 #      readr::write_csv(chrms.with.nz, 'chrms.with.nz.csv')
 #    }
   }
 
   if(scheme_OUTpXXtozero < 1.0) {
-    for(column_of_zs in SelectedStudies) {
+    for(column_of_zs in selected_studies) {
       threshold = abs(qnorm(scheme_INpXXtozero/2))
       All_ZMatrix[c(abs(All_ZMatrix[,..column_of_zs]) < threshold) , column_of_zs] <- 0
     }
@@ -95,29 +95,29 @@ compute_Prior <- function(SelectedStudies, MR_ZMatrix, All_ZMatrix, saveFiles=FA
   }
 
   outcome = colnames(MR_ZMatrix)[ncol(MR_ZMatrix)]
-  generate.formula(outcome, SelectedStudies) -> form
+  generate.formula(outcome, selected_studies) -> form
 
   tmp = "Done! \n"
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
+
 
 
   all.priors =  data.table::data.table()
   all.coefs = data.table::data.table()
 
   tmp = "# Calculating the prior chromosome by chromosome... \n"
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
+
 
   for(chrm in 1:22) {
     tmp = paste0("   Chromosome ", chrm, "\n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
 
     if(is.na(table(All_ZMatrix$chrm)[chrm])){
       tmp = "No SNP on this chromosome \n"
-      Log = c(Log, tmp)
-      if(verbose) cat(tmp)
+      Log = update_log(Log, tmp, verbose)
+
       next
     }
 
@@ -126,9 +126,9 @@ compute_Prior <- function(SelectedStudies, MR_ZMatrix, All_ZMatrix, saveFiles=FA
     d_masked = MR_ZMatrix[train,,drop=F]
 
     tmp = "Running regression, \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
-    dynamic.study.names = SelectedStudies
+    Log = update_log(Log, tmp, verbose)
+
+    dynamic.study.names = selected_studies
 
     lm(data=d_masked, formula = generate.formula(outcome, dynamic.study.names)
     ) -> fit_masked # fit, without one chromosome
@@ -143,8 +143,8 @@ compute_Prior <- function(SelectedStudies, MR_ZMatrix, All_ZMatrix, saveFiles=FA
       tmp = paste0("No effect estimate when masking this chromosome for : ",
                   paste0(missingSt, collapse=" - "),
                   " (all SNPs having non-0 Z-scores are on this chromosome) \n")
-      Log = c(Log, tmp)
-      if(verbose) cat(tmp)
+      Log = update_log(Log, tmp, verbose)
+
     }
     coefs = coefs[order(-coefs$Pr...t..),,drop=F]
   # stopifnot(length(dynamic.study.names) ==  nrow(coefs))
@@ -165,8 +165,8 @@ compute_Prior <- function(SelectedStudies, MR_ZMatrix, All_ZMatrix, saveFiles=FA
     chrm_ = chrm
 
     tmp = "Calculating prior estimates for SNPs on this chromosome, \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
 
     # all SNPs we need to predict (the ones on this chromosome)
     d_test             = All_ZMatrix[chrm==chrm_          ,,drop=T]
@@ -175,8 +175,8 @@ compute_Prior <- function(SelectedStudies, MR_ZMatrix, All_ZMatrix, saveFiles=FA
     predict(fit_masked, d_test, se.fit=T) -> preds
 
     tmp = "Calculating prior standard errors for SNPs on this chromosome, \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
 
     #A few lines to compute the extra.variance if we allow that the z's are random too
     {
@@ -219,16 +219,19 @@ compute_Prior <- function(SelectedStudies, MR_ZMatrix, All_ZMatrix, saveFiles=FA
 
 
   data.table::setkey(all.coefs, study_name, chrm)
-  if(saveFiles){
+
+  colnames(all.coefs) = c("Chrm", "Study", "Estimate", "StdError", "T", "P")
+
+  if(save_files){
     readr::write_csv(path="CoefficientsByChromosome.csv", x=all.coefs)
     tmp = paste0("The file ", "CoefficientsByChromosome.csv has been successfully writed. \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
   }
 
   tmp = "Done! \n"
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
+
 
 
 #  if(scheme_dropFit0) {
@@ -253,15 +256,16 @@ compute_Prior <- function(SelectedStudies, MR_ZMatrix, All_ZMatrix, saveFiles=FA
 
 
 
-  if(saveFiles){
+  if(save_files){
     readr::write_csv(path="Prior.csv", x=all.priors)
     tmp = paste0("The file ", "Prior.csv has been successfully writed. \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
   }
 
   res=list()
-  res$Log = Log
-  res$Prior = all.priors
+  res$log_info = Log
+  res$prior = all.priors
+  res$all_coeffs = all.coefs
   return(res)
 }

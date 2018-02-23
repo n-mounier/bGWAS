@@ -4,20 +4,20 @@
 \alias{makeFull_ZMatrix}
 \title{Create full Z-matrix for prior computation}
 \usage{
-makeFull_ZMatrix(Studies = NULL, GWAS, ZMatrices = "~/ZMatrices",
-  saveFiles = F, verbose = F)
+makeFull_ZMatrix(studies = NULL, GWAS, Z_matrices = "~/Z_matrices",
+  save_files = F, verbose = F)
 }
 \arguments{
-\item{Studies}{The IDs of the significant studies selected by \code{identify_StudiesMR()}
+\item{studies}{The IDs of the significant studies selected by \code{identify_studiesMR()}
 (numeric vector)}
 
 \item{GWAS}{The path to the conventionnal GWAS of interest, the ID of the GWAS from the
 list of studies availables (prior GWASs), or a data.frame (character, numeric or data.frame)}
 
-\item{ZMatrices}{The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
+\item{Z_matrices}{The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
 (character)}
 
-\item{saveFiles}{A logical indicating if the results should be saved as files,
+\item{save_files}{A logical indicating if the results should be saved as files,
 \code{default=FALSE}}
 
 \item{verbose}{A logical indicating if information on progress should be reported,

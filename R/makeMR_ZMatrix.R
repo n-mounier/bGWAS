@@ -12,23 +12,24 @@
 #' @return Log file and pruned Z-Matrix of MR instrument + create a file if saveFiles=T
 #' @export
 
-makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
-                           MRthreshold=1e-5, path="~/ZMatrices", saveFiles=F, verbose=F) {
+makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
+                           MR_threshold=1e-5, path="~/ZMatrices", save_files=F, verbose=F) {
   Log = c()
   tmp = paste0("# Loading the ZMatrix... \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
 
-  if(!is.null(PriorStudies)){
+
+  if(save_files) Files_Info = data.table::fread("PriorGWASs.tsv")
+
+  if(!is.null(prior_studies)){
     tmp = paste0("Selecting studies :\n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
     if(grepl("macOS", sessionInfo()$running)){
-      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=c(1:5, PriorStudies+5), showProgress = FALSE)
+      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=c(1:5, prior_studies+5), showProgress = FALSE)
     } else if(grepl("Linux", sessionInfo()$running)){
-      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=c(1:5, PriorStudies+5), showProgress = FALSE)
+      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=c(1:5, prior_studies+5), showProgress = FALSE)
     } else {
-      stop("Only UNIL and MAC OS are supported")
+      stop("Only UNIX and MAC OS are supported")
     }
 
   } else {
@@ -37,24 +38,22 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
     } else if(grepl("Linux", sessionInfo()$running)){
       ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), showProgress = FALSE)
     } else {
-      stop("Only UNIL and MAC OS are supported")
+      stop("Only UNIX and MAC OS are supported")
     }
   }
 
   tmp = paste0(ncol(ZMatrix)-5, " studies \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
+
   tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific = F), " SNPs \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
 
   # select based on threshold if different from 1e-5 and removed rows without any Z-Score ok
-  Zlimit = qnorm(MRthreshold/2, lower.tail = F)
+  Zlimit = qnorm(MR_threshold/2, lower.tail = F)
 
-  if(MRthreshold != 1e-5 ){
+  if(MR_threshold != 1e-5 ){
     tmp = paste0("# Thresholding... \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
 
     SNPsToKeep = apply(ZMatrix[,-c(1:5)], 1, function(x) any(abs(x)>Zlimit))
     ZMatrix=ZMatrix[SNPsToKeep,]
@@ -63,22 +62,21 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
     StudiesToKeep = apply(ZMatrix[,-c(1:5)], 2, function(x) any(abs(x)>Zlimit))
     if(!all(StudiesToKeep)){
       tmp = paste0(paste0(colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after thresholding) \n")
+      if(save_files){
+        Files_Info$Status[Files_Info$File %in% colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep]] =
+          "Excluded for MR: no strong instrument left after thresholding"
+      }
       ZMatrix[,colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep] := NULL]
-      Log = c(Log, tmp)
     }
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
     tmp = paste0(ncol(ZMatrix)-5, " studies left after thresholding \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
 
     tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific = F), " SNPs left after thresholding \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
   } else {
-
     tmp = paste0("No thresholding needed... \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
   }
 
   # pruning
@@ -87,20 +85,16 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
   dist = 500000
   if(DistancePruning){
     tmp = paste0("Distance pruning... \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
     tmp = paste0("   distance : ", dist/1000, "kb \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
     ZMatrixPruned = prune_ZMatrix(ZMatrix, prune.dist = dist)
   } else {
     r2 = 0.8
     tmp = paste0("LD pruning... \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
     tmp = paste0("   distance : ", dist/1000, "kb", " - r2 threshold : ", r2, "\n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
     ZMatrixPruned = prune_ZMatrix(ZMatrix, prune.dist = dist, r2.limit=r2)
   }
 
@@ -108,23 +102,23 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
   StudiesToKeep = apply(ZMatrixPruned[,-c(1:5)], 2, function(x) any(abs(x)>Zlimit))
   if(!all(StudiesToKeep)){
     tmp = paste0(paste0(colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after pruning) \n")
+    if(save_files){
+      Files_Info$Status[Files_Info$File %in% colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep]] =
+        "Excluded for MR: no strong instrument left after pruning"
+    }
     ZMatrixPruned[,colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep] := NULL]
-    Log = c(Log, tmp)
   }
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
   tmp = paste0(ncol(ZMatrixPruned)-5, " studies left after pruning \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
 
   tmp = paste0(format(nrow(ZMatrixPruned), big.mark = ",", scientific = F), " SNPs left after pruning \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
 
   # Add conventional GWAS column, at the end (make sure alleles are aligned)
   if(is.numeric(GWAS)){  # if GWAS from our data
-    tmp = paste0("# Adding data from the conventional GWAS (ID=", GWAS, "): \n \"", listFiles(IDs = GWAS) , "\" \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    tmp = paste0("# Adding data from the conventional GWAS (ID=", GWAS, "): \n \"", list_files(IDs = GWAS) , "\" \n")
+    Log = update_log(Log, tmp, verbose)
 
     if(grepl("macOS", sessionInfo()$running)){
       GWASData=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5), showProgress = FALSE)
@@ -137,16 +131,14 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
     # no need to check for alignment of alleles, just subset and rename the column
     # keep the SNPs in our pruned matrix and order them correctly
     GWASData = GWASData[match(ZMatrixPruned$rs,GWASData$rs),]
-    ZMatrixPruned[,  listFiles(IDs = GWAS)  := GWASData[,6]]
+    ZMatrixPruned[,  list_files(IDs = GWAS)  := GWASData[,6]]
 
     tmp = "Done! \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
 
   } else if(is.character(GWAS)){  # if GWAS is a file
     tmp = paste0("# Adding data from the conventional GWAS : \n \"", GWAS, "\" \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
 
     if(!grepl(".gz", GWAS)){
       GWASData = data.table::fread(GWAS, showProgress = FALSE)
@@ -184,15 +176,13 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
     ZMatrixPruned[, strsplit(GWAS, "/")[[1]][ length(strsplit(GWAS, "/")[[1]])]] = GWASData$myZ
 
     tmp = "Done! \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
 
   } else if(is.data.frame(GWAS)){  # if GWAS is data.frame
     GName = attributes(GWAS)$GName
     tmp = paste0("# Adding data from the conventional GWAS : \n \"", GName,
                  "\" \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
 
     rs = match(colnames(GWAS),c("snpid", "snp", "rnpid", "rs", "rsid"))
     rs = which(!is.na(rs))
@@ -221,41 +211,46 @@ makeMR_ZMatrix <- function(PriorStudies=NULL, GWAS,
     ZMatrixPruned[, GName] = GWAS$myZ
 
     tmp = "Done! \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
 
   }
 
 
   ZMatrixPruned = ZMatrixPruned[complete.cases(ZMatrixPruned)]
   tmp = paste0(format(nrow(ZMatrixPruned), big.mark = ",", scientific=F), " SNPs in common between prior studies and the conventional GWAS \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
 
   StudiesToKeep = apply(ZMatrixPruned[,-c(1:5)], 2, function(x) any(abs(x)>Zlimit))
   # always keep the conventionnal GWAS no matter the values
   StudiesToKeep[length(StudiesToKeep)]=TRUE
   if(!all(StudiesToKeep)){
     tmp = paste0(paste0(colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument in common) \n")
+    if(save_files){
+      Files_Info$Status[Files_Info$File %in% colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep]] =
+        "Excluded for MR: no strong instrument in common with conventional GWAS"
+    }
     ZMatrixPruned[,colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep] := NULL]
-    Log = c(Log, tmp)
   }
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
   tmp = paste0(ncol(ZMatrixPruned)-6, " studies left after combining with conventional GWAS \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
 
 
   # write Pruned ZMatrix
-  if(saveFiles){
-    write.table(ZMatrixPruned, file="MR_ZMatrix.csv", sep=",", row.names=F, quote=F)
-    tmp = "The file \"MR_ZMatrix.csv\" has been successfully created \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
-  }
+  # if(saveFiles){
+  #   write.table(ZMatrixPruned, file="MR_ZMatrix.csv", sep=",", row.names=F, quote=F)
+  #   tmp = "The file \"MR_ZMatrix.csv\" has been successfully created \n"
+  #   Log = c(Log, tmp)
+  #   if(verbose) cat(tmp)
+  # }
+
+  if(save_files) write.table(Files_Info, file="PriorGWASs.tsv", sep="\t", quote=F, row.names=F )
+
+
+
   res=list()
-  res$Log = Log
-  res$Mat = ZMatrixPruned
+  res$log_info = Log
+  res$mat = ZMatrixPruned
   return(res)
 }
 

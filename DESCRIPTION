@@ -15,8 +15,10 @@ Suggests:
 Imports: 
   data.table,
   fastmatch,
+  ggplot2,
   gtools,
   magrittr,
+  qqman,
   Rcpp,
   readr
   

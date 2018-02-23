@@ -4,12 +4,12 @@
 \alias{request_BFandP}
 \title{Calculate Bayes Factor and empirical p-values from observed Z-scores and priors}
 \usage{
-request_BFandP(Prior, saveFiles = F, verbose = F)
+request_BFandP(Prior, save_files = F, verbose = F)
 }
 \arguments{
 \item{Prior}{from the function makePrior()}
 
-\item{saveFiles}{A logical indicating if the results should be saved as files,
+\item{save_files}{A logical indicating if the results should be saved as files,
 \code{default=FALSE}}
 
 \item{verbose}{A logical indicating if information on progress should be reported,

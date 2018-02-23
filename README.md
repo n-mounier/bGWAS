@@ -3,19 +3,24 @@
 [//]:========================================
 
 :information_source: package under development
+:warning: if you downloaded the Z-Matrix files before 25/02/2018, they are obsolete, you need to delete the old ones and download the new ones!
 
 ## Overview
 [//]:-------------------------------
 
-bGWAS is an R-package to perform a Bayesian GWAS, using summary statistics as input. Briefly, it compares the observed Z-score from a conventional GWAS to a prior Z-score, calculated from publicly available GWASs (currently, a set of 58 studies, last update dd-mm-yyyy - hereinafter referred to as "prior GWASs"). Only prior GWASs having a significant influence on the conventional GWAS (identified using a multivariate Mendelian Randomization (MR) approach) are used to calculate the prior Z-scores.          
+bGWAS is an R-package to perform a Bayesian GWAS, using summary statistics as input. Briefly, it compares the observed Z-score from a conventional GWAS to a prior Z-score, calculated from publicly available GWASs (currently, a set of 58 studies, last update dd-mm-yyyy - hereinafter referred to as "prior GWASs"). Only prior GWASs having a significant influence on the conventional GWAS (identified using a multivariate Mendelian Randomization (MR) approach) are used to calculate the prior Z-scores. Causal effect are estimated masking the focal chromosome to ensure independence.          
 Observed and prior Z-scores are compared using Bayes Factors, and empirical p-values are calculated using a permutation approach.   
 
 The main functions are:   
--   `bGWAS()` -  core function that will return a data.frame containing significant   
-<!--- returns an object of class `bGWAS-class`. See the vignette: vignette('vcf_data')  ---> 
--   `availableStudies()` will directly return the available prior GWASs that can be used to calculate prior Z-scores   
--   `selectStudies()` allows a quick selection of prior GWASs (to include/exclude specific studies when calculating prior Z-scores)   
--   `bGWASfromPrior()` compare prior Z-scores pre-calculated by the user to observed Z-scores # NOT IMPLEMENTED YET   
+-   `bGWAS()` -  core function that returns an object of class "bGWAS"    
+<!--- returns an object of class `bGWAS-class`. See the vignette: vignette('vcf_data')
+THIS USE RISK FACTORS TO CREATE THE PRIOR---> 
+-   `list_priorGWASs()` directly returns the available prior GWASs that can be used to calculate prior Z-scores   
+-   `select_priorGWASs()` allows a quick selection of prior GWASs (to include/exclude specific studies when calculating prior Z-scores)   
+-   `manatthan_plot_bGWAS()` Create a Manhattan Plot from bGWAS results
+-   `coefficients_plot_bGWAS()` Create a Coefficients Plot (causal effect of Prior GWASs) from bGWAS results    
+-   `bGWAS_fromPrior()` alternative function that compares prior Z-scores provided by the user to observed Z-scores # NOT IMPLEMENTED YET   
+
 
 
 ## Installation
@@ -27,7 +32,8 @@ These files contains the Z-scores for all prior GWASs (before and after imputati
 Z-scores before imputation are used for multivariate MR.  
 Z-scores after imputation are used to calculate the prior Z-scores. 
 
-`wget --no-check-certificate https://drive.switch.ch/index.php/s/pxZsWY88RSDsO8K/download -O ZMatrices.tar.gz`    
+`wget --no-check-certificate https://drive.switch.ch/index.php/s/BpRrDXvFPbnKCM6/download -O ZMatrices.tar.gz`  CHANGE LINK!!!
+
 
 `tar xzvf ZMatrices.tar.gz`
 
@@ -66,9 +72,9 @@ Can I add one more?--->
 
 ### Study Selection
 ``` r
-AllStudies = availableStudies()
-listTraits()
-MyStudies = selectStudies(includeTraits=c("Heart Rate", "Body mass index", "Smoking"))
+AllStudies = ()
+list_traits()
+MyStudies = select_priorGWASs(include_traits=c("Heart Rate", "Body mass index", "Smoking"))
 AllStudies[AllStudies$ID %in% MyStudies, ]
 ```
 
@@ -78,8 +84,8 @@ AllStudies[AllStudies$ID %in% MyStudies, ]
 # Using a GWAS from our list our prior GWASs
 # Using all other (57) GWASs to built the prior
 MyGWAS = 1
-listFiles(MyGWAS)
-A = bGWAS(Name = "Test_UsingGWASfromList",
+list_files(MyGWAS)
+A = bGWAS(name = "Test_UsingGWASfromList",
          GWAS = MyGWAS
          verbose=T)
          
@@ -88,34 +94,68 @@ A = bGWAS(Name = "Test_UsingGWASfromList",
 # Using a small GWAS (400,000 SNPs, Pilling et al data - file)
 # Using only specific traits / files (resulting in 9 GWASs included)
 MyGWAS = system.file("Data/SmallGWAS_Pilling2017.csv", package="bGWAS")
-MyStudies = selectStudies(includeTraits=c("Type 2 diabetes", "Smoking"),
-                          includeFiles=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
-listFiles(MyStudies)
+MyStudies = select_priorGWASs(include_traits=c("Type 2 diabetes", "Smoking"),
+                          include_files=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
+list_files(MyStudies)
  
-B = bGWAS(Name = "Test_UsingSmallGWAS",
+B = bGWAS(name = "Test_UsingSmallGWAS",
          GWAS = MyGWAS,
-         PriorStudies=MyStudies,
+         prior_studies=MyStudies,
          verbose=T) 
+print(B)
+manatthan_plot_bGWAS(B)
+```
     
-         
+``` r         
 ## Example C
 # Using a small GWAS (400,000 SNPs, Pilling et al data - data.frame)
 # Using only specific traits / files (resulting in 9 GWASs included)
 data("SmallGWAS_Pilling2017")
-MyStudies = selectStudies(includeTraits=c("Type 2 diabetes", "Smoking"),
-                          includeFiles=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
+MyStudies = select_priorGWASs(include_traits=c("Type 2 diabetes", "Smoking"),
+                          include_files=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
 
-C = bGWAS(Name="Test_UsingSmallDataFrame",
+C = bGWAS(name="Test_UsingSmallDataFrame",
          GWAS = SmallGWAS_Pilling2017,
-         PriorStudies=MyStudies,
+         prior_studies=MyStudies,
          verbose=T,
-         saveFiles=T)
+         save_files=T)
+print(C)
          
          
 # Note that B and C are using the same data (stored differently) and give the same results.
 
          
 ```
+
+## Results
+`bGWAS()` returns an object of class "bGWAS" than can be handled in `R`. \cr
+
+```r
+print(myObj)
+```
+-> insert figure here
+
+Functions for graphic representations:   
+`manatthan_plot_bGWAS(myObj)`   
+-> insert figure here   
+`coefficients_plot_bGWAS(myObj)`   
+-> insert figure here  
+
+extract significant SNPs   
+extract all results   
+extract significant studies   
+
+Aditionnaly, if `save_files=T`, several files are created...   
+... in your working directory :    
+-   "`name`.log" - log file    
+... in the folder `./name/` :   
+-   "PriorGWASs.tsv" - contains Prior GWASs information (general info + status (used/removed) + MR coefficients)   
+-   "CoefficientsByChromosome.csv" - contains the MR estimates when masking the focal chromosome (22 coefficients / study)    
+-   "PriorBFp.csv" - contains BF and p-values estimated for all SNPs    
+-   "SignificantSNPs.csv" - contains BF and p-values estimated for a subset of SNPs    
+
+
+Further description of the files?   
 
 
 ## Runtime
@@ -133,7 +173,7 @@ document results files
 
 bGWASfromPrior()    
 
-selection from consortium    
+selection from consortium (maybe not possible - too complicated, too many cohorts in each consortium...)    
 use of a subset of SNPs   
 use of re-imputed studies for prior   
 use of additional studies for prior   

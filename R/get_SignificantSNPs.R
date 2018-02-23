@@ -14,8 +14,7 @@
 # Function not exported, no need of extended documentation?
 
 
-
-get_SignificantSNPs <- function(Prior, SignMethod="p", SignThresh=5e-8, pruneRes=T, saveFiles=F, verbose=F) {
+get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, prune_res=T, save_files=F, verbose=F) {
   Log = c()
 
   "%S>%" <- function(x,to.be.ignored){ # like a 'sink' version of magrittr's  %T>%
@@ -23,51 +22,51 @@ get_SignificantSNPs <- function(Prior, SignMethod="p", SignThresh=5e-8, pruneRes
   }
 
 
-  if(!SignMethod %in% c("p", "fdr")) stop("method not accepted")
-  if(!is.numeric(SignThresh)) stop("non numeric threshold")
+  if(!sign_method %in% c("p", "fdr")) stop("method not accepted")
+  if(!is.numeric(sign_thresh)) stop("non numeric threshold")
 
   tmp = paste0("   Starting with ", format(nrow(Prior), big.mark = ",", scientific = F), " SNPs \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
 
-  if(SignMethod == "fdr"){
+
+  if(sign_method == "fdr"){
     tmp = "# Selecting significant SNPs according to FDR (Benjamini-Hochberg procedure)... \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
 
     Prior[, fdr := p.adjust(BF_p, method='fdr')]
-    PriorThr = Prior[fdr<SignThresh]
+    PriorThr = Prior[fdr<sign_thresh]
 
     tmp = paste0(format(nrow(PriorThr), big.mark = ",", scientific = F), " SNPs left \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
 
 
     tmp = "Done! \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
   }
 
-  if(SignMethod == "p"){
+  if(sign_method == "p"){
     tmp = "# Selecting significant SNPs according to p-values... \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
 
-    PriorThr = Prior[BF_p<SignThresh]
+
+    PriorThr = Prior[BF_p<sign_thresh]
 
     tmp = paste0(format(nrow(PriorThr), big.mark = ",", scientific = F), " SNPs left \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
 
     tmp = "Done! \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
   }
 
-  if(pruneRes){
+  if(prune_res){
     tmp = "# Pruning significant SNPs... \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
 
     # snps should be ordered by significance
     accepted.snps = ""[0] # an empty character vector of the 'rs' names that will survive pruning
@@ -111,12 +110,12 @@ get_SignificantSNPs <- function(Prior, SignMethod="p", SignThresh=5e-8, pruneRes
     SignifSNPs = PriorThr[PriorThr$rs %in% accepted.snps,]
 
     tmp = paste0(format(nrow(SignifSNPs), big.mark = ",", scientific = F), " SNPs left \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
 
     tmp = "Done! \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
   } else {
     SignifSNPs = PriorThr
   }
@@ -124,16 +123,16 @@ get_SignificantSNPs <- function(Prior, SignMethod="p", SignThresh=5e-8, pruneRes
 
 
 
-  if(saveFiles){
+  if(save_files){
     write.table(SignifSNPs, file= "SignificantSNPs.csv", sep=",", row.names=F, quote=F)
     tmp = "The file \"SignificantSNPs.csv\" has been successfully created \n"
-    Log = c(Log, tmp)
-    if(verbose) print(tmp)
+    Log = update_log(Log, tmp, verbose)
+
   }
 
 
   res=list()
-  res$Log = Log
-  res$SNPs = SignifSNPs
+  res$log_info = Log
+  res$SNPs = SignifSNPs$rs
   return(res)
 }

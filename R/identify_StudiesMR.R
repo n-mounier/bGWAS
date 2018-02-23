@@ -10,7 +10,7 @@
 #' @param ZMatrix The pruned Z-Matrix of strong instrument or the path of the file
 #'        containing it (data table or character)
 #'
-#' @return Log file + list of studies significant + create files (list them) if saveFiles=T
+#' @return Log file + list of studies significant + create files (list them) if save_files=T
 #'
 #' @importFrom magrittr "%>%"
 #' @importFrom magrittr "%<>%"
@@ -18,9 +18,12 @@
 #' @export
 
 
-identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
+identify_studiesMR <- function(ZMatrix, save_files=FALSE, verbose=FALSE){
 
   Log = c()
+
+  if(save_files) Files_Info = data.table::fread("PriorGWASs.tsv")
+
 
   scheme_INpXXtozero = 1e-5 # if p-value studies > 1e-5, Z-Score is set to zero
 
@@ -57,9 +60,7 @@ identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
   }
 
   tmp = paste0("#Preparation of the MR analyses to identify significant studies... \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
-
+  Log = update_log(Log, tmp, verbose)
 
   # Truncate Z-scores
   ZMatrix= push.extreme.zs.back.a.little.towards.zero(ZMatrix)
@@ -70,12 +71,10 @@ identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
 
   Prior_study_names = All_study_names[1:length(All_study_names)-1]
   tmp = paste0("Studies tested : ", paste(Prior_study_names, collapse = " - "), "\n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
 
   tmp = paste0("Conventionnal GWAS of interest : ", All_study_names[length(All_study_names)], "\n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
 
 
   # Set the z-scores to 0 for the regression if too low
@@ -84,9 +83,8 @@ identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
       threshold = abs(qnorm(scheme_INpXXtozero/2))
       ZMatrix[c(abs(ZMatrix[,..column_of_zs]) < threshold) , column_of_zs] <- 0
     }
-    #tmp = "Z-scores were set to 0 if p-value > 1e-5 \n"
-    #Log = c(Log, tmp)
-    #if(verbose) cat(tmp)
+    # tmp = "Z-scores were set to 0 if p-value > 1e-5 \n"
+    #  Log = update_log(Log, tmp, verbose)
   }
 
 
@@ -103,8 +101,7 @@ identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
 
   # Compute and save the univariate regressions (used to check directionnality in multivariate regression):
   tmp = paste0("# Univariate regressions for each trait... \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
 
 
   uni.coefs.collection = data.table::data.table()
@@ -121,13 +118,14 @@ identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
   }
   data.table::setkey(uni.coefs.collection, nm)
 
+
   # if some of the r2 are too high, this is probably the same trait and you should exclude
   # it from the analysis
   if(any(uni.coefs.collection$r.squared>0.7)){
     too.high=which(uni.coefs.collection$r.squared>0.7)
     Names = uni.coefs.collection[too.high,"nm"]
     r2 = uni.coefs.collection[too.high,"r.squared"]
-    S = availableStudies()
+    S = list_priorGWASs()
     IDs = S$ID[match(Names$nm, S$File)]
     Ref = paste0(Names$nm, " (ID = ", IDs, " - r2 = ", r2$r.squared, ")")
 
@@ -137,30 +135,41 @@ identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
                 " before re-rerunning the analysis. \n"))
   }
 
+  colnames(uni.coefs.collection) = c("Study", "Estimate", "StdError", "T", "P",
+                                 "AdjRSquared", "RSquared")
 
-  if(saveFiles){
-    readr::write_csv("Univariate_coefs.csv", x=uni.coefs.collection)
-    tmp = "The file \"Univariate_coefs.csv\" has been successfully writed. \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+  if(save_files){ # add univariate coeffs
+   Files_Info$Uni_Estimate = numeric()
+   Files_Info$Uni_Estimate[match(uni.coefs.collection$Study, Files_Info$File)] = uni.coefs.collection$Estimate
+   Files_Info$Uni_StdError = numeric()
+   Files_Info$Uni_StdError[match(uni.coefs.collection$Study, Files_Info$File)] = uni.coefs.collection$StdError
+   Files_Info$Uni_T = numeric()
+   Files_Info$Uni_T[match(uni.coefs.collection$Study, Files_Info$File)] = unlist(uni.coefs.collection[,"T"])
+   Files_Info$Uni_P = numeric()
+   Files_Info$Uni_P[match(uni.coefs.collection$Study, Files_Info$File)] = uni.coefs.collection$P
+   Files_Info$Uni_AdjRSquared = numeric()
+   Files_Info$Uni_AdjRSquared[match(uni.coefs.collection$Study, Files_Info$File)] = uni.coefs.collection$AdjRSquared
+   Files_Info$Uni_RSquared = numeric()
+   Files_Info$Uni_RSquared[match(uni.coefs.collection$Study, Files_Info$File)] = uni.coefs.collection$RSquared
   }
 
 
   tmp = paste0("Done! \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
+
 
 
   tmp = paste0("# Stepwise AIC multivariate regression...")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
+
 
   significant.studies = Prior_study_names # might be shrunk in the coming lines
   stopifnot(length(significant.studies) == length(Prior_study_names))
 
   initial.formula = paste0(All_study_names[length(All_study_names)],' ~ -1')
   k=2 # for AIC
-  # step looks in global environment for the data it needs, trick : using the assign function
+  # step() looks in global environment for the data it needs,
+  # trick : use the assign function !
   assign("ZMatrix", ZMatrix, envir = .GlobalEnv)
 
   lm(data=ZMatrix, formula = initial.formula) -> fit
@@ -175,7 +184,6 @@ identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
 
   coefs = data.frame( coef(summary(fit.stepped)) )
   coefs = coefs[order(coefs$Pr...t..),,drop=F]
-  #cat(coefs)
   significant.studies = gsub("`","",rownames(coefs))
 
 
@@ -183,14 +191,18 @@ identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
   post_AIC_studies = significant.studies
   if(length(post_AIC_studies)==0) stop("no study significant")
 
+  if(save_files){ # add Status : AIC exclusion
+    StudiesNotSelected =   Prior_study_names[!Prior_study_names %in%   post_AIC_studies ]
+    Files_Info$Status[Files_Info$File %in% StudiesNotSelected] = "Excluded during multivariate MR (AIC stepwise selection)"
+  }
+
+
   if(length(post_AIC_studies)>1){
     tmp = paste0(length(post_AIC_studies), " studies are significant : ", paste0(post_AIC_studies, collapse = " - "), "\n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
   } else {
     tmp = paste0(length(post_AIC_studies), " study is significant : ", paste0(post_AIC_studies, collapse = " - "), "\n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
   }
 
   "%|%" <- function(x,y){
@@ -198,14 +210,12 @@ identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
   }
 
   tmp = paste0("Done! \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
 
 
   # We now have a set of studies from AIC,but we may want to prune them further
   tmp = paste0("#Further pruning of these studies... \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
   removal_reasons=data.table::data.table()
 
   # model
@@ -226,9 +236,12 @@ identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
   }
 
   if(!is.null(studies_to_remove)){
+    if(save_files){ # add Status : AIC exclusion
+      Files_Info$Status[Files_Info$File %in% studies_to_remove] =
+        "Excluded during multivariate MR (p-value > 0.05)"
+    }
     tmp = paste0(paste0(studies_to_remove, collapse=" - "), " : removed because of MR p-value > 0.05 \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
     significant.studies=significant.studies[!significant.studies %in% studies_to_remove]
   }
 
@@ -249,27 +262,22 @@ identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
   }
 
   if(!is.null(studies_to_removeD)){
+    if(save_files){ # add Status : AIC exclusion
+      Files_Info$Status[Files_Info$File %in% studies_to_removeD] =
+        "Excluded during multivariate MR (unconsistent direction)"
+    }
     tmp = paste0(paste0(studies_to_removeD, collapse=" - "), " : removed because of different directions (univariate vs multivariate) \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
     significant.studies=significant.studies[!significant.studies %in% studies_to_removeD]
   }
 
 
   if(!is.null(studies_to_remove)){
     removal_reasons %<>% rbind(.,data.table::data.table(studies_to_remove, reasons))
-
-    if(saveFiles){
-      readr::write_csv(removal_reasons, "Removal_reasons.csv")
-      tmp = paste0("The file ", "Removal_reasons.csv has been successfully writed. \n")
-      Log = c(Log, tmp)
-      if(verbose) cat(tmp)
-    }
   }
 
   tmp = paste0("Done! \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
 
   final_set_of_study_names  = significant.studies[!significant.studies %in% studies_to_remove]
 
@@ -277,24 +285,30 @@ identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
   # compute, and then save, the 'full-22-in-one-go' regression results
   #catn('regression on entire dataset:')
   tmp = paste0("# Final regression... \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
 
   coefs <- data.frame(coef(summary(lm(data=ZMatrix, formula = generate.formula(All_study_names[length(All_study_names)], final_set_of_study_names)))))
   coefs=cbind(nm=rownames(coefs), coefs)
   rownames(coefs) <- NULL
   coefs = coefs[order(coefs$Pr...t..),,drop=F]
 
-  if(saveFiles){
-    readr::write_csv(path="Multivariate_coefs.csv", x=coefs)
-    tmp = paste0("The file ", "Multivariate_coefs.csv has been successfully writed. \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+  colnames(coefs) = c("Study", "Estimate", "StdError", "T", "P")
+
+  if(save_files){
+    write.table(Files_Info, file="PriorGWASsTMP.tsv", sep="\t", quote=F, row.names=F )
+    write.table(coefs, file="coefs.tsv", sep="\t", quote=F, row.names=F )
+    Files_Info$Multi_Estimate = numeric()
+    Files_Info$Multi_Estimate[match(coefs$Study, Files_Info$File)] = coefs$Estimate
+    Files_Info$Multi_StdError = numeric()
+    Files_Info$Multi_StdError[match(coefs$Study, Files_Info$File)] = coefs$StdError
+    Files_Info$Multi_T = numeric()
+    Files_Info$Multii_T[match(coefs$Study, Files_Info$File)] = unlist(coefs[,"T"])
+    Files_Info$Multi_P = numeric()
+    Files_Info$Multi_P[match(coefs$Study, Files_Info$File)] = coefs$P
   }
 
   tmp = paste0("Done! \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
 
   ## Do we really need it ?
 #  coefs <- data.frame(coef(summary(lm(data=ZMatrix, formula = generate.formula(All_study_names[length(All_study_names)], final_set_of_study_names, with.intercept=T)))))
@@ -303,15 +317,18 @@ identify_StudiesMR <- function(ZMatrix, saveFiles=FALSE, verbose=FALSE){
 #  coefs = coefs[order(coefs$Pr...t..),,drop=F]
   #cat(coefs)
   #readr::write_csv(path="univariate.coefs.withInter.csv", x=coefs)
-#  if(saveFiles){
+#  if(save_files){
 #    readr::write_csv(data.table::data.table(study_selected=final_set_of_study_names), "MR_Studies.csv")
 #    tmp = paste0("The file ", "MR_Studies.csv has been successfully writed. \n")
 #    Log = c(Log, tmp)
 #    if(verbose) cat(tmp)
 #  }
 
+  if(save_files)                write.table(Files_Info, file="PriorGWASs.tsv", sep="\t", quote=F, row.names=F )
+
   res=list()
-  res$Log = Log
-  res$Studies = data.table::data.table(study_selected=final_set_of_study_names)
+  res$log_info = Log
+  res$studies = data.table::data.table(study_selected=final_set_of_study_names)
+  res$coeffs = coefs
   return(res)
 }

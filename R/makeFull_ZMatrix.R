@@ -8,7 +8,7 @@
 #' the prior.
 #'
 #' @inheritParams bGWAS
-#' @param Studies The IDs of the significant studies selected by \code{identify_StudiesMR()}
+#' @param studies The IDs of the significant studies selected by \code{identify_studiesMR()}
 #'        (numeric vector)
 #'
 #' @return An object containing Log file and pruned Z-Matrix of MR instrument (data table) + create a file if saveFiles=T
@@ -18,41 +18,41 @@
 
 
 
-makeFull_ZMatrix <- function(Studies=NULL, GWAS,  ZMatrices="~/ZMatrices", saveFiles=F, verbose=F) {
+makeFull_ZMatrix <- function(studies=NULL, GWAS,  Z_matrices="~/Z_matrices", save_files=F, verbose=F) {
   Log = c()
   tmp = paste0("# Loading the ZMatrix... \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
+
 
   tmp = paste0("Selecting studies :\n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
+
   if(grepl("macOS", sessionInfo()$running)) {
-    ZMatrix=data.table::fread(paste0("zcat < ",paste0(ZMatrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, Studies+5 ), showProgress = FALSE)
+    ZMatrix=data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, studies+5 ), showProgress = FALSE)
   } else if(grepl("Linux", sessionInfo()$running)){
-    ZMatrix=data.table::fread(paste0("zcat < ",paste0(ZMatrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, Studies+5 ), showProgress = FALSE)
+    ZMatrix=data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, studies+5 ), showProgress = FALSE)
   } else {
     stop("Only UNIL and MAC OS are supported")
   }
   tmp = paste0(ncol(ZMatrix)-5, " studies \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
+
   tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific = F), " SNPs \n")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
+
 
 
   # Add conventional GWAS column, at the end (make sure alleles are aligned)
 
   if(is.numeric(GWAS)){  # if GWAS from our data
-    tmp = paste0("# Adding data from the conventional GWAS (ID=", GWAS, "): \n \"", listFiles(IDs = GWAS) , "\" \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    tmp = paste0("# Adding data from the conventional GWAS (ID=", GWAS, "): \n \"", list_files(IDs = GWAS) , "\" \n")
+    Log = update_log(Log, tmp, verbose)
+
 
     if(grepl("macOS", sessionInfo()$running)){
-      GWASData=data.table::fread(paste0("zcat < ",paste0(ZMatrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5))
+      GWASData=data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5))
     } else if(grepl("Linux", sessionInfo()$running)){
-      GWASData=data.table::fread(paste0("zcat < ",paste0(ZMatrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5))
+      GWASData=data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5))
     } else {
       stop("Only UNIL and MAC OS are supported")
     }
@@ -60,16 +60,15 @@ makeFull_ZMatrix <- function(Studies=NULL, GWAS,  ZMatrices="~/ZMatrices", saveF
     # no need to check for alignment of alleles, just subset and rename the column
     # keep the SNPs in our pruned matrix and order them correctly
     GWASData = GWASData[match(ZMatrix$rs,GWASData$rs),]
-    ZMatrix[,  listFiles(IDs = GWAS)  := GWASData[,6]]
+    ZMatrix[,  list_files(IDs = GWAS)  := GWASData[,6]]
 
     tmp = "Done! \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
 
   } else if(is.character(GWAS)){  # if external GWAS
     tmp = paste0("# Adding data from the conventional GWAS : \n \"", GWAS, "\" \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
 
     if(!grepl(".gz", GWAS)){
       GWASData = data.table::fread(GWAS, showProgress = FALSE)
@@ -104,14 +103,14 @@ makeFull_ZMatrix <- function(Studies=NULL, GWAS,  ZMatrices="~/ZMatrices", saveF
     ZMatrix[, strsplit(GWAS, "/")[[1]][ length(strsplit(GWAS, "/")[[1]])]] = GWASData$myZ
 
     tmp = "Done! \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
   } else if(is.data.frame(GWAS)){  # if GWAS is data.frame
     GName = attributes(GWAS)$GName
     tmp = paste0("# Adding data from the conventional GWAS : \n \"", GName,
                  "\" \n")
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
 
     rs = match(colnames(GWAS),c("snpid", "snp", "rnpid", "rs", "rsid"))
     rs = which(!is.na(rs))
@@ -138,29 +137,29 @@ makeFull_ZMatrix <- function(Studies=NULL, GWAS,  ZMatrices="~/ZMatrices", saveF
     ZMatrix[, GName] = GWAS$myZ
 
     tmp = "Done! \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
+    Log = update_log(Log, tmp, verbose)
+
   }
 
 
 
   ZMatrix = ZMatrix[complete.cases(ZMatrix)]
   tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific=F), " SNPs in common between prior studies and the conventional GWAS")
-  Log = c(Log, tmp)
-  if(verbose) cat(tmp)
+  Log = update_log(Log, tmp, verbose)
+
 
   # write ZMatrix
   # only if write.file=T
-  if(saveFiles){
-    write.table(ZMatrix, file= "Full_ZMatrix.csv", sep=",", row.names=F, quote=F)
-    tmp = "The file \"Full_ZMatrix.csv\" has been successfully created \n"
-    Log = c(Log, tmp)
-    if(verbose) cat(tmp)
-  }
+  # if(save_files){
+  #   write.table(ZMatrix, file= "Full_ZMatrix.csv", sep=",", row.names=F, quote=F)
+  #   tmp = "The file \"Full_ZMatrix.csv\" has been successfully created \n"
+  #   Log = c(Log, tmp)
+  #   if(verbose) cat(tmp)
+  # }
 
   res=list()
-  res$Log = Log
-  res$Mat = ZMatrix
+  res$log_info = Log
+  res$mat = ZMatrix
   return(res)
 }
 
