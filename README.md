@@ -2,38 +2,38 @@
 # bGWAS
 [//]:========================================
 
-:information_source: package under development
+:information_source: package under development :information_source:    
 :warning: if you downloaded the Z-Matrix files before 25/02/2018, they are obsolete, you need to delete the old ones and download the new ones!
 
 ## Overview
 [//]:-------------------------------
 
-bGWAS is an R-package to perform a Bayesian GWAS, using summary statistics as input. Briefly, it compares the observed Z-score from a conventional GWAS to a prior Z-score, calculated from publicly available GWASs (currently, a set of 58 studies, last update dd-mm-yyyy - hereinafter referred to as "prior GWASs"). Only prior GWASs having a significant influence on the conventional GWAS (identified using a multivariate Mendelian Randomization (MR) approach) are used to calculate the prior Z-scores. Causal effect are estimated masking the focal chromosome to ensure independence.          
+bGWAS is an R-package to perform a Bayesian GWAS, using summary statistics as input. Briefly, it compares the observed Z-scores from a conventional GWAS to prior Z-scores. These prior Z-scores can be provided by the user of directly calculated from publicly available GWASs (currently, a set of 58 studies, last update dd-mm-yyyy - hereinafter referred to as "prior GWASs"). In this case, only prior GWASs having a significant influence on the conventional GWAS (identified using a multivariate Mendelian Randomization (MR) approach) are used to calculate the prior Z-scores. Causal effect are estimated masking the focal chromosome to ensure independence.          
 Observed and prior Z-scores are compared using Bayes Factors, and empirical p-values are calculated using a permutation approach.   
 
 The main functions are:   
--   `bGWAS()` -  core function that returns an object of class "bGWAS"    
+-   `bGWAS()` -  core function that calculates prior Z-scores from prior GWASs, compares them to observed Z-scores and returns an object of class "bGWAS"    
 <!--- returns an object of class `bGWAS-class`. See the vignette: vignette('vcf_data')
 THIS USE RISK FACTORS TO CREATE THE PRIOR---> 
--   `list_priorGWASs()` directly returns the available prior GWASs that can be used to calculate prior Z-scores   
+-   `list_priorGWASs()` directly returns information about the prior GWASs that can be used to calculate prior Z-scores   
 -   `select_priorGWASs()` allows a quick selection of prior GWASs (to include/exclude specific studies when calculating prior Z-scores)   
 -   `manatthan_plot_bGWAS()` Create a Manhattan Plot from bGWAS results
 -   `coefficients_plot_bGWAS()` Create a Coefficients Plot (causal effect of Prior GWASs) from bGWAS results    
--   `bGWAS_fromPrior()` alternative function that compares prior Z-scores provided by the user to observed Z-scores # NOT IMPLEMENTED YET   
+-   `bGWAS_fromPrior()` alternative function that compares prior Z-scores provided by the user to observed Z-scores and returns an object of class "bGWAS" # NOT IMPLEMENTED YET   
 
 
 
 ## Installation
 [//]:-------------------------------
 
+If you want to use the `bGWAS()` function to calculate prior Z-scores, you should start by downloading Z-Matrix files.   
 
 * Download Z-Matrix files :   
 These files contains the Z-scores for all prior GWASs (before and after imputation) and were created ... 
 Z-scores before imputation are used for multivariate MR.  
 Z-scores after imputation are used to calculate the prior Z-scores. 
 
-`wget --no-check-certificate https://drive.switch.ch/index.php/s/BpRrDXvFPbnKCM6/download -O ZMatrices.tar.gz`  CHANGE LINK!!!
-
+`wget --no-check-certificate https://drive.switch.ch/index.php/s/BpRrDXvFPbnKCM6/download -O ZMatrices.tar.gz`
 
 `tar xzvf ZMatrices.tar.gz`
 
@@ -63,17 +63,23 @@ If the Z-statistics is not present, it can be calculated from effect size and st
 Effect-size: `b` or `beta`, `beta1`    
 Standard error:  `se` or `std`     
 
-2. Prior *GWASs* (downloaded above)   
-Matrix files, containing Z-scores for all prior GWASs should be downloaded separately and stored in `~/ZMatrices` or in the folder specified when launching the analysis.
+2. Prior *GWASs* (downloaded above) - not needed for the function `bGWAS_fromPrior()`  
+Matrix files, containing Z-scores for all prior GWASs should be downloaded separately and stored in `~/ZMatrices` or in the folder specified when launching the analysis.   
+
+* Currently, this is not possible for users to directly add their own GWASs to this set of prior GWASs. Feel free to contact us for more information. *   
  
 <!---  Format?
 Can I add one more?--->
 
 
 ### Study Selection
+
+Before running your analysis, you can select the prior GWASs you want to include. You can use the function `list_prioGWASs()` to get some information about the prior GWASs available.   
+You should remove traits that by definition are not independent from your trait. For example, before analysing BMI results, make sure to exclude "Height" from prior GWASs. You can use the function `select_priorGWASs()` to automatically exclude/include some traits or some files.   
++ also check consortium (no function for selection) but if same individuals in your GWAS + prior GWASs not ok
+
 ``` r
-AllStudies = ()
-list_traits()
+AllStudies = list_priorGWASs()
 MyStudies = select_priorGWASs(include_traits=c("Heart Rate", "Body mass index", "Smoking"))
 AllStudies[AllStudies$ID %in% MyStudies, ]
 ```
@@ -83,9 +89,9 @@ AllStudies[AllStudies$ID %in% MyStudies, ]
 ## Example A
 # Using a GWAS from our list our prior GWASs
 # Using all other (57) GWASs to built the prior
-MyGWAS = 1
-list_files(MyGWAS)
-A = bGWAS(name = "Test_UsingGWASfromList",
+MyGWAS = 5
+list_priorGWASs(MyGWAS)
+A = bGWAS(name = "Test_UsingGWASfromPriorGWASs",
          GWAS = MyGWAS
          verbose=T)
          
@@ -185,3 +191,6 @@ optimize null-BF calculation
 
 ## Contact
 <mounier.ninon@gmail.com>
+
+
+
