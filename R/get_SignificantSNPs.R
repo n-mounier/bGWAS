@@ -2,16 +2,16 @@
 
 
 
-#' Identify significant SNPs
-#'
-#' From BFs and p-values, identify significant SNPs given a specified threshold and prune them
-#' if necessary
-#' @inheritParams bGWAS
-#' @param Prior from the function request_BFandP()
-#'
-#' @return Log + data.table containing rs-chr-pos-alt-ref-obs-fit-se-...
-#' @export
-# Function not exported, no need of extended documentation?
+# #' Identify significant SNPs
+# #'
+# #' From BFs and p-values, identify significant SNPs given a specified threshold and prune them
+# #' if necessary
+# #' @inheritParams bGWAS
+# #' @param Prior from the function request_BFandP()
+# #'
+# #' @return Log + data.table containing rs-chr-pos-alt-ref-obs-fit-se-...
+# #' @export
+# # Function not exported, no need of extended documentation?
 
 
 get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, prune_res=T, save_files=F, verbose=F) {

@@ -2,17 +2,17 @@
 
 
 
-#' Compute Prior
-#'
-#' From a list of significant studies (from \code{identify_StudiesMR()}), the pruned Z-matrix
-#' of MR instruments (from \code{makeMR_ZMatrix()}) and the full Z-matrix of all SNPs for these
-#' significant studies (from \code{makeFull_ZMatrix()}), compute the prior
-#'
-#' @inheritParams bGWAS
-#' @param selected_studies data table
-#' @param MR_ZMatrix data table
-#' @param All_ZMatrix data table
-#'
+# #' Compute Prior
+# #'
+# #' From a list of significant studies (from \code{identify_StudiesMR()}), the pruned Z-matrix
+# #' of MR instruments (from \code{makeMR_ZMatrix()}) and the full Z-matrix of all SNPs for these
+# #' significant studies (from \code{makeFull_ZMatrix()}), compute the prior
+# #'
+# #' @inheritParams bGWAS
+# #' @param selected_studies data table
+# #' @param MR_ZMatrix data table
+# #' @param All_ZMatrix data table
+# #'
 #  Function not exported, no need of extended documentation?
 
 

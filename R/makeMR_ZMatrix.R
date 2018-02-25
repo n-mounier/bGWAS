@@ -2,15 +2,15 @@
 
 
 
-#' Create pruned Z-matrix of MR instruments
-#'
-#' From a list of studies, create pruned Z-matrix of MR instruments (significant at
-#' a specified threshold)
-#'
-#' @inheritParams bGWAS
-#'
-#' @return Log file and pruned Z-Matrix of MR instrument + create a file if saveFiles=T
-#' @export
+# #' Create pruned Z-matrix of MR instruments
+# #'
+# #' From a list of studies, create pruned Z-matrix of MR instruments (significant at
+# #' a specified threshold)
+# #'
+# #' @inheritParams bGWAS
+# #'
+# #' @return Log file and pruned Z-Matrix of MR instrument + create a file if saveFiles=T
+# #'
 
 makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
                            MR_threshold=1e-5, path="~/ZMatrices", save_files=F, verbose=F) {

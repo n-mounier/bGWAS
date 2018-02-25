@@ -2,20 +2,20 @@
 
 
 
-#' Identify studies for prior using multivariate MR
-#'
-#' From a pruned Z-matrix of strong MR instruments, performs multivariate MR
-#'
-#' @inheritParams bGWAS
-#' @param ZMatrix The pruned Z-Matrix of strong instrument or the path of the file
-#'        containing it (data table or character)
-#'
-#' @return Log file + list of studies significant + create files (list them) if save_files=T
-#'
-#' @importFrom magrittr "%>%"
-#' @importFrom magrittr "%<>%"
-#'
-#' @export
+# #' Identify studies for prior using multivariate MR
+# #'
+# #' From a pruned Z-matrix of strong MR instruments, performs multivariate MR
+# #'
+# #' @inheritParams bGWAS
+# #' @param ZMatrix The pruned Z-Matrix of strong instrument or the path of the file
+# #'        containing it (data table or character)
+# #'
+# #' @return Log file + list of studies significant + create files (list them) if save_files=T
+# #'
+# #' @importFrom magrittr "%>%"
+# #' @importFrom magrittr "%<>%"
+# #'
+
 
 
 identify_studiesMR <- function(ZMatrix, save_files=FALSE, verbose=FALSE){

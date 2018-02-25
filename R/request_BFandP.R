@@ -2,16 +2,15 @@
 
 
 
-#' Calculate Bayes Factor and empirical p-values from observed Z-scores and priors
-#'
-#' From a pruned Z-matrix of strong MR instruments, performs multivariate MR
-#' @inheritParams bGWAS
-#' @param Prior from the function makePrior()
-#
+# #' Calculate Bayes Factor and empirical p-values from observed Z-scores and priors
+# #'
+# #' From a pruned Z-matrix of strong MR instruments, performs multivariate MR
+# #' @inheritParams bGWAS
+# #' @param Prior from the function makePrior()
 #' @importFrom magrittr "%>%"
-#'
-#' @return Log + data.table containing rs-chr-pos-alt-ref-obs-fit-se-...
-#'
+# #'
+# #' @return Log + data.table containing rs-chr-pos-alt-ref-obs-fit-se-...
+# #'
 # Function not exported, no need of extended documentation?
 
 

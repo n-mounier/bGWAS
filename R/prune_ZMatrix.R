@@ -2,20 +2,20 @@
 
 
 
-#' Prune a Z-Matrix
-#'
-#' @inheritParams makeMR_ZMatrix
-#' @param ZMatrix A subset of the prior GWASs Z-Matrix
-#' @param prune.dist The distance for pruning
-#' @param r2.limit The r2 threshold if LD-pruning, \code{default=1.1}, only distance pruning
-#'        is performed
-#'
-#' @details
-#' To perform LD-pruning, need binary files !!!
-#'
+# #' Prune a Z-Matrix
+# #'
+# #' @inheritParams makeMR_ZMatrix
+# #' @param ZMatrix A subset of the prior GWASs Z-Matrix
+# #' @param prune.dist The distance for pruning
+# #' @param r2.limit The r2 threshold if LD-pruning, \code{default=1.1}, only distance pruning
+# #'        is performed
+# #'
+# #' @details
+# #' To perform LD-pruning, need binary files !!!
+# #'
 #' @importFrom magrittr "%>%"
 #' @importFrom data.table ":="
-#  Function not exported, no need of extended documentation?
+# #  Function not exported, no need of extended documentation?
 
 
 prune_ZMatrix <- function(ZMatrix, prune.dist=500000, r2.limit=1.1, verbose=F) {

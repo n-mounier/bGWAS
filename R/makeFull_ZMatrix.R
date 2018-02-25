@@ -2,18 +2,17 @@
 
 
 
-#' Create full Z-matrix for prior computation
-#'
-#' From a list of significant studies, create the full Z-matrix that can be used to compute
-#' the prior.
-#'
-#' @inheritParams bGWAS
-#' @param studies The IDs of the significant studies selected by \code{identify_studiesMR()}
-#'        (numeric vector)
-#'
-#' @return An object containing Log file and pruned Z-Matrix of MR instrument (data table) + create a file if saveFiles=T
-#'
-#' @export
+# #' Create full Z-matrix for prior computation
+# #'
+# #' From a list of significant studies, create the full Z-matrix that can be used to compute
+# #' the prior.
+# #'
+# #' @inheritParams bGWAS
+# #' @param studies The IDs of the significant studies selected by \code{identify_studiesMR()}
+# #'        (numeric vector)
+# #'
+# #' @return An object containing Log file and pruned Z-Matrix of MR instrument (data table) + create a file if saveFiles=T
+# #'
 
 
 
