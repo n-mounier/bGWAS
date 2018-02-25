@@ -295,14 +295,12 @@ identify_studiesMR <- function(ZMatrix, save_files=FALSE, verbose=FALSE){
   colnames(coefs) = c("Study", "Estimate", "StdError", "T", "P")
 
   if(save_files){
-    write.table(Files_Info, file="PriorGWASsTMP.tsv", sep="\t", quote=F, row.names=F )
-    write.table(coefs, file="coefs.tsv", sep="\t", quote=F, row.names=F )
     Files_Info$Multi_Estimate = numeric()
     Files_Info$Multi_Estimate[match(coefs$Study, Files_Info$File)] = coefs$Estimate
     Files_Info$Multi_StdError = numeric()
     Files_Info$Multi_StdError[match(coefs$Study, Files_Info$File)] = coefs$StdError
     Files_Info$Multi_T = numeric()
-    Files_Info$Multii_T[match(coefs$Study, Files_Info$File)] = unlist(coefs[,"T"])
+    Files_Info$Multi_T[match(coefs$Study, Files_Info$File)] = unlist(coefs[,"T"])
     Files_Info$Multi_P = numeric()
     Files_Info$Multi_P[match(coefs$Study, Files_Info$File)] = coefs$P
   }

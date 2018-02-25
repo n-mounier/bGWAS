@@ -224,7 +224,7 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, save_files=
 
   if(save_files){
     readr::write_csv(path="CoefficientsByChromosome.csv", x=all.coefs)
-    tmp = paste0("The file ", "CoefficientsByChromosome.csv has been successfully writed. \n")
+    tmp = paste0("The file ", "CoefficientsByChromosome.csv has been successfully written. \n")
     Log = update_log(Log, tmp, verbose)
 
   }
@@ -258,7 +258,7 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, save_files=
 
   if(save_files){
     readr::write_csv(path="Prior.csv", x=all.priors)
-    tmp = paste0("The file ", "Prior.csv has been successfully writed. \n")
+    tmp = paste0("The file ", "Prior.csv has been successfully written. \n")
     Log = update_log(Log, tmp, verbose)
 
   }
