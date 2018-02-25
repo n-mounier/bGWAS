@@ -4,9 +4,11 @@
 \alias{list_priorGWASs}
 \title{Get list of studies that can be used to build the prior}
 \usage{
-list_priorGWASs(verbose = F)
+list_priorGWASs(IDs = NULL, verbose = F)
 }
 \arguments{
+\item{IDs}{numeric,}
+
 \item{verbose}{boolean, default = FALSE}
 }
 \value{

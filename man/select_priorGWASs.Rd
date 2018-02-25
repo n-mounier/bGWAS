@@ -19,9 +19,9 @@ select_priorGWASs(include_files = NULL, include_traits = NULL,
 
 \item{verbose}{boolean}
 
-\item{include_consortium}{vector, list of consortium ### TO BE DONE}
+\item{include_consortium}{vector, list of consortium ### TO BE DONE?}
 
-\item{exclude_consortium}{vector, list of consortium ### TO BE DONE}
+\item{exclude_consortium}{vector, list of consortium ### TO BE DONE?}
 }
 \value{
 IDs of studies that meet the criteria

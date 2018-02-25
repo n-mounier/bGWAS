@@ -5,22 +5,26 @@
 #' Get list of studies that can be used to build the prior
 #'
 #' Get list of studies with available GWAS summary statistics
+#' @param IDs numeric,
 #' @param verbose boolean, default = FALSE
 #' @return Data.Frame of details for all available studies
 #' @export
 
-list_priorGWASs <- function(verbose=F) {
+list_priorGWASs <- function(IDs=NULL, verbose=F) {
+  if(!is.null(IDs) && !is.numeric(ID)) stop("ID : should be numeric")
   Studies = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), showProgress = FALSE)
+  if(!is.null(IDs)){
+    Studies=Studies[IDs, ]
+  }
   return(Studies)
 }
 
 
-#' Get file names of studies that can be used to build the prior
-#'
-#' Get list of studies with available GWAS summary statistics
-#' @param IDs The IDs of the files to be listed, by default=NULL, list all files (numeric)
-#' @return List of files
-#' @export
+# #' Get file names of studies that can be used to build the prior
+# #'
+# #' Get list of studies with available GWAS summary statistics
+# #' @param IDs The IDs of the files to be listed, by default=NULL, list all files (numeric)
+# #' @return List of files
 
 list_files <- function(IDs=NULL, verbose=F) {
   if(is.null(IDs)) {
@@ -35,11 +39,10 @@ list_files <- function(IDs=NULL, verbose=F) {
 }
 
 
-#' Get traits from studies that can be used to build the prior
-#'
-#' Get list of traits with available GWAS summary statistics
-#' @return List of traits
-#' @export
+# #' Get traits from studies that can be used to build the prior
+# #'
+# #' Get list of traits with available GWAS summary statistics
+# #' @return List of traits
 
 list_traits <- function(verbose=F) {
   Traits = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "Trait", showProgress = FALSE)$Trait
@@ -47,11 +50,11 @@ list_traits <- function(verbose=F) {
 }
 
 
-#' Get consortia from studies that can be used to build the prior
-#'
-#' Get list of consortia with available GWAS summary statistics
-#' @return List of consortia
-#' @export
+# #' Get consortia from studies that can be used to build the prior
+# #'
+# #' Get list of consortia with available GWAS summary statistics
+# #' @return List of consortia
+
 
 list_consortia <- function(verbose=F) {
   Consortia = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "Consortium", showProgress = FALSE)$Consortium
@@ -66,10 +69,10 @@ list_consortia <- function(verbose=F) {
 #' (if all excluding parameters are NULL, keep all studies included at the step before)
 #' @param include_files list of file names
 #' @param include_traits list of trait
-#' @param include_consortium vector, list of consortium ### TO BE DONE
+#' @param include_consortium vector, list of consortium ### TO BE DONE?
 #' @param exclude_files list of file names
 #' @param exclude_traits list of trait
-#' @param exclude_consortium vector, list of consortium ### TO BE DONE
+#' @param exclude_consortium vector, list of consortium ### TO BE DONE?
 #' @param verbose boolean
 #' @return IDs of studies that meet the criteria
 #' @examples
