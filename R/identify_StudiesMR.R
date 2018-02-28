@@ -12,8 +12,8 @@
 # #'
 # #' @return Log file + list of studies significant + create files (list them) if save_files=T
 # #'
-# #' @importFrom magrittr "%>%"
-# #' @importFrom magrittr "%<>%"
+ #' @importFrom magrittr "%>%"
+ #' @importFrom magrittr "%<>%"
 # #'
 
 
