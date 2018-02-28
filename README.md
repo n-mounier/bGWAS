@@ -8,7 +8,7 @@
 :warning: if you downloaded the Z-Matrix files before 25/02/2018, they are obsolete, you need to delete the old ones and download the new ones!   
 
 ## Overview
-[//]:-------------------------------
+[//]:*******
 
 bGWAS is an R-package to perform a Bayesian GWAS, using summary statistics as input. Briefly, it compares the observed Z-scores from a conventional GWAS to prior Z-scores. These prior Z-scores can be provided by the user or directly calculated from publicly available GWASs (currently, a set of 58 studies, last update 25-02-2018 - hereinafter referred to as "prior GWASs"). In this second scenario, only prior GWASs having a significant influence on the conventional GWAS (identified using a multivariate Mendelian Randomization (MR) approach) are used to calculate the prior Z-scores. Causal effect are estimated masking the focal chromosome to ensure independence.          
 Observed and prior Z-scores are compared using Bayes Factors, and empirical p-values are calculated using a permutation approach.   
@@ -42,7 +42,7 @@ alternative function that compares prior Z-scores provided by the user to observ
 
 
 ## Installation
-[//]:-------------------------------
+[//]:*******
 
 * Install R-package
 ``` r
@@ -63,11 +63,11 @@ tar xzvf ZMatrices.tar.gz
 ```
   
 ## Usage
-[//]:-------------------------------
+[//]:*******
 
 To run the analysis with `bGWAS` two inputs are needed:
 
-##### 1. The *GWAS* results to be tested   
+#### 1. The *GWAS* results to be tested   
 Can be a regular (space/tab/comma-separated) file or a gzipped file (.gz), must contain the following columns, which can have alternative names.  
 SNP-identifier:  `rs` or `rsid`, `snp`, `snpid`, `rnpid`    
 Alternate allele:  `a1` or `alt`, `alts`    
@@ -77,7 +77,7 @@ If the Z-statistics is not present, it can be calculated from effect size and st
 Effect-size: `b` or `beta`, `beta1`    
 Standard error:  `se` or `std`     
 
-##### 2. Prior *GWASs*   
+#### 2. Prior *GWASs*   
 (see above for downloading instructions) - not needed for the function **`bGWAS_fromPrior()`**    
    
 Matrix files, containing Z-scores for all prior GWASs should be downloaded separately and stored in `~/ZMatrices` or in the folder specified when launching the analysis.   
@@ -89,6 +89,7 @@ Can I add one more?--->
 
 
 ### Study Selection
+[//]:-------------------------------
 
 Before running your analysis, you can select the prior GWASs you want to include. You can use the function **`list_prioGWASs()`** to get some information about the prior GWASs available.   
 You should remove traits that by definition are not independent from your trait. For example, before analysing BMI results, make sure to exclude "Height" from the prior GWASs used. You can use the function **`select_priorGWASs()`** to automatically exclude/include some traits or some files.   
@@ -101,6 +102,8 @@ AllStudies[AllStudies$ID %in% MyStudies, ]
 ```
 
 ### Analysis
+[//]:-------------------------------
+
 ``` r
 ## Example A
 # Using a GWAS from our list our prior GWASs
@@ -116,13 +119,15 @@ A = bGWAS(name = "Test_UsingGWASfromPriorGWASs",
 # All Prior GWASs except the one use as "GWAS" will be used to create the prior,
 # Significant SNPs will be identified using default parameters (p<5e-8) and will not be pruned,
 # No file will be saved.
-         
+``` 
 
+``` r
 ## Example B
 # Using a small GWAS (400,000 SNPs, Pilling et al data - file)
 # Using only specific traits / files (resulting in 9 GWASs included)
 
 MyGWAS = system.file("Data/SmallGWAS_Pilling2017.csv", package="bGWAS")
+
 MyStudies = select_priorGWASs(include_traits=c("Type 2 diabetes", "Smoking"),
                           include_files=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
 list_files(MyStudies)
@@ -131,6 +136,12 @@ B = bGWAS(name = "Test_UsingSmallGWAS",
          GWAS = MyGWAS,
          prior_studies=MyStudies,
          verbose=T) 
+# MR instruments will be selected using default parameters,
+# A subset of Prior GWASs will be used to create the prior,
+# Significant SNPs will be identified using default parameters (p<5e-8) and will not be pruned,
+# No file will be saved.         
+         
+      
 print(B)
 manatthan_plot_bGWAS(B)
 ```
@@ -140,6 +151,7 @@ manatthan_plot_bGWAS(B)
 # Using a small GWAS (400,000 SNPs, Pilling et al data - data.frame)
 # Using only specific traits / files (resulting in 9 GWASs included)
 data("SmallGWAS_Pilling2017")
+
 MyStudies = select_priorGWASs(include_traits=c("Type 2 diabetes", "Smoking"),
                           include_files=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
 
@@ -148,6 +160,11 @@ C = bGWAS(name="Test_UsingSmallDataFrame",
          prior_studies=MyStudies,
          verbose=T,
          save_files=T)
+# MR instruments will be selected using default parameters,
+# A subset of Prior GWASs will be used to create the prior,
+# Significant SNPs will be identified using default parameters (p<5e-8) and will not be pruned,
+# Files will be saved.         
+         
 print(C)
          
          
@@ -156,13 +173,19 @@ print(C)
          
 ```
 
-## Results
-`bGWAS()` returns an object of class "bGWAS" than can be handled in `R`.    
+### Results
+[//]:-------------------------------
+
+
+**`bGWAS()`** returns an object of class "bGWAS" than can be handled in `R`.    
 
 ```r
-class(bGWAS_obj)
+# Results from example A
+data("Results_ExampleA")
+
+class(A)
 # "bGWAS"
-print(bGWAS_obj)
+print(A)
 # -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
 # 
 #  bGWAS performed on 399,986 SNPs 
@@ -182,44 +205,50 @@ print(bGWAS_obj)
 ```
 Functions to extract results from an object of class "bGWAS":   
 ```r
-extract_results_bGWAS(bGWAS_obj)
+extract_results_bGWAS(A)
 ```
 
 ```r
-extract_coefficients_bGWAS(bGWAS_obj)
+extract_coefficients_bGWAS(A)
 ```
 
 
 Functions for graphic representations:   
 ```r 
-manatthan_plot_bGWAS(bGWAS_obj)
+manatthan_plot_bGWAS(A)
 ```
 ![](docs/figures/ManatthanPlot.png)  
 ```r 
-coefficients_plot_bGWAS(myObj) 
+coefficients_plot_bGWAS(A) 
 ```
 ![](docs/figures/CoefficientsPlot.png)  
    
 
 Aditionnaly, if `save_files=T`, several files are created...   
 ... in your working directory :    
--   "`name`.log" - log file    
+*   "`name`.log" - log file   
+
 ... in the folder `./name/` :   
--   "PriorGWASs.tsv" - contains Prior GWASs information (general info + status (used/removed) + MR coefficients)   
--   "CoefficientsByChromosome.csv" - contains the MR estimates when masking the focal chromosome (22 coefficients / study)    
--   "PriorBFp.csv" - contains BF and p-values estimated for all SNPs    
--   "SignificantSNPs.csv" - contains BF and p-values estimated for a subset of SNPs    
+*   "PriorGWASs.tsv" - contains Prior GWASs information (general info + status (used/removed) + MR coefficients)   
+*   "CoefficientsByChromosome.csv" - contains the MR estimates when masking the focal chromosome (22 coefficients / study)    
+*   "PriorBFp.csv" - contains BF and p-values estimated for all SNPs    
+*   "SignificantSNPs.csv" - contains BF and p-values estimated for a subset of SNPs    
 
 
-Further description of the files?   
+-> Further description of the files  
 
 
 ## Runtime
-[//]:-------------------------------
+[//]:*******
 
 Analysis using all the 58 prior GWASs available, for a conventional GWAS containing ~7M SNPs in common with the prior studies ~ 145 minutes.
 
 Analysis using 9 prior GWASs, for a conventional GWAS containing 400,000 SNPs in common with prior studies (see example B) ~ 8 minutes
+
+
+
+## Contact
+<mounier.ninon@gmail.com>
 
 
 ## Improvements to be implemented
@@ -238,9 +267,6 @@ optimize null-BF calculation
 
 
 
-
-## Contact
-<mounier.ninon@gmail.com>
 
 
 
