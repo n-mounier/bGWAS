@@ -2,7 +2,7 @@
 
 
 
-#' bGWAS
+#' bGWAS - main function
 #'
 #' Performs a bayesian GWAS from Summary Statistics, using publicly available results
 #' to calculate the prior effects of the SNPs and compare it to observed z-scores
@@ -520,7 +520,7 @@ bGWAS <- function(name,
   write(log_info, paste0(name,".log"))
 
   results=list()
-  results$log_info_info = log_info
+  results$log_info = log_info
   results$significant_SNPs = Results$SNPs
   results$all_BFs = PriorWithBF$SNPs
   results$significant_studies = res_MR$coeffs
