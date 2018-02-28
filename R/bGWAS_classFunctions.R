@@ -1,23 +1,6 @@
 ###### bGWAS class functions ######
 
 
-# SignificantSNPs = data.table::fread("../Tests/Test_UsingSmallDataFrame/SignificantSNPs.csv")
-# AllResults = data.table::fread("../Tests/Test_UsingSmallDataFrame/PriorBFp.csv")
-# SignificantStudies = data.table::fread("../Tests/Test_UsingSmallDataFrame/Multivariate_coefs.csv")
-# AllCoeffs = data.table::fread("../Tests/Test_UsingSmallDataFrame/CoefficientsByChromosome.csv")
-#
-# MyObj = list()
-#
-# MyObj$significant_SNPs = SignificantSNPs$rs
-# MyObj$all_BFs = AllResults
-# MyObj$significant_studies = SignificantStudies
-# MyObj$all_MRcoeffs = AllCoeffs
-# MyObj$log_info = read.csv("../Tests/Test_UsingSmallDataFrame.log")
-# colnames(MyObj$all_MRcoeffs)=c("Chrm", "StudyName", "Estimate", "StdError", "TValue", "P")
-# colnames(MyObj$significant_studies)=c("StudyName", "Estimate", "StdError", "TValue", "P")
-# class(MyObj)="bGWAS"
-
-
 
 #' @param obj an object of class bGWAS
 #'
@@ -50,7 +33,6 @@ print.bGWAS <- function(obj) {
 # print(MyObj)
 
 
-###### Function to create pruned Z-matrix of MR instruments ######
 
 
 
@@ -137,8 +119,8 @@ manatthan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
     all <- all[order(all$chrm, all$pos), ]
 
     # y = -log10(p) ou -log10(fdr)
-    SNPs_to_plot$y = -log10(SNPs_to_plot[,..value, with=F])
-
+    SNPs_to_plot$y = -log10(SNPs_to_plot[,..value, with=F]) - # to make sure all SNPs names are in plotting windows
+                      - 0.1
      # x = have to look at all SNPs chr/pos
     get_posx <- function(snp, all){
       chr = as.numeric(snp[2])
@@ -168,7 +150,6 @@ manatthan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
 }
 
 
-# manatthan_plot_bGWAS(MyObj, save_file=T)
 
 
 #' Ceofficients Plot from bGWAS results
@@ -259,9 +240,9 @@ if(save_file) dev.off()
 # coefficients_plot_bGWAS(MyObj, save_file = T)
 
 
-#' Exctract Results
+#' Exctract SNPs results from bGWAS results
 #'
-#' Extract results from an object of class bGWAS obtained
+#' Extract SNPs results from an object of class bGWAS obtained
 #' when using bGWAS() or bGWAS_fromPrior()
 #'
 #'
@@ -288,7 +269,7 @@ extract_results_bGWAS <- function(obj, SNPs="significants"){
 
 
 
-#' Exctract MR coefficients
+#' Exctract MR coefficients from bGWAS results
 #'
 #' Extract MR coefficients from an object of class bGWAS obtained
 #' when using bGWAS()
