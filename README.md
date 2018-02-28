@@ -186,30 +186,84 @@ data("Results_ExampleA")
 class(A)
 # "bGWAS"
 print(A)
-# -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
-# 
-#  bGWAS performed on 399,986 SNPs 
-# 
-# -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
-# 
-# 1 studies used to build the prior : 
-#                   Study   Estimate  StdError
-#  jointGwasMc_LDL.txt.gz -0.2219264 0.1047306
+# -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 #
-# -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
-# 
-# 7 significant SNPs identified : 
-#  rs56131196, rs66626994, rs157582, rs157581, rs10455872, rs118039278, rs283809
+#  bGWAS performed on 7,104,649 SNPs
 #
-# -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
+# -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+#
+# 7 studies used to build the prior :
+#                                                      Study    Estimate    StdError
+#          All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq.gz  0.06707833  0.016167132
+#                                    DIAGRAMv3.2013MAY07.zip  0.08591397  0.026578888
+#                                  EDUyears_2016_sumstat.txt -0.03609801  0.016561887
+#                                     jointGwasMc_LDL.txt.gz  0.12351084  0.011990610
+#                                      jointGwasMc_TG.txt.gz  0.07034726  0.013960301
+#  MAGIC_Manning_et_al_lnFastingInsulin_MainEffect.txt...BMI  0.14637027  0.057695521
+#                                             MetaSum.height  0.02236071 0.005837044
+#
+# -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+#
+# 19 significant SNPs identified :
+# rs599839, rs964184, rs56289821, rs11591147, rs944801, rs2954029, rs4953023, rs137897428, rs55730499, rs579459,
+# rs7578326, rs2410621, rs62120566, rs34967177, rs668948, rs2228603, rs1169288, rs2148194, rs139794538
+#
+# -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
+ 
 ```
 Functions to extract results from an object of class "bGWAS":   
 ```r
-extract_results_bGWAS(A)
+hits = extract_results_bGWAS(myObj, "significants")
+print(hits)
+# rs         chrm   pos   alt ref    obs         fit        se        log.bf  nullls_count     BF_p
+# rs599839    1   109822166  A   G   6.304567   4.2059161 0.5362215  18.037043    0     1.407529e-10
+# rs964184    11  116648917  C   G  -6.144531  -3.3559249 0.5488481  15.757918    0     1.407529e-10
+# rs56289821  19  11188247   A   G  -5.023050  -3.3812354 0.4482898  11.401707    0     1.407529e-10
+# rs11591147  1   55505647   T   G  -5.087970  -3.0578829 0.4256008  11.115867    0     1.407529e-10
+# rs944801    9   22051670   C   G   10.054911  0.5824288 0.2967470   9.275391    1     2.815058e-10
+# rs2954029   8   126490972  T   A  -4.189963  -3.5102907 0.4525705   8.493019    3     5.630116e-10
+# rs4953023   2   44074000   A   G  -4.738788  -2.2908836 0.3391445   8.486565    3     5.630116e-10
+# rs137897428 10  60793223   T   G   5.688300   1.2563294 0.5323997   8.401426    3     5.630116e-10
+# rs55730499  6   161005610  T   C   7.384310   0.9791115 0.2818131   8.221794    3     5.630116e-10
+# rs579459    9   136154168  C   T   5.299689   1.6495696 0.3000976   7.888927    7     1.126023e-09
+# rs7578326   2   227020653  G   A  -4.736911  -1.5943275 0.6309521   7.519732    15    2.252047e-09
+# rs2410621   8   19854682   C   T  -4.337672  -1.9841644 0.5199402   7.107929    30    4.363340e-09
+# rs62120566  19  45197732   G   C  -4.126030  -2.3491911 0.3593355   7.053283    34    4.926352e-09
+# rs34967177  7   45176432   A   G   12.500800  0.1682764 0.2636460   6.998161    37    5.348610e-09
+# rs668948    2   21291529   A   G   3.663595   3.7404512 0.4433215   6.618781    65    9.289692e-09
+# rs2228603   19  19329924   T   C  -3.916886  -2.2765867 0.4031095   6.438471    90    1.280851e-08
+# rs1169288   12  121416650  C   A   4.639650   1.5821789 0.3014183   6.434916    90    1.280851e-08
+# rs2148194   10  3975619    T   C   7.013320   0.7858808 0.2603974   6.401342    93    1.323077e-08
+# rs139794538 11  116078910  T   C  -7.526290  -0.5417488 0.2736795   5.594159    285   4.025533e-08
+
+all_results =extract_results_bGWAS(A, "all")
+nrow(all_results)
+# 7104649
+head(all_results)
+# rs         chrm   pos   alt ref    obs         fit        se        log.bf  nullls_count     BF_p
+# rs599839    1   109822166  A   G   6.304567   4.2059161 0.5362215  18.037043    0     1.407529e-10
+# rs964184    11  116648917  C   G  -6.144531  -3.3559249 0.5488481  15.757918    0     1.407529e-10
+# rs56289821  19  11188247   A   G  -5.023050  -3.3812354 0.4482898  11.401707    0     1.407529e-10
+# rs11591147  1   55505647   T   G  -5.087970  -3.0578829 0.4256008  11.115867    0     1.407529e-10
+# rs944801    9   22051670   C   G   10.054911  0.5824288 0.2967470   9.275391    1     2.815058e-10
+# rs2954029   8   126490972  T   A  -4.189963  -3.5102907 0.4525705   8.493019    3     5.630116e-10
 ```
 
 ```r
-extract_coefficients_bGWAS(A)
+MR_coefficients = extract_MRcoeffs_bGWAS(A)
+colnames(MR_coefficients)
+# "Study"            "Estimate"        "StdError"        "T"     "P"
+# "chrm1_Estimate"   "chrm1_StdError"  "chrm1_PValue"   "chrm2_Estimate"   "chrm2_StdError"   "chrm2_PValue"    
+# "chrm3_Estimate"   "chrm3_StdError"  "chrm3_PValue"   "chrm4_Estimate"   "chrm4_StdError"   "chrm4_PValue"    
+# "chrm5_Estimate"   "chrm5_StdError"  "chrm5_PValue"   "chrm6_Estimate"   "chrm6_StdError"   "chrm6_PValue"
+# "chrm7_Estimate"   "chrm7_StdError"  "chrm7_PValue"   "chrm8_Estimate"   "chrm8_StdError"   "chrm8_PValue"
+# "chrm9_Estimate"   "chrm9_StdError"  "chrm9_PValue"   "chrm10_Estimate"  "chrm10_StdError"  "chrm10_PValue"
+# "chrm11_Estimate"  "chrm11_StdError" "chrm11_PValue"  "chrm12_Estimate"  "chrm12_StdError"  "chrm12_PValue"   
+# "chrm13_Estimate"  "chrm13_StdError" "chrm13_PValue"  "chrm14_Estimate"  "chrm14_StdError"  "chrm14_PValue"
+# "chrm15_Estimate"  "chrm15_StdError" "chrm15_PValue"  "chrm16_Estimate"  "chrm16_StdError"  "chrm16_PValue"   
+# "chrm17_Estimate"  "chrm17_StdError" "chrm17_PValue"  "chrm18_Estimate"  "chrm18_StdError"  "chrm18_PValue"
+# "chrm19_Estimate"  "chrm19_StdError" "chrm19_PValue"  "chrm20_Estimate"  "chrm20_StdError"  "chrm20_PValue"   
+# "chrm21_Estimate"  "chrm21_StdError" "chrm21_PValue"  "chrm22_Estimate"  "chrm22_StdError"  "chrm22_PValue"
 ```
 
 
@@ -223,16 +277,16 @@ coefficients_plot_bGWAS(A)
 ```
 ![](docs/figures/CoefficientsPlot.png)  
    
-
-Aditionnaly, if `save_files=T`, several files are created...   
-... in your working directory :    
-*   "`name`.log" - log file   
+   
+##### Aditionnaly, if `save_files=T`, several files are created...   
+... in the working directory :   
+-   **`name`.log** - log file   
 
 ... in the folder `./name/` :   
-*   "PriorGWASs.tsv" - contains Prior GWASs information (general info + status (used/removed) + MR coefficients)   
-*   "CoefficientsByChromosome.csv" - contains the MR estimates when masking the focal chromosome (22 coefficients / study)    
-*   "PriorBFp.csv" - contains BF and p-values estimated for all SNPs    
-*   "SignificantSNPs.csv" - contains BF and p-values estimated for a subset of SNPs    
+-   **PriorGWASs.tsv** - contains Prior GWASs information (general info + status (used/removed) + MR coefficients)   
+-   **CoefficientsByChromosome.csv** - contains the MR estimates when masking the focal chromosome (22 coefficients / study)   
+-   **PriorBFp.csv** - contains BF and p-values estimated for all SNPs   
+-   **SignificantSNPs.csv** - contains BF and p-values estimated for a subset of SNPs    
 
 
 -> Further description of the files  
@@ -250,7 +304,13 @@ Analysis using 9 prior GWASs, for a conventional GWAS containing 400,000 SNPs in
 ## Contact
 <mounier.ninon@gmail.com>
 
-
+    
+      
+\vspace{120pt}
+       
+       
+       
+<!---    
 ## Improvements to be implemented
 [//]:-------------------------------
 
@@ -265,7 +325,7 @@ use of additional studies for prior
 
 optimize null-BF calculation
 
-
+--->  
 
 
 
