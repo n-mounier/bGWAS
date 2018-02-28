@@ -2,8 +2,11 @@
 % Please edit documentation in R/bGWAS_classFunctions.R
 \name{coefficients_plot_bGWAS}
 \alias{coefficients_plot_bGWAS}
+\alias{coefficients_plot_bGWAS}
 \title{Ceofficients Plot from bGWAS results}
 \usage{
+coefficients_plot_bGWAS(obj, save_file = F, file_name = NULL)
+
 coefficients_plot_bGWAS(obj, save_file = F, file_name = NULL)
 }
 \arguments{
@@ -14,11 +17,24 @@ coefficients_plot_bGWAS(obj, save_file = F, file_name = NULL)
 
 \item{file_name}{The name of the file saved (is \code{save_file} is \code{TRUE})
 \code{default=NULL}, will used NameOfYourAnalysis_CoefficientsPlot.png}
+
+\item{obj}{an object of class bGWAS}
+
+\item{save_file}{A logical indicating if the graphic should be saved,
+\code{default=FALSE}, graphic will be displayed on the on-screen device}
+
+\item{file_name}{The name of the file saved (is \code{save_file} is \code{TRUE})
+\code{default=NULL}, will used NameOfYourAnalysis_CoefficientsPlot.png}
 }
 \value{
+a Coefficients Plot
+
 a Coefficients Plot
 }
 \description{
 Create a Coefficients Plot (causal effect of Prior GWASs) from bGWAS results (object of class bGWAS obtained
 when using bGWAS())
+
+Extract results from an object of class bGWAS obtained
+when using bGWAS() or bGWAS_fromPrior()
 }

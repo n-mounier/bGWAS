@@ -200,6 +200,9 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
   }
   if(save_file && !is.character(file_name)) stop("file_name : should be a character")
 
+  cat("\n \n")
+  cat(file_name)
+  cat("\n \n")
 
   coeffs = obj$significant_studies
   # add the trait name (if multiple studies for a same trait, add " - X" )
@@ -274,7 +277,7 @@ if(save_file) dev.off()
 #' @return a Coefficients Plot
 #' @export
 
-coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
+extract_results_bGWAS <- function(obj, save_file=F, file_name=NULL){
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
   if(is.null(obj$all_MRcoeffs)) stop("The prior has not been created using Prior GWASs, there are no coefficients to plot")
@@ -288,6 +291,9 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
   }
   if(save_file && !is.character(file_name)) stop("file_name : should be a character")
 
+  cat("\n \n")
+  cat(file_name)
+  cat("\n \n")
 
   coeffs = obj$significant_studies
   # add the trait name (if multiple studies for a same trait, add " - X" )
