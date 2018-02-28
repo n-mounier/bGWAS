@@ -2,18 +2,20 @@
 # bGWAS
 [//]:========================================
 
-:information_source: package under development :information_source:    
+:information_source: package under development :information_source:   
+
+
 :warning: if you downloaded the Z-Matrix files before 25/02/2018, they are obsolete, you need to delete the old ones and download the new ones!
 
 ## Overview
 [//]:-------------------------------
 
-bGWAS is an R-package to perform a Bayesian GWAS, using summary statistics as input. Briefly, it compares the observed Z-scores from a conventional GWAS to prior Z-scores. These prior Z-scores can be provided by the user of directly calculated from publicly available GWASs (currently, a set of 58 studies, last update dd-mm-yyyy - hereinafter referred to as "prior GWASs"). In this case, only prior GWASs having a significant influence on the conventional GWAS (identified using a multivariate Mendelian Randomization (MR) approach) are used to calculate the prior Z-scores. Causal effect are estimated masking the focal chromosome to ensure independence.          
+bGWAS is an R-package to perform a Bayesian GWAS, using summary statistics as input. Briefly, it compares the observed Z-scores from a conventional GWAS to prior Z-scores. These prior Z-scores can be provided by the user or directly calculated from publicly available GWASs (currently, a set of 58 studies, last update dd-mm-yyyy - hereinafter referred to as "prior GWASs"). In this second scenario, only prior GWASs having a significant influence on the conventional GWAS (identified using a multivariate Mendelian Randomization (MR) approach) are used to calculate the prior Z-scores. Causal effect are estimated masking the focal chromosome to ensure independence.          
 Observed and prior Z-scores are compared using Bayes Factors, and empirical p-values are calculated using a permutation approach.   
 
 The main functions are:   
 -   `bGWAS()` -  core function that calculates prior Z-scores from prior GWASs, compares them to observed Z-scores and returns an object of class "bGWAS"    
-<!--- returns an object of class `bGWAS-class`. See the vignette: vignette('vcf_data')
+<!--- returns an object of class `bGWAS-class`. See the vignette: vignette('')
 THIS USE RISK FACTORS TO CREATE THE PRIOR---> 
 -   `list_priorGWASs()` directly returns information about the prior GWASs that can be used to calculate prior Z-scores   
 -   `select_priorGWASs()` allows a quick selection of prior GWASs (to include/exclude specific studies when calculating prior Z-scores)   
@@ -92,7 +94,7 @@ AllStudies[AllStudies$ID %in% MyStudies, ]
 MyGWAS = 5
 list_priorGWASs(MyGWAS)
 A = bGWAS(name = "Test_UsingGWASfromPriorGWASs",
-         GWAS = MyGWAS
+         GWAS = MyGWAS,
          verbose=T)
          
 
@@ -134,7 +136,7 @@ print(C)
 ```
 
 ## Results
-`bGWAS()` returns an object of class "bGWAS" than can be handled in `R`. \cr
+`bGWAS()` returns an object of class "bGWAS" than can be handled in `R`.    
 
 ```r
 print(myObj)
