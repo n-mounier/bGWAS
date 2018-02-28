@@ -259,6 +259,95 @@ if(save_file) dev.off()
 # coefficients_plot_bGWAS(MyObj, save_file = T)
 
 
+#' Exctract Results
+#'
+#' Extract results from an object of class bGWAS obtained
+#' when using bGWAS() or bGWAS_fromPrior()
+#'
+#'
+#' @param obj an object of class bGWAS
+#' @param save_file A logical indicating if the graphic should be saved,
+#'        \code{default=FALSE}, graphic will be displayed on the on-screen device
+#' @param file_name The name of the file saved (is \code{save_file} is \code{TRUE})
+#'        \code{default=NULL}, will used NameOfYourAnalysis_CoefficientsPlot.png
+
+#' @return a Coefficients Plot
+#' @export
+
+coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
+  ## check parameters
+  if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
+  if(is.null(obj$all_MRcoeffs)) stop("The prior has not been created using Prior GWASs, there are no coefficients to plot")
+  if(!is.logical(save_file)) stop("save_file : should be logical")
+  # if no name, use the one from the analysis (in log file)
+  if(save_file && is.null(file_name)){
+    file_name = paste0(strsplit(strsplit(obj$log_info[
+      grep("The name of your analysis is: ", obj$log_info)],
+      "The name of your analysis is: \"", fixed=T)[[1]][2], "\"", fixed=T)[[1]][1],
+      "_CoefficientsPlot.png")
+  }
+  if(save_file && !is.character(file_name)) stop("file_name : should be a character")
+
+
+  coeffs = obj$significant_studies
+  # add the trait name (if multiple studies for a same trait, add " - X" )
+  all_studies =  list_priorGWASs()
+  coeffs$Trait = all_studies[match(coeffs$Study, all_studies$File), Trait]
+  if(length(unique(coeffs$Trait))!=nrow(coeffs)){
+    for(t in unique(coeffs$Trait)){
+      if(nrow(coeffs[coeffs$Trait==t]) >1 )
+        coeffs$Trait[coeffs$Trait==t] = paste0(t, " (", c(1:sum(coeffs[,coeffs$Trait==t])), ")")
+    }
+  }
+
+
+  # add CI
+  coeffs$Lower = coeffs$Estimate - 1.96 * coeffs$StdError
+  coeffs$Upper = coeffs$Estimate + 1.96 * coeffs$StdError
+
+
+  # theme
+  apatheme=ggplot2::theme_bw()+
+    ggplot2::theme(panel.grid.major=ggplot2::element_blank(),
+                   panel.grid.minor=ggplot2::element_blank(),
+                   panel.border=ggplot2::element_blank(),
+                   axis.line=ggplot2::element_line(),
+                   text=ggplot2::element_text(family='Times'),
+                   legend.title=ggplot2::element_blank())
+
+  P=  ggplot2::ggplot(data=coeffs, ggplot2::aes(x=Trait, y=Estimate,
+                                                ymin=Lower,
+                                                ymax=Upper)) +
+    # "global estimates"
+    ggplot2::geom_pointrange(col="black", shape=21, fill="lightgray")+
+    ggplot2::geom_hline(yintercept=0, lty=2) +  # add a dotted line at x=0 after flip
+
+    #geom_segment(x=3, xend=3, y=3.5, yend=3.7, lty=2, col="#169D74", lwd = 0.45)
+    ggplot2::labs(title = "") +
+    ggplot2::coord_flip() +  # flip coordinates (puts labels on y axis)
+    ggplot2::xlab("") + ggplot2::ylab("Multivariate MR causal effect estimates (95% CI)") +
+    apatheme  # use a white background
+  # "coefficient estimates")
+  # ggplot order the studies by "Trait"
+  coeffs = coeffs[order(coeffs$Trait),]
+  for(i in 1:nrow(coeffs)){
+    t = coeffs$Study[i]
+    chrm_estimates = unlist(obj$all_MRcoeffs[obj$all_MRcoeffs$Study==t, "Estimate"])
+    for(c in chrm_estimates){
+      P = P +
+        ggplot2::geom_segment(x=i-0.1, xend=i+0.1, y=as.numeric(c), yend=as.numeric(c),
+                              col="darkgrey", lwd = 0.8)
+    }
+  }
+  if(save_file) png(file_name, width = 20, height = 12, units = "cm", res = 500)
+  print(P)
+  if(save_file) dev.off()
+}
+
+
+
+
+
 ### Useful small functions (re-used by different functions)
 
 update_log <- function(log_obj, text, verbose=F){
