@@ -11,7 +11,7 @@
 #' @export
 
 list_priorGWASs <- function(IDs=NULL, verbose=F) {
-  if(!is.null(IDs) && !is.numeric(ID)) stop("ID : should be numeric")
+  if(!is.null(IDs) && !is.numeric(IDs)) stop("ID : should be numeric")
   Studies = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), showProgress = FALSE)
   if(!is.null(IDs)){
     Studies=Studies[IDs, ]

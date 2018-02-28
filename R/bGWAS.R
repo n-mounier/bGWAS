@@ -79,10 +79,10 @@
 #'
 #' @examples
 #' # Permorm bGWAS, using a conventional GWAS from the list of prior GWASs
-#' MyGWAS = 1
-#' list_files(MyGWAS)
+#' MyGWAS = 5
+#' list_priorGWASs(MyGWAS)
 #' \dontrun{
-#' A = bGWAS(name = "Test_UsingGWASfromList",
+#' A = bGWAS(name = "Test_UsingGWASfromPriorGWASs",
 #'          GWAS = MyGWAS,
 #'          verbose=T)
 #'          }
@@ -107,7 +107,7 @@
 #'           GWAS = SmallGWAS_Pilling2017,
 #'           prior_studies=MyStudies,
 #'           verbose=T,
-#'           saveFiles=T)
+#'           save_files=T)
 #'           }
 #'
 #'# Note that B and C are using the same data (stored differently) and give the same results.
