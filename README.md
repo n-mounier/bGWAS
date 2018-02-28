@@ -266,7 +266,7 @@ colnames(MR_coefficients)
 # "chrm21_Estimate"  "chrm21_StdError" "chrm21_PValue"  "chrm22_Estimate"  "chrm22_StdError"  "chrm22_PValue"
 
 MR_coefficients[1:4, 1:8]
-#                                            Study    Estimate   StdError       T    P         chrm1_Estimate  chrm1_StdError  chrm1_PValue
+#                                            Study    Estimate   StdError        T       P          chrm1_Estimate    chrm1_StdError    chrm1_PValue
 # All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq.gz  0.06707833 0.01616713   4.149056 3.479263e-05     0.07218810     0.01722797 2.921263e-05
 #                           DIAGRAMv3.2013MAY07.zip  0.08591397 0.02657889   3.232414 1.247588e-03     0.08567881     0.02664810 1.326470e-03
 #                         EDUyears_2016_sumstat.txt -0.03609801 0.01656189  -2.179583 2.940545e-02    -0.03737184     0.01738187 3.168322e-02
