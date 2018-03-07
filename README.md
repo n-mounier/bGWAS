@@ -180,8 +180,7 @@ print(C)
 **`bGWAS()`** returns an object of class "bGWAS" than can be handled in `R`.    
 
 ```r
-# Results from example A
-data("Results_ExampleA")
+## Results from example A
 
 class(A)
 # "bGWAS"
