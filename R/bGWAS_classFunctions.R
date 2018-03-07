@@ -206,7 +206,7 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
   coeffs = obj$significant_studies
   # add the trait name (if multiple studies for a same trait, add " - X" )
   all_studies =  list_priorGWASs()
-  coeffs$Trait = all_studies[match(coeffs$Study, all_studies$File), 1]
+  coeffs$Trait = unlist(all_studies[match(coeffs$Study, all_studies$File), "Trait"])
   if(length(unique(coeffs$Trait))!=nrow(coeffs)){
     for(t in unique(coeffs$Trait)){
       if(nrow(coeffs[coeffs$Trait==t,]) >1 )
@@ -230,7 +230,7 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
           legend.title=ggplot2::element_blank())
 
   # use with to deal with R CMD check (because Trait / Estimate are not defined)
-  with(coeffs,{ P=  ggplot2::ggplot(data=coeffs, ggplot2::aes(x=Trait, y=Estimate,
+  P= with(coeffs,{ ggplot2::ggplot(data=coeffs, ggplot2::aes(x=Trait, y=Estimate,
                      ymin=Lower,
                      ymax=Upper)) +
    # "global estimates"
