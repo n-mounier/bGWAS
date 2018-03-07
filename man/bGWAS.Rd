@@ -2,9 +2,9 @@
 % Please edit documentation in R/bGWAS.R
 \name{bGWAS}
 \alias{bGWAS}
-\title{bGWAS}
+\title{bGWAS - main function}
 \usage{
-bGWAS(name, GWAS, Z_matrices = NULL, prior_studies = NULL,
+bGWAS(name, GWAS, Z_matrices = "~/ZMatrices/", prior_studies = NULL,
   SNPs_list = NULL, MR_threshold = 1e-05, sign_method = "p",
   sign_thresh = 5e-08, prune_res = FALSE, save_files = FALSE,
   verbose = FALSE)
@@ -94,10 +94,10 @@ data for the analysis (some alleles might be swapped when comparing with the ini
 }
 \examples{
 # Permorm bGWAS, using a conventional GWAS from the list of prior GWASs
-MyGWAS = 1
-list_files(MyGWAS)
+MyGWAS = 5
+list_priorGWASs(MyGWAS)
 \dontrun{
-A = bGWAS(name = "Test_UsingGWASfromList",
+A = bGWAS(name = "Test_UsingGWASfromPriorGWASs",
          GWAS = MyGWAS,
          verbose=T)
          }
@@ -122,7 +122,7 @@ C = bGWAS(name="Test_UsingSmallDataFrame",
           GWAS = SmallGWAS_Pilling2017,
           prior_studies=MyStudies,
           verbose=T,
-          saveFiles=T)
+          save_files=T)
           }
 
 # Note that B and C are using the same data (stored differently) and give the same results.
