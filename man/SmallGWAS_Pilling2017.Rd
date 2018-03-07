@@ -3,7 +3,7 @@
 \docType{data}
 \name{SmallGWAS_Pilling2017}
 \alias{SmallGWAS_Pilling2017}
-\title{Analysis of genotypes associated with parental lifespan in the UK Biobank.}
+\title{Analysis of genotypes associated with parental lifespan in the UK BioBank.}
 \format{A data frame with 400000 rows and 4 variables:
 \describe{
   \item{snp}{rsid of the SNP}

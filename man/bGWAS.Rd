@@ -12,8 +12,8 @@ bGWAS(name, GWAS, Z_matrices = "~/ZMatrices/", prior_studies = NULL,
 \arguments{
 \item{name}{The name of the analysis (character)}
 
-\item{GWAS}{The path to the conventionnal GWAS of interest, the ID of the GWAS from the
-list of studies availables (prior GWASs), or a data.frame (character, numeric or data.frame)}
+\item{GWAS}{The path to the conventional GWAS of interest, the ID of the GWAS from the
+list of studies available (prior GWASs), or a data.frame (character, numeric or data.frame)}
 
 \item{Z_matrices}{The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
 (character)}
@@ -46,7 +46,7 @@ p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)
 }
 \value{
 \code{bGWAS}() returns an object of class "bGWAS". \cr
-Aditionnaly, if \code{save_files=T}, several files are created... \cr
+Additionnaly, if \code{save_files=T}, several files are created... \cr
 ... in your working directory :
 \itemize{
 \item  "\code{name}.log" - log file
@@ -62,7 +62,7 @@ chromosome (22 coefficients / study)
 }
 }
 \description{
-Performs a bayesian GWAS from Summary Statistics, using publicly available results
+Performs a Bayesian GWAS from Summary Statistics, using publicly available results
 to calculate the prior effects of the SNPs and compare it to observed z-scores
 }
 \details{

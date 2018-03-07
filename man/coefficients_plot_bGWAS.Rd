@@ -2,7 +2,7 @@
 % Please edit documentation in R/bGWAS_classFunctions.R
 \name{coefficients_plot_bGWAS}
 \alias{coefficients_plot_bGWAS}
-\title{Ceofficients Plot from bGWAS results}
+\title{Coefficients Plot from bGWAS results}
 \usage{
 coefficients_plot_bGWAS(obj, save_file = F, file_name = NULL)
 }

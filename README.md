@@ -212,7 +212,7 @@ print(A)
 ```
 Functions to extract results from an object of class "bGWAS":   
 ```r
-hits = extract_results_bGWAS(myObj, "significants")
+hits = extract_results_bGWAS(myObj, "significant")
 print(hits)
 # rs         chrm   pos   alt ref    obs         fit        se        log.bf  nullls_count     BF_p
 # rs599839    1   109822166  A   G   6.304567   4.2059161 0.5362215  18.037043    0     1.407529e-10

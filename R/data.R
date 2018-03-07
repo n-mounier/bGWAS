@@ -1,4 +1,4 @@
-#' Analysis of genotypes associated with parental lifespan in the UK Biobank.
+#' Analysis of genotypes associated with parental lifespan in the UK BioBank.
 #'
 #' Subset of the original dataset containing the estimated effect of SNPs on parental age of death
 #'

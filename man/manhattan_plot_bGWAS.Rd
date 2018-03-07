@@ -29,5 +29,5 @@ a Manhattan Plot
 }
 \description{
 Create a Manhattan Plot from bGWAS results (object of class bGWAS obtained
-when using bGWAS() or bGWASFromprior()),
+when using bGWAS() or bGWASfromPrior()),
 }

@@ -4,13 +4,13 @@
 
 #' bGWAS - main function
 #'
-#' Performs a bayesian GWAS from Summary Statistics, using publicly available results
+#' Performs a Bayesian GWAS from Summary Statistics, using publicly available results
 #' to calculate the prior effects of the SNPs and compare it to observed z-scores
 #'
 #'
 #' @param name The name of the analysis (character)
-#' @param GWAS The path to the conventionnal GWAS of interest, the ID of the GWAS from the
-#'        list of studies availables (prior GWASs), or a data.frame (character, numeric or data.frame)
+#' @param GWAS The path to the conventional GWAS of interest, the ID of the GWAS from the
+#'        list of studies available (prior GWASs), or a data.frame (character, numeric or data.frame)
 #' @param Z_matrices The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
 #'        (character)
 #' @param prior_studies The IDs of prior GWASs to use for the analysis, \code{default=NULL},
@@ -62,7 +62,7 @@
 #' data for the analysis (some alleles might be swapped when comparing with the initial data)
 #'
 #' @return \code{bGWAS}() returns an object of class "bGWAS". \cr
-#' Aditionnaly, if \code{save_files=T}, several files are created... \cr
+#' Additionnaly, if \code{save_files=T}, several files are created... \cr
 #' ... in your working directory :
 #' \itemize{
 #' \item  "\code{name}.log" - log file

@@ -4,12 +4,12 @@
 \alias{extract_results_bGWAS}
 \title{Extract SNPs results from bGWAS results}
 \usage{
-extract_results_bGWAS(obj, SNPs = "significants")
+extract_results_bGWAS(obj, SNPs = "significant")
 }
 \arguments{
 \item{obj}{an object of class bGWAS}
 
-\item{SNPs, }{"all" / "significants"}
+\item{SNPs, }{"all" / "significant"}
 }
 \value{
 a data.frame containing the results for all / significant SNPs
