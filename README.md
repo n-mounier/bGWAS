@@ -169,7 +169,7 @@ print(C)
          
          
 # Note that B and C are using the same data (stored differently) and give the same results.
-
+all.equal(B,C)
          
 ```
 
