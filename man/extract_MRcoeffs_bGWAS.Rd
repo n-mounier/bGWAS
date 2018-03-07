@@ -2,7 +2,7 @@
 % Please edit documentation in R/bGWAS_classFunctions.R
 \name{extract_MRcoeffs_bGWAS}
 \alias{extract_MRcoeffs_bGWAS}
-\title{Exctract MR coefficients}
+\title{Extract MR coefficients from bGWAS results}
 \usage{
 extract_MRcoeffs_bGWAS(obj)
 }
