@@ -118,7 +118,7 @@
 
 bGWAS <- function(name,
                   GWAS,
-                  Z_matrices = NULL,
+                  Z_matrices = "~/ZMatrices/",
                   prior_studies = NULL,
                   SNPs_list = NULL,
                   MR_threshold = 1e-5,
@@ -181,11 +181,7 @@ bGWAS <- function(name,
 
 
   ## ZMatrices
-  if(is.null(Z_matrices)){
-    if(!file.exists("~/ZMatrices/ZMatrix_Imputed.csv.gz")) stop("No ZMatrix_Imputed.csv.gz file in ~/ZMatrices")
-    if(!file.exists("~/ZMatrices/ZMatrix_NotImputed.csv.gz")) stop("No ZMatrix_NotImputed.csv.gz file in ~/ZMatrices")
-    Z_matrices = "~/ZMatrices"
-  } else if (is.character(Z_matrices)){
+ if (is.character(Z_matrices)){
     if(!file.exists(paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz"))) stop("No ZMatrix_Imputed.csv.gz file in specified Z_matrices folder")
     if(!file.exists(paste0(Z_matrices, "/ZMatrix_NotImputed.csv.gz"))) stop("No ZMatrix_NotImputed.csv.gz file in specified Z_matrices folder")
     # Define if the path is relative or not
