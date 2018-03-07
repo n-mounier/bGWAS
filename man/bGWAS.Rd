@@ -114,8 +114,8 @@ B = bGWAS(name = "Test_UsingSmallGWAS",
           verbose=T)
          }
 
-#'# Permorm bGWAS, using a small conventional GWAS included in data (data.frame) and selecting a subset of
-# studies for the prior
+#'# Permorm bGWAS, using a small conventional GWAS included in data (data.frame) and selecting a subset
+# of studies for the prior
 \dontrun{
 data("SmallGWAS_Pilling2017")
 C = bGWAS(name="Test_UsingSmallDataFrame",

@@ -50,7 +50,7 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, save_files=
 
 
   push.extreme.zs.back.a.little.towards.zero <- function(d) { # Some z-scores are just too far from zero
-    max.allowed.z = abs(qnorm(1e-300 / 2)) # p=1e-300 is the max allowed now, truncate z-scores accordingly
+    max.allowed.z = abs(stats::qnorm(1e-300 / 2)) # p=1e-300 is the max allowed now, truncate z-scores accordingly
     studies.here = names(d)
     studies.here = studies.here[!studies.here %in% c("rs","chrm","pos","alt","ref")]
     for(n in studies.here) {
@@ -65,7 +65,7 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, save_files=
   # Set the z-scores to 0 for the regression if too low
   if(scheme_INpXXtozero < 1.0) {
     for(column_of_zs in selected_studies) {
-      threshold = abs(qnorm(scheme_INpXXtozero/2))
+      threshold = abs(stats::qnorm(scheme_INpXXtozero/2))
       MR_ZMatrix[c(abs(MR_ZMatrix[,..column_of_zs]) < threshold) , column_of_zs] <- 0
     }
     #tmp = "Z-scores were set to 0 if p-value > 1e-5 \n"
@@ -85,7 +85,7 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, save_files=
 
   if(scheme_OUTpXXtozero < 1.0) {
     for(column_of_zs in selected_studies) {
-      threshold = abs(qnorm(scheme_INpXXtozero/2))
+      threshold = abs(stats::qnorm(scheme_INpXXtozero/2))
       All_ZMatrix[c(abs(All_ZMatrix[,..column_of_zs]) < threshold) , column_of_zs] <- 0
     }
   }

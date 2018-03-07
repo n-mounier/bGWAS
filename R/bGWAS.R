@@ -99,8 +99,8 @@
 #'           verbose=T)
 #'          }
 #'
-#'#'# Permorm bGWAS, using a small conventional GWAS included in data (data.frame) and selecting a subset of
-#'# studies for the prior
+#'#'# Permorm bGWAS, using a small conventional GWAS included in data (data.frame) and selecting a subset
+#'# of studies for the prior
 #'\dontrun{
 #' data("SmallGWAS_Pilling2017")
 #' C = bGWAS(name="Test_UsingSmallDataFrame",
@@ -140,9 +140,9 @@ bGWAS <- function(name,
 
   # platform identification : used in the main function
   # automatically re-detected when needed by other sub-functions
-  platform = c("Linux", "macOS", "W")[c(grepl("Linux", sessionInfo()$running)
-                                        , grepl("macOS", sessionInfo()$running)
-                                        , grepl("Windows", sessionInfo()$running))]
+  platform = c("Linux", "macOS", "W")[c(grepl("Linux", utils::sessionInfo()$running)
+                                        , grepl("macOS", utils::sessionInfo()$running)
+                                        , grepl("Windows", utils::sessionInfo()$running))]
   if(platform=="W") stop("Windows is not supported yet")
 
   # initialization of log_info file
@@ -257,8 +257,8 @@ bGWAS <- function(name,
         # write the data (as tar.gz) and change GWAS name to the created file
         # but save it in the current folder, no initial one
         TMP_Name = paste0(gsub(".gz", "",  paste0(getwd(), "/", strsplit(GWAS, "/")[[1]][length(strsplit(GWAS, "/")[[1]])])), "_withZ.gz")
-        write.table(DataGWAS, file=gzfile(TMP_Name), sep="\t",
-                    quote=F, row.names=F)
+        utils::write.table(DataGWAS, file=gzfile(TMP_Name), sep="\t",
+                           quote=F, row.names=F)
         GWAS = TMP_Name
         # flag the created file
         TMP_FILE = T
@@ -332,18 +332,18 @@ bGWAS <- function(name,
   ## ListOfSNPs
   # We should have at least XX SNPs / check Linux-MAC for Zcat
   # Also check the number or SNPs in common in the file if ListOfSNPs not specified ?
-  if(!is.null(SNPs_list)){
-    if(!is.character(SNPs_list)) stop("SNPs_list : non character")
-    OurSNPsMR = data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=1, showProgress = FALSE)
-    commonMR = table(ListOfSNPs %in% OurSNPsMR$rs)["TRUE"]
-    if(commonMR<20) stop("ListOfSNPs : You should provide at least 20 SNPs that can be used as strong instruments for MR")
-    OurSNPsAll = data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=1, showProgress = FALSE)
-    commonAll = table(ListOfSNPs %in% OurSNPsAll$rs)["TRUE"]
-    tmp = paste0(length(ListOfSNPs), " SNPs provided \n")
-    tmp = c(tmp, paste0(commonMR, " can be used for MR \n"))
-    tmp = c(tmp, paste0(commonAll, " can be used to compute prior \n"))
-    log_info = update_log(log_info, tmp, verbose)
-  }
+#  if(!is.null(SNPs_list)){
+#    if(!is.character(SNPs_list)) stop("SNPs_list : non character")
+#    OurSNPsMR = data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=1, showProgress = FALSE)
+#    commonMR = table(ListOfSNPs %in% OurSNPsMR$rs)["TRUE"]
+#    if(commonMR<20) stop("ListOfSNPs : You should provide at least 20 SNPs that can be used as strong instruments for MR")
+#    OurSNPsAll = data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=1, showProgress = FALSE)
+#    commonAll = table(ListOfSNPs %in% OurSNPsAll$rs)["TRUE"]
+#    tmp = paste0(length(ListOfSNPs), " SNPs provided \n")
+#    tmp = c(tmp, paste0(commonMR, " can be used for MR \n"))
+#    tmp = c(tmp, paste0(commonAll, " can be used to compute prior \n"))
+#    log_info = update_log(log_info, tmp, verbose)
+#  }
 
 
   ## prior_studies
@@ -354,7 +354,7 @@ bGWAS <- function(name,
   # if GWAS from data, make sure to remove it
   if(is.numeric(GWAS) && GWAS %in% prior_studies){
     prior_studies = prior_studies[-GWAS]
-    tmp = paste0("The study ", list_files(ID=GWAS), " (ID=", GWAS, ") has been removed from the studies used to build the prior since it is used as conventionnal GWAS. \n")
+    tmp = paste0("The study ", list_files(IDs=GWAS), " (ID=", GWAS, ") has been removed from the studies used to build the prior since it is used as conventionnal GWAS. \n")
     log_info = update_log(log_info, tmp, verbose)
 ### TO BE DONE
     # check that the user did not use exactly the same study for GWAS and for Prior,
@@ -412,7 +412,7 @@ bGWAS <- function(name,
     Files_Info[prior_studies, "Status"] = "USED"
     if(is.numeric(GWAS))  Files_Info[GWAS, "Status"] = "Conventionnal GWAS"
 
-    write.table(Files_Info, file="PriorGWASs.tsv", sep="\t", quote=F, row.names=F )
+    utils::write.table(Files_Info, file="PriorGWASs.tsv", sep="\t", quote=F, row.names=F )
 
     tmp = paste0("List of files : ", Dir, "/PriorGWASs.csv has been successfully created.  \n")
     log_info = update_log(log_info, tmp, verbose)

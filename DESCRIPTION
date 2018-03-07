@@ -15,6 +15,7 @@ Suggests:
     knitr,
     rmarkdown
 Imports:
+  calibrate (>= 1.7.2),
   data.table (>= 1.10.4.3),
   fastmatch (>= 1.1.0),
   ggplot2 (>= 2.2.1),

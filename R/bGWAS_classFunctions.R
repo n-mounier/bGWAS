@@ -60,7 +60,7 @@ all.equal.bGWAS <- function(obj1, obj2) {
 #' Manhattan Plot from bGWAS results
 #'
 #' Create a Manhattan Plot from bGWAS results (object of class bGWAS obtained
-#' when using bGWAS() or bGWASFromprior()),
+#' when using bGWAS() or bGWASfromPrior()),
 #'
 #'
 #' @param obj an object of class bGWAS
@@ -76,6 +76,7 @@ all.equal.bGWAS <- function(obj1, obj2) {
 #'        \code{annotate=TRUE} might decrease readability of the figure.
 #'
 #' @return a Manhattan Plot
+#'
 #' @export
 
 manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
@@ -108,7 +109,7 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
 
 
 
-  if(save_file) png(file_name, width = 20, height = 12, units = "cm", res = 500)
+  if(save_file) grDevices::png(file_name, width = 20, height = 12, units = "cm", res = 500)
 
   qqman::manhattan(obj$all_BFs ,
                    chr = "chrm" ,
@@ -166,13 +167,13 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
   }
 
 
-  if(save_file) dev.off()
+  if(save_file) grDevices::dev.off()
 }
 
 
 
 
-#' Ceofficients Plot from bGWAS results
+#' Coefficients Plot from bGWAS results
 #'
 #' Create a Coefficients Plot (causal effect of Prior GWASs) from bGWAS results (object of class bGWAS obtained
 #' when using bGWAS())
@@ -205,7 +206,7 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
   coeffs = obj$significant_studies
   # add the trait name (if multiple studies for a same trait, add " - X" )
   all_studies =  list_priorGWASs()
-  coeffs$Trait = all_studies[match(coeffs$Study, all_studies$File), Trait]
+  coeffs$Trait = all_studies[match(coeffs$Study, all_studies$File), 1]
   if(length(unique(coeffs$Trait))!=nrow(coeffs)){
     for(t in unique(coeffs$Trait)){
       if(nrow(coeffs[coeffs$Trait==t,]) >1 )
@@ -228,7 +229,8 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
           text=ggplot2::element_text(family='Times'),
           legend.title=ggplot2::element_blank())
 
- P=  ggplot2::ggplot(data=coeffs, ggplot2::aes(x=Trait, y=Estimate,
+  # use with to deal with R CMD check (because Trait / Estimate are not defined)
+  with(coeffs,{ P=  ggplot2::ggplot(data=coeffs, ggplot2::aes(x=Trait, y=Estimate,
                      ymin=Lower,
                      ymax=Upper)) +
    # "global estimates"
@@ -240,9 +242,11 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
    ggplot2::coord_flip() +  # flip coordinates (puts labels on y axis)
    ggplot2::xlab("") + ggplot2::ylab("Multivariate MR causal effect estimates (95% CI)") +
    apatheme  # use a white background
+  })
  # "coefficient estimates")
  # ggplot order the studies by "Trait"
  coeffs = coeffs[order(coeffs$Trait),]
+
  for(i in 1:nrow(coeffs)){
    t = coeffs$Study[i]
    chrm_estimates = unlist(obj$all_MRcoeffs[obj$all_MRcoeffs$Study==t, "Estimate"])
@@ -252,9 +256,9 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
                               col="darkgrey", lwd = 0.8)
    }
  }
-if(save_file) png(file_name, width = 20, height = 12, units = "cm", res = 500)
+if(save_file) grDevices::png(file_name, width = 20, height = 12, units = "cm", res = 500)
 print(P)
-if(save_file) dev.off()
+if(save_file) grDevices::dev.off()
 }
 
 # coefficients_plot_bGWAS(MyObj, save_file = T)
@@ -267,15 +271,15 @@ if(save_file) dev.off()
 #'
 #'
 #' @param obj an object of class bGWAS
-#' @param SNPs, "all" / "significants"
+#' @param SNPs, "all" / "significant"
 #'
 #' @return a data.frame containing the results for all / significant SNPs
 #' @export
 
-extract_results_bGWAS <- function(obj, SNPs="significants"){
+extract_results_bGWAS <- function(obj, SNPs="significant"){
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
-  if(!SNPs %in% c("all", "significants")) stop("SNPs : should be \"all\" or \"significants\".")
+  if(!SNPs %in% c("all", "significant")) stop("SNPs : should be \"all\" or \"significants\".")
 
   if(SNPs=="all"){
     Res = obj$all_BFs

@@ -277,11 +277,11 @@ Functions for graphic representations:
 ```r 
 manhattan_plot_bGWAS(A)
 ```
-![](docs/figures/ManhattanPlot.png)  
+![](https://drive.switch.ch/index.php/apps/files_sharing/ajax/publicpreview.php?x=2506&y=584&a=true&file=ManhattanPlot.png&t=LQ8bk8p5PZFUCho&scalingup=0)  
 ```r 
 coefficients_plot_bGWAS(A) 
 ```
-![](docs/figures/CoefficientsPlot.png)  
+![](https://drive.switch.ch/index.php/apps/files_sharing/ajax/publicpreview.php?x=2506&y=584&a=true&file=CoefficientsPlot.png&t=PnfY6EC7R1SoLUe&scalingup=0)  
    
    
 ##### Aditionnaly, if `save_files=T`, several files are created...   

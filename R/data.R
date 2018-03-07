@@ -8,7 +8,7 @@
 #'   \item{a1}{effect allele for the SNP}
 #'   \item{a0}{reference allele for the SNP}
 #'   \item{beta}{estimated effect size for the SNP}
-#'   \item{a1}{standard error of the estimated effect size for the SNP}
+#'   \item{se}{standard error of the estimated effect size for the SNP}
 #' }
 #' @source \url{https://figshare.com/articles/Plling_et_al_2017_UKB_parents_attained_age_GWAS/5439382/1}
 "SmallGWAS_Pilling2017"
