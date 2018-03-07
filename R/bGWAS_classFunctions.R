@@ -260,7 +260,7 @@ if(save_file) dev.off()
 # coefficients_plot_bGWAS(MyObj, save_file = T)
 
 
-#' Exctract SNPs results from bGWAS results
+#' Extract SNPs results from bGWAS results
 #'
 #' Extract SNPs results from an object of class bGWAS obtained
 #' when using bGWAS() or bGWAS_fromPrior()
@@ -289,7 +289,7 @@ extract_results_bGWAS <- function(obj, SNPs="significants"){
 
 
 
-#' Exctract MR coefficients from bGWAS results
+#' Extract MR coefficients from bGWAS results
 #'
 #' Extract MR coefficients from an object of class bGWAS obtained
 #' when using bGWAS()
@@ -304,7 +304,7 @@ extract_results_bGWAS <- function(obj, SNPs="significants"){
 extract_MRcoeffs_bGWAS <- function(obj){
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
-  if(is.null(obj$all_MRcoeffs)) stop("The prior has not been created using Prior GWASs, there are no coefficients to exctract")
+  if(is.null(obj$all_MRcoeffs)) stop("The prior has not been created using Prior GWASs, there are no coefficients to extract")
 
   # For each study :
   # global coeff / chromosomes coeff

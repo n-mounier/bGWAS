@@ -2,7 +2,7 @@
 % Please edit documentation in R/bGWAS_classFunctions.R
 \name{extract_results_bGWAS}
 \alias{extract_results_bGWAS}
-\title{Exctract SNPs results from bGWAS results}
+\title{Extract SNPs results from bGWAS results}
 \usage{
 extract_results_bGWAS(obj, SNPs = "significants")
 }
