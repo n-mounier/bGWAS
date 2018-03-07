@@ -15,12 +15,12 @@ Suggests:
     knitr,
     rmarkdown
 Imports:
-  data.table,
-  fastmatch,
-  ggplot2,
-  gtools,
-  magrittr,
-  qqman,
-  Rcpp,
-  readr
+  data.table (>= 1.10.4.3),
+  fastmatch (>= 1.1.0),
+  ggplot2 (>= 2.2.1),
+  gtools (>= 3.5.0),
+  magrittr (>= 1.5),
+  qqman (>= 0.1.4),
+  Rcpp (>= 0.12.15),
+  readr (>= 1.1.1)
 VignetteBuilder: knitr
