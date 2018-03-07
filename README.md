@@ -27,7 +27,7 @@ allows a quick selection of prior GWASs (to include/exclude specific studies whe
 -   **`extract_results_bGWAS()`**    
 returns results (prior estimate / standard-error + p-value from BF for SNPs) from an object of class "bGWAS"   
 
--   **`manatthan_plot_bGWAS()`**   
+-   **`manhattan_plot_bGWAS()`**   
 creates a Manhattan Plot from an object of class "bGWAS"  
 
 -   **`extract_MRcoeffs_bGWAS()`**    
@@ -143,7 +143,7 @@ B = bGWAS(name = "Test_UsingSmallGWAS",
          
       
 print(B)
-manatthan_plot_bGWAS(B)
+manhattan_plot_bGWAS(B)
 ```
     
 ``` r         
@@ -276,9 +276,9 @@ MR_coefficients[1:4, 1:8]
 
 Functions for graphic representations:   
 ```r 
-manatthan_plot_bGWAS(A)
+manhattan_plot_bGWAS(A)
 ```
-![](docs/figures/ManatthanPlot.png)  
+![](docs/figures/ManhattanPlot.png)  
 ```r 
 coefficients_plot_bGWAS(A) 
 ```
@@ -313,8 +313,7 @@ Analysis using 9 prior GWASs, for a conventional GWAS containing 400,000 SNPs in
 
     
       
-\vspace{120pt}
-       
+
        
        
 <!---    
