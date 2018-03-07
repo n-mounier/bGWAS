@@ -34,6 +34,27 @@ print.bGWAS <- function(obj) {
 
 
 
+#' @param obj1 an object of class bGWAS
+#' @param obj2 an object of class bGWA
+#'
+#' @return all.equal
+#' @export
+all.equal.bGWAS <- function(obj1, obj2) {
+  if(length(obj1)!= length(obj2)) return(FALSE)
+  # log - we don't care
+  # significant SNPs
+  if(!all.equal(obj1$significant_SNPs,obj2$significant_SNPs)) return(FALSE)
+  # all BFs
+  if(!all.equal(obj1$all_BFs,obj2$all_BFs, tolerance=0.0001)) return(FALSE)
+  # significant studies
+  if(!all.equal(obj1$significant_studies,obj2$significant_studies, tolerance=0.0001)) return(FALSE)
+  # all MR coeffs
+  if(!all.equal(obj1$all_MRcoeffs,obj2$all_MRcoeffs, tolerance=0.0001)) return(FALSE)
+
+  return(TRUE)
+}
+
+
 
 
 #' Manhattan Plot from bGWAS results
@@ -57,7 +78,7 @@ print.bGWAS <- function(obj) {
 #' @return a Manhattan Plot
 #' @export
 
-manatthan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
+manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
                                  threshold=NULL, annotate=T) {
 
   ## check parameters
@@ -68,7 +89,7 @@ manatthan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
     file_name = paste0(strsplit(strsplit(obj$log_info[
       grep("The name of your analysis is: ", obj$log_info)],
       "The name of your analysis is: \"", fixed=T)[[1]][2], "\"", fixed=T)[[1]][1],
-    "_ManatthanPlot.png")
+    "_ManhattanPlot.png")
   }
   if(save_file && !is.character(file_name)) stop("file_name : should be a character")
   if(!is.logical(annotate)) stop("annotate : shoud be logical")
@@ -119,8 +140,7 @@ manatthan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
     all <- all[order(all$chrm, all$pos), ]
 
     # y = -log10(p) ou -log10(fdr)
-    SNPs_to_plot$y = -log10(SNPs_to_plot[,..value, with=F]) - # to make sure all SNPs names are in plotting windows
-                      - 0.1
+    SNPs_to_plot$y = -log10(SNPs_to_plot[,..value, with=F]) - 0.3 # to make sure all SNPs names are in plotting windows
      # x = have to look at all SNPs chr/pos
     get_posx <- function(snp, all){
       chr = as.numeric(snp[2])
@@ -188,8 +208,8 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
   coeffs$Trait = all_studies[match(coeffs$Study, all_studies$File), Trait]
   if(length(unique(coeffs$Trait))!=nrow(coeffs)){
     for(t in unique(coeffs$Trait)){
-      if(nrow(coeffs[coeffs$Trait==t]) >1 )
-      coeffs$Trait[coeffs$Trait==t] = paste0(t, " (", c(1:sum(coeffs[,coeffs$Trait==t])), ")")
+      if(nrow(coeffs[coeffs$Trait==t,]) >1 )
+      coeffs$Trait[coeffs$Trait==t] = paste0(t, " (", c(1:nrow(coeffs[coeffs$Trait==t,])), ")")
     }
   }
 
