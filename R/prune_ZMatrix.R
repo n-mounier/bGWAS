@@ -25,9 +25,9 @@ prune_ZMatrix <- function(ZMatrix, prune.dist=500000, r2.limit=1.1, verbose=F) {
   }
 
 
-  # remove non-numeric columns
+  # remove non-numeric columns + the last one, we don't want to prune based on the conventionnal GWAS
   ZMatrix[,!(colnames(ZMatrix) %in% c('chrm','rs','pos', 'alt', 'ref')),with=F] -> ZMatrix.justZMatrix
-
+  ZMatrix.justZMatrix[,-ncol(ZMatrix.justZMatrix), with=F]
 
   # get the largest Z for each SNP
   apply(ZMatrix.justZMatrix, 1, function(ZMatrix){
