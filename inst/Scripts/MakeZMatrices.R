@@ -114,6 +114,9 @@ write.table(MySNPs, "/data/sgg2/ninon/projects/bGWAS_Packaging/SNPsInfo", quote=
 # Then Create Z_Matrices
 # (re-use Aaron's code)
 
+## Create the full Z-Matrix, and then exctract the SNP with p<10^-5 in at least one study
+# we don't care if imputed / non imputed
+
 threshold = 1e-5
 
 
@@ -197,5 +200,186 @@ B = fread("zcat < inst/Data/ZMatrix_NotImputed.csv.gz")
 # > B = data.table::fread(paste0("zcat < ", system.file("Data/ZMatrix_NotImputed.csv.gz", package="bGWAS")))
 
 
+####################################################################################
+#                         Let's make nice Z-Matrices !                             #
+####################################################################################
+
+### Make Full ZMatrix from scratch
+library(data.table)
+
+## parameters
+# imputation quality
+r2_pred = 0.7
+# minor allele frequency (in Lifegen Paper : 0.5%)
+maf_th = 0.005
 
 
+
+# use UK10K for alignement
+UK10K <- fread("/data/sgg2/aaron/homedir/Experiments/genome-data/positions.in.TWINSUK-ALSPAC/positions.b19.TWINSUKALSPAC")
+#  chr pos.b19       rs            alts   ref          aaf
+#   1   52185   rs201374420           T  TTAA    0.0002644803
+#   1   55249   rs200769871      CTATGG     C    0.0068764877
+# ...
+
+
+
+Studies = system("ls ~/data/Imputed_GWASs/", intern=T)
+
+# start with rsid ...
+# for all UK10K SNPs
+Full_Z = UK10K[,c("rs", "chr", "pos.b19", "alts", "ref")]
+colnames(Full_Z) = c("rs", "chrm", "pos", "alt", "ref")
+
+# keep only single nucleotide polymorphism
+Full_Z = Full_Z[Full_Z$alt %in% c("A", "T", "C", "G"),]
+Full_Z = Full_Z[Full_Z$ref %in% c("A", "T", "C", "G"),]
+# 15,609,168 SNPs
+
+
+########## Check imputation quality ##########
+Res = data.frame(Study=character(), Total=numeric(),
+                 PercR2HigherThan0.9 = numeric(),
+                 PercR2HigherThan0.7 = numeric(),
+                 PercR2HigherThan0.5 = numeric(),
+                 PercR2HigherThan0.3 = numeric(),
+                 PercMAFHigherThan0.1 = numeric(),
+                 PercMAFHigherThan0.05 = numeric(),
+                 PercMAFHigherThan0.01 = numeric(),
+                 GoodQuality=numeric(),
+                 MAF=numeric(),
+                 GoodQualityAndMAF=numeric(),
+                 stringsAsFactors = F)
+
+
+
+
+for(s in Studies){
+  print(paste0("Adding GWAS: ", s))
+  St = fread(paste0("~/data/Imputed_GWASs/", s))
+
+Res[nrow(Res)+1,] = c(as.character(s),
+                      nrow(St),
+                      round(nrow(St[St$r2.pred>0.9,])/nrow(St), 5),
+                      round(nrow(St[St$r2.pred>0.7,])/nrow(St), 5),
+                      round(nrow(St[St$r2.pred>0.5,])/nrow(St), 5),
+                      round(nrow(St[St$r2.pred>0.3,])/nrow(St), 5),
+                      round(nrow(St[St$maf>0.1,])/nrow(St), 5),
+                      round(nrow(St[St$maf>0.05,])/nrow(St), 5),
+                      round(nrow(St[St$maf>0.01,])/nrow(St), 5),
+                      nrow(St[St$r2.pred>0.7,]),
+                      nrow(St[St$maf>0.05,]),
+                      nrow(St[St$maf>0.05 & St$r2.pred>0.7,]))
+}
+
+write.table(Res, "FileInfo.csv", sep=",", quote=F, row.names=F)
+
+########## Check variance ##########
+
+VarAll = c()
+Var0.01WellImputed = c()
+Var0.005WellImputed = c()
+for(s in Studies){
+  print(s)
+
+
+  GWAS_Imp = fread(paste0("~/data/Imputed_GWASs/", s))
+
+  # are SSImp file all aligned : yes.
+
+  VarAll = c(VarAll, var(GWAS_Imp$z_imp))
+
+  MyGWAS = GWAS_Imp[GWAS_Imp$maf > 0.01 & GWAS_Imp$r2.pred>0.7, ]
+  Var0.01WellImputed = c(Var0.01WellImputed, var(MyGWAS$z_imp))
+
+  MyGWAS2 = GWAS_Imp[GWAS_Imp$maf > 0.005 & GWAS_Imp$r2.pred>0.7, ]
+  Var0.005WellImputed = c(Var0.005WellImputed, var(MyGWAS2$z_imp))
+
+}
+
+VAR = data.frame(GWAS=Studies, Var_All=VarAll, Var_qual0.7_1perc=Var0.01WellImputed, Var_qual0.7_0.5perc=Var0.005WellImputed)
+write.csv(VAR, "VarianceNewlyImputed_GWAS.csv")
+
+
+
+########## Create Z-Matrix ##########
+
+# then add study at a time
+# and remove SNPs without info fot this study
+# -> at the end, we'll have only the SNPs with Z-score for all studies!
+
+AllAligned=c()
+# Studies_imp = Res$Study[Res$PercR2HigherThan0.7>0.5]
+for(s in Studies){
+  print(paste0("Adding GWAS: ", s))
+  St = fread(paste0("~/data/Imputed_GWASs/", s))
+
+
+  ## filter on allele freq and imp quality
+  print("Filtering on maf and imputation quality...")
+  St = St[St$r2.pred>r2_pred,]
+  St = St[St$maf>maf_th,]
+
+
+  ## reduce to UK10K SNPs and align
+  print("Checking alignement with UK10 SNPs...")
+  St = St[St$SNP %in% Full_Z$rs,]
+  St = St[match(Full_Z$rs, St$SNP),]
+  # check alignment
+  aligned = which(St$a2 == Full_Z$alt &
+                    St$a1 == Full_Z$ref)
+  swapped = which(St$a1 == Full_Z$alt &
+                    St$a2 == Full_Z$ref)
+  # studies imputed using UK10K so they should not be any swapped
+  St[, myZ:= numeric()]
+  St[aligned, myZ:= St$z_imp[aligned]]
+  St[swapped, myZ:= -St$z_imp[swapped]]
+  if(length(swapped)==0) AllAligned[length(AllAligned)+1]=TRUE
+  if(length(swapped)==0) print("All aligned!")
+  if(length(swapped)>0) AllAligned[length(AllAligned)+1]=FALSE
+
+  ## add z-scores to the Z-matrix
+  # and remove SNPs without info
+  print("Adding Z-scores to the Z-matrix...")
+  Full_Z[, gsub(".smry..fdr.uk10K", "", s)] = St$myZ
+  nSNPs_before = nrow(Full_Z)
+  print("Removing SNPs without Z-scores...")
+  Full_Z = Full_Z[complete.cases(Full_Z)]
+  nSNPs_after = nrow(Full_Z)
+  print(paste0(nSNPs_after, " SNPs in the full Z-Matrix..."))
+
+
+  print("Done! \n \n")
+
+}
+
+
+# if some "-" in the file name, replace by "_"
+colnames(Full_Z) = gsub("-", "_", colnames(Full_Z))
+
+
+## removing the "low imputation quality" (less that 50 SNPs with r2.imp>0.7) GWAS -> 6,282,521 SNPs
+# write.table(Full_Z, "FullZ_48GWASs.csv", sep=",", quote=F, row.names=F)
+# v = apply(Full_Z[:6:ncol(Full_Z)], 2, var)
+
+## using all GWASs -> 756,024 SNPs
+write.table(Full_Z, "FullZ_58GWASs.csv", sep=",", quote=F, row.names=F)
+# v = apply(Full_Z[:6:ncol(Full_Z)], 2, var)
+
+
+
+
+### Derive Strong Instruments ZMatrix
+SI_Z = Full_Z
+Zlimit = qnorm(1e-5/2, lower.tail = F)
+SNPsToKeep = apply(SI_Z[,-c(1:5)], 1, function(x) any(abs(x)>Zlimit))
+
+# 48 studies, 750,000 SNPs -> 72,457 strong instruments
+# 58 studies, 6.3M SNPs    -> 205,102 strong instruments
+# tmp Non-Imputed ZMatrix  -> 103,594
+SI_Z = SI_Z[SNPsToKeep,]
+
+
+
+
+### Add columns to existing ZMatrix
