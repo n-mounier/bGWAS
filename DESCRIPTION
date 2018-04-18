@@ -1,8 +1,8 @@
 Package: bGWAS
 Type: Package
 Title: Bayesian Genome-Wide Association Study
-Description: Package regrouping functions to perform Bayesian Genome-Wide Association Studies (bGWAS). See REFERENCE for more information about the method.
-Version: 0.2.1
+Description: Package regrouping functions to perform Bayesian Genome-Wide Association Studies (bGWAS). See McDaid et al (2017) for more information about the method.
+Version: 0.1.0
 License: GPL-2 | file LICENSE
 Author: Ninon Mounier
 Maintainer: Ninon Mounier <mounier.ninon@gmail.com>
