@@ -7,7 +7,7 @@
 bGWAS(name, GWAS, Z_matrices = "~/ZMatrices/", prior_studies = NULL,
   SNPs_list = NULL, MR_threshold = 1e-05, sign_method = "p",
   sign_thresh = 5e-08, prune_res = FALSE, save_files = FALSE,
-  verbose = FALSE)
+  verbose = TRUE)
 }
 \arguments{
 \item{name}{The name of the analysis (character)}
@@ -42,7 +42,7 @@ p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)
 \code{default=FALSE}}
 
 \item{verbose}{A logical indicating if information on progress should be reported,
-\code{default=FALSE}}
+\code{default=TRUE}}
 }
 \value{
 \code{bGWAS}() returns an object of class "bGWAS". \cr
@@ -98,8 +98,7 @@ MyGWAS = 5
 list_priorGWASs(MyGWAS)
 \dontrun{
 A = bGWAS(name = "Test_UsingGWASfromPriorGWASs",
-         GWAS = MyGWAS,
-         verbose=T)
+         GWAS = MyGWAS)
          }
 
 # Permorm bGWAS, using a small conventional GWAS included in data (file) and selecting a subset of
@@ -111,7 +110,7 @@ MyStudies = select_priorGWASs(include_traits=c("Type 2 diabetes", "Smoking"),
 B = bGWAS(name = "Test_UsingSmallGWAS",
           GWAS = MyGWAS,
           prior_studies=MyStudies,
-          verbose=T)
+          verbose=F)
          }
 
 #'# Permorm bGWAS, using a small conventional GWAS included in data (data.frame) and selecting a subset
@@ -120,8 +119,7 @@ B = bGWAS(name = "Test_UsingSmallGWAS",
 data("SmallGWAS_Pilling2017")
 C = bGWAS(name="Test_UsingSmallDataFrame",
           GWAS = SmallGWAS_Pilling2017,
-          prior_studies=MyStudies,
-          verbose=T,
+          prior_studies=MyStudies
           save_files=T)
           }
 
