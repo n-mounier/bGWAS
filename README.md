@@ -2,10 +2,11 @@
 # bGWAS
 [//]:========================================
 
-:information_source: package under development  
+:information_source: Package Under Development
+We are currently implementing new functions, to make the approach more robust, more flexible and faster. Check the NEWS to learn more about what has been modified.
     
     
-:warning: if you downloaded the Z-Matrix files before 25/02/2018, they are obsolete, you need to delete the old ones and download the new ones!   
+:warning: Ff you downloaded the Z-Matrix files before 25/02/2018, they are obsolete, you need to delete the old ones and download the new ones!   
 
 ## Overview
 [//]:*******
@@ -37,7 +38,7 @@ returns multivariate MR coefficients (1 estimate using all chromosomes + 22 esti
 creates a Coefficients Plot (causal effect of Prior GWASs) from an object of class "bGWAS"  
 
 -   **`bGWAS_fromPrior()`**    
-alternative function that compares prior Z-scores provided by the user to observed Z-scores and returns an object of class "bGWAS" # NOT IMPLEMENTED YET   
+alternative function that compares prior Z-scores provided by the user to observed Z-scores and returns an object of class "bGWAS" # TO BE IMPLEMENTED 
 
 
 
@@ -68,12 +69,12 @@ tar xzvf ZMatrices.tar.gz
 To run the analysis with `bGWAS` two inputs are needed:
 
 #### 1. The *GWAS* results to be tested   
-Can be a regular (space/tab/comma-separated) file or a gzipped file (.gz), must contain the following columns, which can have alternative names.  
+Can be a regular (space/tab/comma-separated) file or a gzipped file (.gz) or a `data.frame` must contain the following columns, which can have alternative names.  
 SNP-identifier:  `rs` or `rsid`, `snp`, `snpid`, `rnpid`    
 Alternate allele:  `a1` or `alt`, `alts`    
 Reference allele: `a2` or `a0`, `ref`    
 Z-statistics: `z` or `Z`, `zscore`      
-If the Z-statistics is not present, it can be calculated from effect size and standard error, in which case the following columns should be provided:
+If the Z-statistics is not present, it can be automatically calculated from effect size and standard error, in which case the following columns should be provided:
 Effect-size: `b` or `beta`, `beta1`    
 Standard error:  `se` or `std`     
 
@@ -82,7 +83,9 @@ Standard error:  `se` or `std`
    
 Matrix files, containing Z-scores for all prior GWASs should be downloaded separately and stored in `~/ZMatrices` or in the folder specified when launching the analysis.   
 
-*Currently, this is not possible for users to directly add their own GWASs to this set of prior GWASs. Feel free to contact us for more information.*   
+*Currently, this is not possible for users to directly add their own GWASs to this set of prior GWASs.   *
+*More GWASs will be added soon.   *
+*Feel free to contact us for more information.*   
  
 <!---  Format?
 Can I add one more?--->
@@ -92,8 +95,8 @@ Can I add one more?--->
 [//]:-------------------------------
 
 Before running your analysis, you can select the prior GWASs you want to include. You can use the function **`list_prioGWASs()`** to get some information about the prior GWASs available.   
-You should remove traits that by definition are not independent from your trait. For example, before analysing BMI results, make sure to exclude "Height" from the prior GWASs used. You can use the function **`select_priorGWASs()`** to automatically exclude/include some traits or some files.   
-*+ also check consortium (no function for selection) but if same individuals in your GWAS + prior GWASs, not ok*
+You should remove traits that by definition are not independent from your trait of interest. For example, before analysing BMI results, make sure to exclude "Height" from the prior GWASs used. You can use the function **`select_priorGWASs()`** to automatically exclude/include some traits or some files.   
+You should also check for sample overlap (no function for selection based on consortium implemented) but if you have individuals in common between your conventional GWAS and prior GWASs, it might induce some bias.
 
 ``` r
 AllStudies = list_priorGWASs()
@@ -295,7 +298,7 @@ coefficients_plot_bGWAS(A)
 -   **SignificantSNPs.csv** - contains BF and p-values estimated for a subset of SNPs    
 
 
--> Further description of the files  
+-> Further description of the files will be added soon.
 
 
 ## Runtime
@@ -305,6 +308,7 @@ Analysis using all the 58 prior GWASs available, for a conventional GWAS contain
 
 Analysis using 9 prior GWASs, for a conventional GWAS containing 400,000 SNPs in common with prior studies (see example B) ~ 8 minutes
 
+We are currently implementing an distribution-based approach (remplacing the permutation approach currently used) to estimate p-values. This will reduce runtime considerably.
 
 
 ## Contact
