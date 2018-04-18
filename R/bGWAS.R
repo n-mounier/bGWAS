@@ -32,7 +32,7 @@
 # #' @param OutPath character, path to the outputs, needed if saveFiles is TRUE, by default,
 # #' current working dictory
 #' @param verbose  A logical indicating if information on progress should be reported,
-#'        \code{default=FALSE}
+#'        \code{default=TRUE}
 #'
 #' @details
 #' \code{Name} and \code{GWAS} are required arguments.
@@ -83,8 +83,7 @@
 #' list_priorGWASs(MyGWAS)
 #' \dontrun{
 #' A = bGWAS(name = "Test_UsingGWASfromPriorGWASs",
-#'          GWAS = MyGWAS,
-#'          verbose=T)
+#'          GWAS = MyGWAS)
 #'          }
 #'
 #'# Permorm bGWAS, using a small conventional GWAS included in data (file) and selecting a subset of
@@ -96,7 +95,7 @@
 #' B = bGWAS(name = "Test_UsingSmallGWAS",
 #'           GWAS = MyGWAS,
 #'           prior_studies=MyStudies,
-#'           verbose=T)
+#'           verbose=F)
 #'          }
 #'
 #'#'# Permorm bGWAS, using a small conventional GWAS included in data (data.frame) and selecting a subset
@@ -105,8 +104,7 @@
 #' data("SmallGWAS_Pilling2017")
 #' C = bGWAS(name="Test_UsingSmallDataFrame",
 #'           GWAS = SmallGWAS_Pilling2017,
-#'           prior_studies=MyStudies,
-#'           verbose=T,
+#'           prior_studies=MyStudies
 #'           save_files=T)
 #'           }
 #'
@@ -127,7 +125,7 @@ bGWAS <- function(name,
                   prune_res = FALSE,
 #                  OutPath = getwd(),
                   save_files = FALSE,
-                  verbose = FALSE) {
+                  verbose = TRUE) {
 
 
   InitPath = getwd()
@@ -188,7 +186,7 @@ bGWAS <- function(name,
     if(!substr(Z_matrices,1,1) %in% c("/", "~")){
       Z_matrices=paste0(InitPath, "/", Z_matrices)
     }
-  } else stop("Z_matrices : wrong format")
+  } else stop("Z_matrices : wrong format, should be character")
 
   tmp = paste0("The Z-Matrix files are stored in \"", Z_matrices, "\".  \n")
   log_info = update_log(log_info, tmp, verbose)
@@ -280,32 +278,61 @@ bGWAS <- function(name,
     # add attribute GName to the data.frame, to be re-used in other subfunctions
     attributes(GWAS)$GName =  deparse(substitute(GWAS)) # get the "name" of the object used as an argument in the function
     # transform into data.table (needed when creating ZMat for data manipulation)
-    GWAS = data.table::as.data.table(GWAS)
+    #GWAS = data.table::as.data.table(GWAS)
+    # do not transform it into a DT yet, messes things up for factor identification
     tmp = paste0("The conventional GWAS used as input the object: \"",
                  attributes(GWAS)$GName, "\".  \n")
     log_info = update_log(log_info, tmp, verbose)
 
     HeaderGWAS = colnames(GWAS)
+
     if(all(!HeaderGWAS %in% c("rsid", "snpid", "snp", "rnpid", "rs"))) stop("GWAS : no SNPID column")
     # how to deal with multiple rsid / snpid columns ???
     # here, we don't care, we need at least one
-    tmp = paste0("   SNPID column, ok")
+    if(is.factor(GWAS[,which(HeaderGWAS %in% c("rsid", "snpid", "snp", "rnpid", "rs"))])){
+      GWAS[,which(HeaderGWAS %in% c("rsid", "snpid", "snp", "rnpid", "rs"))] =
+        as.character(unlist(GWAS[,which(HeaderGWAS %in% c("rsid", "snpid", "snp", "rnpid", "rs"))]))
+    }
+    tmp = paste0("   SNPID column , ok")
     if(all(!HeaderGWAS %in% c("a1", "alts", "alt"))) stop("GWAS : no ALT column")
+    if(is.factor(GWAS[,which(HeaderGWAS %in% c("a1", "alts", "alt"))])){
+      GWAS[,which(HeaderGWAS %in% c("a1", "alts", "alt"))] =
+        as.character(unlist(GWAS[,which(HeaderGWAS %in% c("a1", "alts", "alt"))]))
+    }
     tmp = c(tmp, paste0("ALT column, ok"))
     if(all(!HeaderGWAS %in% c("a2", "a0", "ref"))) stop("GWAS : no REF column")
+    if(is.factor(GWAS[,which(HeaderGWAS %in% c("a2", "a0", "ref"))])){
+      GWAS[,which(HeaderGWAS %in% c("a2", "a0", "ref"))] =
+        as.character(unlist(GWAS[,which(HeaderGWAS %in% c("a2", "a0", "ref"))]))
+    }
     tmp = c(tmp, paste0("REF column, ok"))
     if(all(!HeaderGWAS %in% c("z", "Z", "zscore"))){
       # allow for beta + se to calculate Z
       if(!all(!HeaderGWAS %in% c("b", "beta", "beta1")) & !all(!HeaderGWAS %in% c("se", "std"))){
         # if beta + se : calculate Z
-        GWAS$Z = GWAS[,HeaderGWAS[HeaderGWAS %in% c("b", "beta", "beta1")], with=F] /
-          GWAS[,HeaderGWAS[HeaderGWAS %in% c("se", "std")], with=F]
+        if(is.factor(GWAS[,which(HeaderGWAS %in% c("b", "beta", "beta1"))])){
+          GWAS[,which(HeaderGWAS %in% c("b", "beta", "beta1"))] =
+            as.character(unlist(GWAS[,which(HeaderGWAS %in% c("b", "beta", "beta1"))]))
+        }
+        if(is.factor(GWAS[,which(HeaderGWAS %in% c("se", "std"))])){
+          GWAS[,which(HeaderGWAS %in% c("se", "std"))] =
+            as.character(unlist(GWAS[,which(HeaderGWAS %in% c("se", "std"))]))
+        }
+        GWAS$z = GWAS[,HeaderGWAS[HeaderGWAS %in% c("b", "beta", "beta1")]]
+          GWAS[,HeaderGWAS[HeaderGWAS %in% c("se", "std")]]
       } else {
         stop("GWAS : no Z-SCORE column")
       }
     } else {
+      if(is.factor(GWAS[,which(HeaderGWAS %in% c("z", "Z", "zscore"))])){
+        GWAS[,which(HeaderGWAS %in% c("z", "Z", "zscore"))] =
+          as.character(unlist(GWAS[,which(HeaderGWAS %in% c("z", "Z", "zscore"))]))
+      }
       tmp = c(tmp, paste0("Z column, ok  \n"))
     }
+    GWAS=data.table::as.data.table(GWAS)
+
+
     tmp = paste(tmp, collapse= " - ")
     log_info = update_log(log_info, tmp, verbose)
   } else stop("GWAS : unrecognized format")
@@ -508,7 +535,6 @@ bGWAS <- function(name,
   Time = as.integer((proc.time()-StartTime)[3])
   minutes <- as.integer(trunc(Time/60))
   seconds <- Time - minutes * 60
-
   tmp = paste0("Time of the analysis: ", minutes, " minute(s) and ", seconds, " second(s).  \n")
   log_info = update_log(log_info, tmp, verbose)
 
