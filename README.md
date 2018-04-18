@@ -308,7 +308,7 @@ Analysis using all the 58 prior GWASs available, for a conventional GWAS contain
 
 Analysis using 9 prior GWASs, for a conventional GWAS containing 400,000 SNPs in common with prior studies (see example B) ~ 8 minutes
 
-We are currently implementing an distribution-based approach (remplacing the permutation approach currently used) to estimate p-values. This will reduce runtime considerably.
+We are currently implementing a distribution-based approach (remplacing the permutation approach currently used) to estimate p-values. This will reduce runtime considerably.
 
 
 ## Contact
