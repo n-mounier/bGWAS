@@ -2,7 +2,7 @@
 # bGWAS
 [//]:========================================
 
-:information_source: Package Under Development
+:information_source: Package Under Development    
 We are currently implementing new functions, to make the approach more robust, more flexible and faster. Check the NEWS to learn more about what has been modified.
     
     
