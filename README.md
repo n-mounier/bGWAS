@@ -6,7 +6,7 @@
 We are currently implementing new functions, to make the approach more robust, more flexible and faster. Check the NEWS to learn more about what has been modified.
     
     
-:warning: Ff you downloaded the Z-Matrix files before 25/02/2018, they are obsolete, you need to delete the old ones and download the new ones!   
+:warning: If you downloaded the Z-Matrix files before 25/02/2018, they are obsolete, you need to delete the old ones and download the new ones!   
 
 ## Overview
 [//]:*******
