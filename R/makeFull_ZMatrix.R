@@ -143,7 +143,7 @@ makeFull_ZMatrix <- function(studies=NULL, GWAS,  Z_matrices="~/Z_matrices", sav
 
 
   ZMatrix = ZMatrix[complete.cases(ZMatrix)]
-  tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific=F), " SNPs in common between prior studies and the conventional GWAS")
+  tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific=F), " SNPs in common between prior studies and the conventional GWAS \n")
   Log = update_log(Log, tmp, verbose)
 
 
