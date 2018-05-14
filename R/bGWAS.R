@@ -279,6 +279,7 @@ bGWAS <- function(name,
     attributes(GWAS)$GName =  deparse(substitute(GWAS)) # get the "name" of the object used as an argument in the function
     # transform into data.table (needed when creating ZMat for data manipulation)
     #GWAS = data.table::as.data.table(GWAS)
+    GWAS = as.data.frame(GWAS)
     # do not transform it into a DT yet, messes things up for factor identification
     tmp = paste0("The conventional GWAS used as input the object: \"",
                  attributes(GWAS)$GName, "\".  \n")
@@ -318,7 +319,7 @@ bGWAS <- function(name,
           GWAS[,which(HeaderGWAS %in% c("se", "std"))] =
             as.character(unlist(GWAS[,which(HeaderGWAS %in% c("se", "std"))]))
         }
-        GWAS$z = GWAS[,HeaderGWAS[HeaderGWAS %in% c("b", "beta", "beta1")]]
+        GWAS$z = GWAS[,HeaderGWAS[HeaderGWAS %in% c("b", "beta", "beta1")]] /
           GWAS[,HeaderGWAS[HeaderGWAS %in% c("se", "std")]]
       } else {
         stop("GWAS : no Z-SCORE column")
@@ -500,7 +501,7 @@ bGWAS <- function(name,
   tmp = paste0("> Calculating them for all SNPs  \n")
   log_info = update_log(log_info, tmp, verbose)
 
-  PriorWithBF = request_BFandP(Prior$prior, save_files, verbose)
+  PriorWithBF = request_BFandP(Prior$prior, sign_thresh, save_files, verbose)
   log_info = c(log_info, PriorWithBF$log_info)
 
 
@@ -547,6 +548,8 @@ bGWAS <- function(name,
   results$all_BFs = PriorWithBF$SNPs
   results$significant_studies = res_MR$coeffs
   results$all_MRcoeffs = Prior$all_coeffs
+  results$nonZero_effects = Prior$non_zero
+
 
   class(results) = "bGWAS"
  return(results)
