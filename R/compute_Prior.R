@@ -34,14 +34,14 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, save_files=
   # but for other cases, allow the use of a file
   if(data.table::is.data.table(selected_studies)){ # ok, but still need to check that the format is ok
     # i.e. all the studies listed are part of list_files()
-    if(!all(selected_studies$study_selected %in% list_files())) stop("The studies are not in our list")
+    if(!all(selected_studies$study_selected %in% list_files())) stop("The studies are not in our list", call. = FALSE)
     selected_studies = selected_studies$study_selected
   } else if(is.character(selected_studies)){ # TO BE DONE
     selected_studies <- data.table::fread(selected_studies,showProgress = FALSE)
     # check that the studies names are part of list file
-    if(!all(selected_studies %in% list_files())) stop("The studies are not in our list")
+    if(!all(selected_studies %in% list_files())) stop("The studies are not in our list",  call. = FALSE)
   } else {
-    stop("Selected Studies provided not correct")
+    stop("Selected Studies provided not correct",  call. = FALSE)
   }
 
 
@@ -89,6 +89,8 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, save_files=
       All_ZMatrix[c(abs(All_ZMatrix[,..column_of_zs]) < threshold) , column_of_zs] <- 0
     }
   }
+
+  NonZero_ZMatrix = All_ZMatrix[apply(All_ZMatrix[,6:ncol(All_ZMatrix)], 1, function(x) any(unlist(abs(x)>threshold))),]
 
   generate.formula <- function(outcome, study_names ) {
     paste(paste0(outcome,' ~ -1 + '),paste(collapse=' + ', paste(sep='','`',study_names,'`')))
@@ -267,5 +269,6 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, save_files=
   res$log_info = Log
   res$prior = all.priors
   res$all_coeffs = all.coefs
+  res$non_zero = NonZero_ZMatrix
   return(res)
 }
