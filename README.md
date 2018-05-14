@@ -12,7 +12,7 @@ We are currently implementing new functions, to make the approach more robust, m
 [//]:*******
 
 bGWAS is an R-package to perform a Bayesian GWAS, using summary statistics as input. Briefly, it compares the observed Z-scores from a conventional GWAS to prior Z-scores. These prior Z-scores can be provided by the user or directly calculated from publicly available GWASs (currently, a set of 58 studies, last update 25-02-2018 - hereinafter referred to as "prior GWASs"). In this second scenario, only prior GWASs having a significant influence on the conventional GWAS (identified using a multivariate Mendelian Randomization (MR) approach) are used to calculate the prior Z-scores. Causal effect are estimated masking the focal chromosome to ensure independence.          
-Observed and prior Z-scores are compared using Bayes Factors, and empirical p-values are calculated using a permutation approach.   
+Observed and prior Z-scores are compared using Bayes Factors. Significance is assessed by calculating the probability of observing a value larger than the observed BF (P-value) given the prior distribution by decomposing the analytical form of the BFs and taking advantage of the fact that most SNPs have a zero prior effect estimate. For small BFs (i.e. insignificant P-values), an approximation is used to make the computation faster.   
 
 The main functions are:  
 
@@ -304,11 +304,11 @@ coefficients_plot_bGWAS(A)
 ## Runtime
 [//]:*******
 
-Analysis using all the 58 prior GWASs available, for a conventional GWAS containing ~7M SNPs in common with the prior studies ~ 145 minutes.
+Analysis using all the 58 prior GWASs available, for a conventional GWAS containing ~7M SNPs in common with the prior studies ~ 25 minutes.
 
-Analysis using 9 prior GWASs, for a conventional GWAS containing 400,000 SNPs in common with prior studies (see example B) ~ 8 minutes
+Analysis using 9 prior GWASs, for a conventional GWAS containing 400,000 SNPs in common with prior studies (see example B) ~ 2 minutes
 
-We are currently implementing a distribution-based approach (remplacing the permutation approach currently used) to estimate p-values. This will reduce runtime considerably.
+We implemented a distribution-based approach (remplacing the permutation approach previously used) to estimate p-values. This reduced runtime considerably.
 
 
 ## Contact
