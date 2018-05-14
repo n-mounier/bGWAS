@@ -139,7 +139,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
 
     GWAS[, myZ:= numeric()]
     GWAS[aligned, myZ:= GWAS[aligned, ..z, with=F]]
-    GWAS[swapped, myZ:= -unlist(GWAS[swapped, ..z, with=F])]
+    GWAS[swapped, myZ:= -GWAS[swapped, ..z, with=F]]
 
 
 
