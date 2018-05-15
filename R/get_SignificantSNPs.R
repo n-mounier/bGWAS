@@ -22,8 +22,8 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, prune_
   }
 
 
-  if(!sign_method %in% c("p", "fdr")) stop("method not accepted")
-  if(!is.numeric(sign_thresh)) stop("non numeric threshold")
+  if(!sign_method %in% c("p", "fdr")) stop("method not accepted",  call. = FALSE)
+  if(!is.numeric(sign_thresh)) stop("non numeric threshold",  call. = FALSE)
 
   tmp = paste0("   Starting with ", format(nrow(Prior), big.mark = ",", scientific = F), " SNPs \n")
   Log = update_log(Log, tmp, verbose)
@@ -34,7 +34,7 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, prune_
     Log = update_log(Log, tmp, verbose)
 
 
-    Prior[, fdr := p.adjust(BF_p, method='fdr')]
+    Prior[, fdr := p.adjust(BF_P, method='fdr')]
     PriorThr = Prior[fdr<sign_thresh]
 
     tmp = paste0(format(nrow(PriorThr), big.mark = ",", scientific = F), " SNPs left \n")
@@ -52,7 +52,7 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, prune_
     Log = update_log(Log, tmp, verbose)
 
 
-    PriorThr = Prior[BF_p<sign_thresh]
+    PriorThr = Prior[BF_P<sign_thresh]
 
     tmp = paste0(format(nrow(PriorThr), big.mark = ",", scientific = F), " SNPs left \n")
     Log = update_log(Log, tmp, verbose)
@@ -69,6 +69,7 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, prune_
 
 
     # snps should be ordered by significance
+    PriorThr = PriorThr[order(PriorThr$BF_P)]
     accepted.snps = ""[0] # an empty character vector of the 'rs' names that will survive pruning
     i = 1
     while(i <= nrow(PriorThr)) {
@@ -100,7 +101,7 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, prune_
 
         if(nrow(same.chrm.already.accepted) == 0) { break } # no problem with this one, just restart and allow it to be accepted
         same.chrm.already.accepted[, pos.delta := pos-cand.pos ]
-        same.chrm.already.accepted = same.chrm.already.accepted[ abs(pos.delta) < 500000 ] # no point looking far away
+        same.chrm.already.accepted = same.chrm.already.accepted[ abs(pos.delta) < 100000 ] # no point looking far away
         if(nrow(same.chrm.already.accepted) == 0) { break }
         next
 
