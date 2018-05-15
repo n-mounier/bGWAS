@@ -35,7 +35,7 @@ p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)
 \item{sign_thresh}{The threshold used to identify significant SNPs, \code{default="5.10e-8"}
 (numeric)}
 
-\item{prune_res}{A logical indicating if the results should be pruned (by distance, 500kb),
+\item{prune_res}{A logical indicating if the results should be pruned (by distance, 100kb),
 \code{default=FALSE}}
 
 \item{save_files}{A logical indicating if the results should be saved as files,
@@ -119,7 +119,7 @@ B = bGWAS(name = "Test_UsingSmallGWAS",
 data("SmallGWAS_Pilling2017")
 C = bGWAS(name="Test_UsingSmallDataFrame",
           GWAS = SmallGWAS_Pilling2017,
-          prior_studies=MyStudies
+          prior_studies=MyStudies,
           save_files=T)
           }
 
