@@ -104,7 +104,7 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
       grep("Significant SNPs will be identified according to ", obj$log_info)],
       "The threshold used is :")[[1]][2], ".", fixed=T)[[1]][1])
   } else {
-      method="p"
+      method="p-value"
   }
 
 
@@ -116,7 +116,7 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
                    bp = "pos" ,
                    p = ifelse( method == "FDR" ,
                                "fdr" ,
-                               "BF_p" ) ,
+                               "BF_P" ) ,
                    snp = "rs",
                    col = c("gray10", "gray60"),
                    suggestiveline = FALSE,
@@ -134,7 +134,7 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
 
   if(annotate){ # significant SNPs from the analysis
     # extract them
-    value = ifelse(method=="FDR", "fdr", "BF_p")
+    value = ifelse(method=="FDR", "fdr", "BF_P")
     SNPs_to_plot = obj$all_BFs[rs %in% obj$significant_SNPs,
                                c("rs", "chrm", "pos", value), with=F]
     all = obj$all_BFs[,c("rs", "chrm", "pos")]
@@ -206,7 +206,7 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
   coeffs = obj$significant_studies
   # add the trait name (if multiple studies for a same trait, add " - X" )
   all_studies =  list_priorGWASs()
-  coeffs$Trait = unlist(all_studies[match(coeffs$Study, all_studies$File), "Trait"])
+  coeffs$Trait = unlist(all_studies[match(coeffs$study, all_studies$File), "Trait"])
   if(length(unique(coeffs$Trait))!=nrow(coeffs)){
     for(t in unique(coeffs$Trait)){
       if(nrow(coeffs[coeffs$Trait==t,]) >1 )
@@ -216,8 +216,8 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
 
 
   # add CI
-  coeffs$Lower = coeffs$Estimate - 1.96 * coeffs$StdError
-  coeffs$Upper = coeffs$Estimate + 1.96 * coeffs$StdError
+  coeffs$Lower = coeffs$estimate - 1.96 * coeffs$std_error
+  coeffs$Upper = coeffs$estimate + 1.96 * coeffs$std_error
 
 
   # theme
@@ -230,7 +230,7 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
           legend.title=ggplot2::element_blank())
 
   # use with to deal with R CMD check (because Trait / Estimate are not defined)
-  P= with(coeffs,{ ggplot2::ggplot(data=coeffs, ggplot2::aes(x=Trait, y=Estimate,
+  P= with(coeffs,{ ggplot2::ggplot(data=coeffs, ggplot2::aes(x=Trait, y=estimate,
                      ymin=Lower,
                      ymax=Upper)) +
    # "global estimates"
@@ -248,8 +248,8 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
  coeffs = coeffs[order(coeffs$Trait),]
 
  for(i in 1:nrow(coeffs)){
-   t = coeffs$Study[i]
-   chrm_estimates = unlist(obj$all_MRcoeffs[obj$all_MRcoeffs$Study==t, "Estimate"])
+   t = coeffs$study[i]
+   chrm_estimates = unlist(obj$all_MRcoeffs[obj$all_MRcoeffs$study==t, "estimate"])
    for(c in chrm_estimates){
      P = P +
        ggplot2::geom_segment(x=i-0.1, xend=i+0.1, y=as.numeric(c), yend=as.numeric(c),
@@ -315,11 +315,106 @@ extract_MRcoeffs_bGWAS <- function(obj){
   Res=data.frame(obj$significant_studies)
   for(c in 1:22){
     CHRM = obj$all_MRcoeffs[Chrm==c]
-    Res[,paste0("chrm", c, "_Estimate")] = CHRM$Estimate[match(Res$Study, CHRM$Study)]
-    Res[,paste0("chrm", c, "_StdError")] = CHRM$StdError[match(Res$Study, CHRM$Study)]
-    Res[,paste0("chrm", c, "_PValue")] = CHRM$P[match(Res$Study, CHRM$Study)]
+    Res[,paste0("chrm", c, "_estimate")] = CHRM$estimate[match(Res$study, CHRM$study)]
+    Res[,paste0("chrm", c, "_std_error")] = CHRM$std_error[match(Res$study, CHRM$study)]
+    Res[,paste0("chrm", c, "_P")] = CHRM$P[match(Res$study, CHRM$study)]
     }
   return(Res)
+}
+
+
+
+#' Heatmap of SNP effects on prior traits from bGWAS results
+#'
+#' Create a heatmap of SNP effects on prior traits from bGWAS results
+#' (object of class bGWAS obtained when using bGWAS() or bGWASfromPrior()),
+#'
+#'
+#' @param obj an object of class bGWAS
+#' @param save_file A logical indicating if the graphic should be saved,
+#'        \code{default=FALSE}, graphic will be displayed on the on-screen device
+#' @param file_name The name of the file saved (is \code{save_file} is \code{TRUE})
+#'        \code{default=NULL}, will used NameOfYourAnalysis_Heatmap.png
+#' @return a Heatmap
+#'
+#' @export
+
+
+
+library(data.table)
+library(gplots)
+library("RColorBrewer")
+col=colorRampPalette(c("blue", "white", "red"))(16*13)
+## ALIGNEMENT !!!
+
+
+heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
+
+  ## check parameters
+  if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
+  if(!is.logical(save_file)) stop("save_file : should be logical")
+  # if no name, use the one from the analysis (in log file)
+  if(save_file && is.null(file_name)){
+    file_name = paste0(strsplit(strsplit(obj$log_info[
+      grep("The name of your analysis is: ", obj$log_info)],
+      "The name of your analysis is: \"", fixed=T)[[1]][2], "\"", fixed=T)[[1]][1],
+      "_Heatmap.png")
+  }
+  if(save_file && !is.character(file_name)) stop("file_name : should be a character")
+
+
+  if(save_file) grDevices::png(file_name, width = 20, height = 12, units = "cm", res = 500)
+
+  Effects = obj$nonZero_effects
+  # + keep only top hits !
+  Effects = Effects[Effects$rs %in% obj$significant_SNPs,]
+  # what if a SNP is a hit but has no significant effect from any risk factor ? Add a line with all 0 ?
+
+  # sign = POS if the risk factor has a positive effect on our trait
+  #        NEG if the risk factor has a negative effect on our trait
+  Effects_Aligned = Effects[,6:(ncol(obj$nonZero_effects)-1)]
+
+  Sign = ifelse(obj$significant_studies$Estimate[match(colnames(Effects_Aligned), obj$significant_studies$Study)]>0, "POS", "NEG")
+  for(t in 1:ncol(Effects_Aligned)){
+    if(Sign[t]=="NEG"){
+      tName = colnames(Effects_Aligned)[t]
+      Effects_Aligned[, (tName) := -(obj$nonZero_effects[obj$nonZero_effects$rs %in% obj$significant_SNPs,..tName, with=F])]
+    }
+  }
+  # keep 0 = 0 or set to NA ?
+  # row distance + clustering
+  rd<-dist(Effects_Aligned)
+  rc<-hclust(rd)
+  # column distance + clustering
+  cd<-dist(t(Effects_Aligned))
+  cc<-hclust(cd)
+
+
+  # Add Order ???
+
+  # Heatmap : beta, aligned risk scores
+  col=colorRampPalette(c("blue", "white", "red"))(16*13)
+  SNPsAlleles = paste(Effects$rs, Effects$alt, sep=" - ")
+
+  gplots::heatmap.2(as.matrix(Effects_Aligned), Rowv=as.dendrogram(rc), Colv=as.dendrogram(cc),
+            dendrogram="both", col=col, trace="none",
+            margins=c(9.5, 7.7),labCol=colnames(Effects_Aligned), labRow=SNPsAlleles , cexCol=0.7, cexRow=0.6,
+            #lhei=c(,6),
+            lwid=c(1.5, 3.5), keysize=0.75, key.ylab="Count", key.par = list(cex=0.5, cex.main=1, cex.axis=1, cex.lab=1, cex.sub=1), srtCol=45,
+            key.xlab="Z-Score")
+
+
+  gplots::heatmap.2(as.matrix(Effects_Aligned), Rowv=as.dendrogram(rc), Colv=as.dendrogram(cc),#, reorder(dendo, Order),
+            dendrogram="col", col=col, trace="none",
+            margins=c(12, 0),labCol=colnames(Effects_Aligned), labRow=rep("", nrow(Effects_Aligned)) , cexCol=0.7, cex=0.5,
+            #lhei=c(2,4),
+            lwid=c(1.5,3.5), keysize=0.75, key.par = list(cex=0.5)) #keysize=0.9)
+  heatmap(as.matrix(Effects_Aligned), Rowv=as.dendrogram(rc), Colv=as.dendrogram(cc),
+          col = col, margins=c(14,0),labCol=colnames(Effects_Aligned), labRow=rep("", nrow(Effects_Aligned)))
+
+
+
+  if(save_file) grDevices::dev.off()
 }
 
 
