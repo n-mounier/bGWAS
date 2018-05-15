@@ -171,7 +171,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
     if(!all(StudiesToKeep)){
       tmp = paste0(paste0(colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after thresholding) \n")
       if(save_files){
-        Files_Info$Status[Files_Info$File %in% colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep]] =
+        Files_Info$status[Files_Info$File %in% colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep]] =
           "Excluded for MR: no strong instrument left after thresholding"
       }
       ZMatrix[,colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep] := NULL]
@@ -190,7 +190,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
   # pruning
   # by default, distance pruning, but enable the LD pruning from Aaron's function to compare
   DistancePruning=T
-  dist = 500000
+  dist = 100000
   if(DistancePruning){
     tmp = paste0("Distance pruning... \n")
     Log = update_log(Log, tmp, verbose)
@@ -211,7 +211,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
   if(!all(StudiesToKeep)){
     tmp = paste0(paste0(colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after pruning) \n")
     if(save_files){
-      Files_Info$Status[Files_Info$File %in% colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep]] =
+      Files_Info$status[Files_Info$File %in% colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep]] =
         "Excluded for MR: no strong instrument left after pruning"
     }
     ZMatrixPruned[,colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep] := NULL]
@@ -220,7 +220,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
   tmp = paste0(ncol(ZMatrixPruned)-6, " studies left after pruning \n")
   Log = update_log(Log, tmp, verbose)
 
-  tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific = F), " SNPs left after pruning \n")
+  tmp = paste0(format(nrow(ZMatrixPruned), big.mark = ",", scientific = F), " SNPs left after pruning \n")
   Log = update_log(Log, tmp, verbose)
 
 
