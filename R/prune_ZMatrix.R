@@ -18,7 +18,7 @@
 # #  Function not exported, no need of extended documentation?
 
 
-prune_ZMatrix <- function(ZMatrix, prune.dist=500000, r2.limit=1.1, verbose=F) {
+prune_ZMatrix <- function(ZMatrix, prune.dist=100000, r2.limit=1.1, verbose=F) {
 
   "%|%" <- function(x,y){
     do.call(y,list(substitute(x)),envir=parent.frame()) # just right
