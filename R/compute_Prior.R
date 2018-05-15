@@ -120,6 +120,8 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, save_files=
       tmp = "No SNP on this chromosome \n"
       Log = update_log(Log, tmp, verbose)
 
+      # ALSO TEST IF NSNP < NSTUDIES
+
       next
     }
 
@@ -206,23 +208,27 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, save_files=
       ,obs=d_test[,..outcome]
       ,fit=preds$fit
       ,se =preds$se.fit
+   #   ,observed_Z=d_test[,..outcome]
+   #   ,prior_estimate=preds$fit
+   #   ,prior_std_error =preds$se.fit
       #, residual.variance.in.training
     )] -> nice.table
-
     if(scheme_PriorVar) {
       nice.table[ , se := sqrt( (se^2) + extra.variance ) ]
+      #nice.table[ , prior_std_error := sqrt( (prior_std_error^2) + extra.variance ) ]
     }
 
     all.priors = rbind(all.priors, nice.table)
 
   }
+  colnames(all.priors)[6:8] = c("observed_Z", "prior_estimate", "prior_std_error")
 
 
 
 
   data.table::setkey(all.coefs, study_name, chrm)
 
-  colnames(all.coefs) = c("Chrm", "Study", "Estimate", "StdError", "T", "P")
+  colnames(all.coefs) = c("chrm", "study", "estimate", "std_error", "T", "P")
 
   if(save_files){
     readr::write_csv(path="CoefficientsByChromosome.csv", x=all.coefs)
