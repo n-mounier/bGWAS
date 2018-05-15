@@ -22,15 +22,24 @@ request_BFandP <- function(Prior, sign_thresh, save_files=F, verbose=F) {
 
 
 
+  # Prior$BF =  dnorm(mean= Prior$fit    , sd=sqrt(
+  #   1+Prior$se**2
+  #   ) , x=Prior$obs) /
+  # dnorm(mean= 0.0       , sd=sqrt(
+  #   1
+  #   ) , x=Prior$obs)
+
+
   # calculate BF
-  Prior$BF =  dnorm(mean= Prior$fit    , sd=sqrt(
-    1+Prior$se**2
-  ) , x=Prior$obs) /
+  Prior$BF =  dnorm(mean= Prior$prior_estimate    , sd=sqrt(
+    1+Prior$prior_std_error**2
+  ) , x=Prior$observed_Z) /
     dnorm(mean= 0.0       , sd=sqrt(
       1
-    ) , x=Prior$obs)
+    ) , x=Prior$observed_Z)
   # order by BF
   Prior = Prior[order(Prior$BF),]
+
 
 
   tmp = "Done! \n"
@@ -84,7 +93,7 @@ request_BFandP <- function(Prior, sign_thresh, save_files=F, verbose=F) {
 
     # deal with all zero SNPs / deal with non-zero SNPs
     res$my_p = apply(res, 1, function(x) ((sum(zero_snp(se_bychrm**2, x[1]) * zero_bychrm)
-                                           + sum(nonzero_snp(non_zero$fit, non_zero$se**2, x[1])))) / ntotal)
+                                           + sum(nonzero_snp(non_zero$prior_estimate, non_zero$prior_std_error**2, x[1])))) / ntotal)
 
     return(res$my_p)
   }
@@ -112,7 +121,7 @@ request_BFandP <- function(Prior, sign_thresh, save_files=F, verbose=F) {
     ntotal =  nrow(non_zero)
 
     # deal with all zero SNPs / deal with non-zero SNPs
-    res$my_p =  apply(res, 1, function(x) sum(nonzero_snp(non_zero$fit, non_zero$se**2, x[1])) / ntotal)
+    res$my_p =  apply(res, 1, function(x) sum(nonzero_snp(non_zero$prior_estimate, non_zero$prior_std_error**2, x[1])) / ntotal)
 
     return(res$my_p)
   }
@@ -143,8 +152,8 @@ request_BFandP <- function(Prior, sign_thresh, save_files=F, verbose=F) {
     res$my_p=NA
     ntotal = sum(zero_bychrm) + nrow(non_zero)
     n2 = nrow(non_zero)
-    perc_mu = quantile(non_zero$fit, probs = seq(0,1,0.01))
-    sigma2_mu = mean(non_zero$se)
+    perc_mu = quantile(non_zero$prior_estimate, probs = seq(0,1,0.01))
+    sigma2_mu = mean(non_zero$prior_std_error)
 
     # deal with all zero SNPs / deal with non-zero SNPs
     res$my_p = apply(res, 1, function(x) (sum(zero_snp(se_bychrm**2, x[1]) * zero_bychrm)
@@ -206,19 +215,18 @@ request_BFandP <- function(Prior, sign_thresh, save_files=F, verbose=F) {
   }
 
 
-
-
-  non_zero = Prior[Prior$fit!=0,]
-  zero = Prior[Prior$fit==0,]
-  zero_bychrm = table(Prior$chrm)
+  non_zero = Prior[Prior$prior_estimate!=0,]
+  zero = Prior[Prior$prior_estimate==0,]
+  zero_bychrm = table(zero$chrm)
   se_bychrm = numeric(length = 22)
   names(se_bychrm) = c(1:22)
-  se_bychrm = zero$se[match(names(se_bychrm), zero$chrm)]
+  se_bychrm = zero$prior_std_erorr[match(names(se_bychrm), zero$chrm)]
 
 
-  Prior$BF_p = get_pValue_hybrid_final(Prior$BF,
+
+  Prior$BF_P = get_pValue_hybrid_final(Prior$BF,
                                        se_bychrm = se_bychrm, zero_bychrm = zero_bychrm, non_zero = non_zero,
-                                       size_window = 10000, sign_thr = sign_thresh, tolerance=0.05, near_sign = 1)
+                                       size_window = 1000, sign_thr = sign_thresh, tolerance=0.05, near_sign = 1)
 
   if(save_files){
     system("rm Prior.csv")
