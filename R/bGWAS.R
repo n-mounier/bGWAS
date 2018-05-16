@@ -206,10 +206,10 @@ bGWAS <- function(name,
     # Check colnames...
     if(!grepl(".gz", GWAS)){
       # ...if regular file
-      HeaderGWAS = colnames(data.table::fread(GWAS, nrows = 0, showProgress = FALSE))
+      HeaderGWAS = colnames(data.table::fread(GWAS, nrows = 1, showProgress = FALSE))
     } else if(grepl(".gz", GWAS)) {
       # ...if tar.gz
-      if(platform %in% c("Linux", "macOS")) HeaderGWAS = colnames(data.table::fread(paste0("zcat < ", GWAS), nrows = 0, showProgress = FALSE))
+      if(platform %in% c("Linux", "macOS")) HeaderGWAS = colnames(data.table::fread(paste0("zcat < ", GWAS), nrows = 1, showProgress = FALSE))
     }
 
     if(all(!HeaderGWAS %in% c("rsid", "snpid", "snp", "rnpid", "rs"))) stop("GWAS : no SNPID column", call. = FALSE)
