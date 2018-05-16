@@ -164,8 +164,8 @@ bGWAS <- function(name,
   if(file.exists(file.path(InitPath, paste0(name, ".log")))) stop("You already run an analysis with the same name in that directory,
                                                     please specify another name or choose another directory to run the analysis", call. = FALSE)
   if(save_files){
-    ifelse(!dir.exists(Dir), dir.create(Dir), stop("You already run an analysis with the same name in that directory,
-                                                 please specify another name or choose another directory to run the analysis", call. = FALSE))
+    if(dir.exists(Dir)) stop("You already run an analysis with the same name in that directory,
+                                                 please specify another name or choose another directory to run the analysis", call. = FALSE)
   }
 
 
@@ -409,6 +409,7 @@ bGWAS <- function(name,
 
   # Go into the analysis' directory
   if(save_files){
+    dir.create(Dir)
     setwd(Dir)
   }
 
