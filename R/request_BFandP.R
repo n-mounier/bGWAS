@@ -220,7 +220,7 @@ request_BFandP <- function(Prior, sign_thresh, save_files=F, verbose=F) {
   zero_bychrm = table(zero$chrm)
   se_bychrm = numeric(length = 22)
   names(se_bychrm) = c(1:22)
-  se_bychrm = zero$prior_std_erorr[match(names(se_bychrm), zero$chrm)]
+  se_bychrm = zero$prior_std_error[match(names(se_bychrm), zero$chrm)]
 
 
 
