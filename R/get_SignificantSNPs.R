@@ -14,7 +14,7 @@
 # # Function not exported, no need of extended documentation?
 
 
-get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, prune_res=T, save_files=F, verbose=F) {
+get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pruning_dist, res_pruning_LD, save_files=F, verbose=F) {
   Log = c()
 
   "%S>%" <- function(x,to.be.ignored){ # like a 'sink' version of magrittr's  %T>%
@@ -63,62 +63,31 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, prune_
 
   }
 
-  if(prune_res){
+
+
+  # pruning results only if res_pruning_dist!=0
+  if(res_pruning_dist>0){
     tmp = "# Pruning significant SNPs... \n"
     Log = update_log(Log, tmp, verbose)
-
-
-    # snps should be ordered by significance
-    PriorThr = PriorThr[order(PriorThr$BF_P)]
-    accepted.snps = ""[0] # an empty character vector of the 'rs' names that will survive pruning
-    i = 1
-    while(i <= nrow(PriorThr)) {
-      # 'accept' the current SNP
-      PriorThr[i] -> accepted
-      accepted.rs = accepted$rs
-
-      accepted.snps = c(accepted.snps, accepted.rs)
-
-
-      # now, skip on until we find the next one to accept (or we reach the end)
-      while(T) {
-
-        i = i+1
-
-        if(i >  nrow(PriorThr)) {
-          break # all done
-        }
-
-        # check if the next (candidate) 'current' SNP is close to earlier accepted SNPs
-        cand = PriorThr[i]
-
-        cand$rs -> cand.rs
-        cand$chr -> cand.chrm
-        cand$pos -> cand.pos
-
-        PriorThr[PriorThr$chr == cand.chrm & PriorThr$rs %in% accepted.snps ] %S>% print -> same.chrm.already.accepted
-
-
-        if(nrow(same.chrm.already.accepted) == 0) { break } # no problem with this one, just restart and allow it to be accepted
-        same.chrm.already.accepted[, pos.delta := pos-cand.pos ]
-        same.chrm.already.accepted = same.chrm.already.accepted[ abs(pos.delta) < 100000 ] # no point looking far away
-        if(nrow(same.chrm.already.accepted) == 0) { break }
-        next
-
+    ToPrune = PriorThr[,c(1,2,3,10)]
+    colnames(ToPrune) = c("SNP", "chr_name", "chr_start", "pval.exposure")
+    if(res_pruning_LD<1){# LD-pruning
+      tmp = paste0("   distance : ", res_pruning_dist, "Kb", " - LD threshold : ", res_pruning_LD, "\n")
+      Log = update_log(Log, tmp, verbose)
+      # Do pruning, chr by chr
+      SNPsToKeep = c()
+      for(chr in unique(ToPrune$chr_name)){
+        SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = res_pruning_dist*2, clump_r2 = res_pruning_LD)$SNP))
       }
+    } else {# distance pruning
+      tmp = paste0("   distance : ", MR_pruning_dist, "Kb \n")
+      Log = update_log(Log, tmp, verbose)
+      SNPsToKeep = prune_byDistance(ToPrune, prune.dist=MR_pruning_dist, byP=T)
     }
-    # select Significant SNPs
-    SignifSNPs = PriorThr[PriorThr$rs %in% accepted.snps,]
-
-    tmp = paste0(format(nrow(SignifSNPs), big.mark = ",", scientific = F), " SNPs left \n")
-    Log = update_log(Log, tmp, verbose)
-
+    PriorThr =  PriorThr[PriorThr$rs %in% SNPsToKeep,]
 
     tmp = "Done! \n"
     Log = update_log(Log, tmp, verbose)
-
-  } else {
-    SignifSNPs = PriorThr
   }
 
 

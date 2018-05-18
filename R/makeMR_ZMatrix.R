@@ -13,7 +13,7 @@
 # #'
 
 makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
-                           MR_threshold=1e-5, path="~/ZMatrices", save_files=F, verbose=F) {
+                           MR_threshold, MR_pruning_dist, MR_pruning_LD, path="~/ZMatrices", save_files=F, verbose=F) {
   Log = c()
   tmp = paste0("# Loading the ZMatrix... \n")
   Log = update_log(Log, tmp, verbose)
@@ -93,7 +93,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
     z = which(!is.na(z))
 
 
-    # keep the SNPs in our pruned matrix and order them correctly
+    # keep the SNPs in our Z matrix and order them correctly
     GWASData = GWASData[match(ZMatrix$rs, unlist(GWASData[,..rs])),]
     # check alignment
     aligned = which(GWASData[,..alt, with=F] == ZMatrix$alt &
@@ -128,7 +128,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
     z = match(colnames(GWAS),c("z", "Z", "zscore"))
     z = which(!is.na(z))
 
-    # keep the SNPs in our pruned matrix and order them correctly
+    # keep the SNPs in our Z matrix and order them correctly
     GWAS = GWAS[match(ZMatrix$rs, unlist(GWAS[,..rs])),]
     # check alignment
     aligned = which(GWAS[,..alt, with=F] == ZMatrix$alt &
@@ -188,25 +188,35 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
   }
 
   # pruning
-  # by default, distance pruning, but enable the LD pruning from Aaron's function to compare
-  DistancePruning=T
-  dist = 100000
-  if(DistancePruning){
-    tmp = paste0("Distance pruning... \n")
+  tmp = paste0("Pruning MR instruments... \n")
+  Log = update_log(Log, tmp, verbose)
+  apply(ZMatrix[,-c(1:5, ncol(ZMatrix)), with=F], 1, function(ZMatrix){
+    max(abs(ZMatrix))
+  }) -> maxZ
+  ToPrune = ZMatrix[,1:3]
+  colnames(ToPrune) = c("SNP", "chr_name", "chr_start")
+  if(MR_pruning_LD<1){# LD-pruning
+    tmp = paste0("   distance : ", MR_pruning_dist, "Kb", " - LD threshold : ", MR_pruning_LD, "\n")
     Log = update_log(Log, tmp, verbose)
-    tmp = paste0("   distance : ", dist/1000, "kb \n")
+    # get max Z-score and convert to p-value
+    ToPrune$pval.exposure = 2*pnorm(-abs(maxZ))
+    # Do pruning, chr by chr
+    SNPsToKeep = c()
+    for(chr in unique(ToPrune$chr_name)){
+      SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = MR_pruning_dist*2, clump_r2 = MR_pruning_LD)$SNP))
+      }
+    }
+  else {# distance pruning
+    tmp = paste0("   distance : ", MR_pruning_dist, "Kb \n")
     Log = update_log(Log, tmp, verbose)
-    ZMatrixPruned = prune_ZMatrix(ZMatrix, prune.dist = dist)
-  } else {
-    r2 = 0.8
-    tmp = paste0("LD pruning... \n")
-    Log = update_log(Log, tmp, verbose)
-    tmp = paste0("   distance : ", dist/1000, "kb", " - r2 threshold : ", r2, "\n")
-    Log = update_log(Log, tmp, verbose)
-    ZMatrixPruned = prune_ZMatrix(ZMatrix, prune.dist = dist, r2.limit=r2)
-  }
+    ToPrune$Z = maxZ
+    SNPsToKeep = prune_byDistance(ToPrune, prune.dist=MR_pruning_dist, byP=F)
+      }
 
-    # check that each study have at least one SNP surviving pruning
+
+  ZMatrixPruned = ZMatrix[ZMatrix$rs %in% SNPsToKeep,]
+
+  # check that each study have at least one SNP surviving pruning
   StudiesToKeep = apply(ZMatrixPruned[,-c(1:5,as.numeric(ncol(ZMatrixPruned))), with=F], 2, function(x) any(abs(x)>Zlimit))
   if(!all(StudiesToKeep)){
     tmp = paste0(paste0(colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after pruning) \n")
