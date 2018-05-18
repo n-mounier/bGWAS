@@ -80,9 +80,9 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
         SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = res_pruning_dist*2, clump_r2 = res_pruning_LD)$SNP))
       }
     } else {# distance pruning
-      tmp = paste0("   distance : ", MR_pruning_dist, "Kb \n")
+      tmp = paste0("   distance : ", res_pruning_dist, "Kb \n")
       Log = update_log(Log, tmp, verbose)
-      SNPsToKeep = prune_byDistance(ToPrune, prune.dist=MR_pruning_dist, byP=T)
+      SNPsToKeep = prune_byDistance(ToPrune, prune.dist=res_pruning_dist, byP=T)
     }
     PriorThr =  PriorThr[PriorThr$rs %in% SNPsToKeep,]
 
@@ -94,7 +94,7 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
 
 
   if(save_files){
-    write.table(SignifSNPs, file= "SignificantSNPs.csv", sep=",", row.names=F, quote=F)
+    write.table(PriorThr, file= "SignificantSNPs.csv", sep=",", row.names=F, quote=F)
     tmp = "The file \"SignificantSNPs.csv\" has been successfully created \n"
     Log = update_log(Log, tmp, verbose)
 
@@ -103,6 +103,6 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
 
   res=list()
   res$log_info = Log
-  res$SNPs = SignifSNPs$rs
+  res$SNPs = PriorThr$rs
   return(res)
 }
