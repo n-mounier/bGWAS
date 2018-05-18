@@ -73,7 +73,7 @@
 #' \item "PriorGWASs.tsv" - contains Prior GWASs information
 #' (general info + status (used/removed) + MR coefficients)
 #' \item "CoefficientsByChromosome.csv" - contains the MR estimates when masking the focal
-#' chromosome (22 coefficients / study)
+#' chromosome (22 coefficients / Prior GWAS)
 #' \item "PriorBFp.csv" - contains BF and p-values estimated for all SNPs
 #' \item "SignificantSNPs.csv" - contains BF and p-values estimated for a subset of SNPs
 #' }
@@ -394,7 +394,7 @@ bGWAS <- function(name,
   if(MR_pruning_dist>1000) stop("MR_pruning_dist : should be lower than 1Mb", call. = FALSE)
 
 
-  tmp = paste0("The distance used for pruning MR instruments is: ", format(MR_pruning_dist, scientific = T), ".  \n")
+  tmp = paste0("The distance used for pruning MR instruments is: ", MR_pruning_dist, "Kb.  \n")
   log_info = update_log(log_info, tmp, verbose)
 
 
@@ -403,11 +403,11 @@ bGWAS <- function(name,
   if(!is.numeric(MR_pruning_LD)) stop("MR_pruning_LD : non-numeric argument", call. = FALSE)
   if(MR_pruning_LD<0) stop("MR_pruning_LD : should be positive", call. = FALSE)
 
-  if(MR_pruning_LD>1){
-    tmp = "Distance-based pruning will be used for MR instruments.  \n"
+  if(MR_pruning_LD<1){
+    tmp = paste0("The LD threshold used for pruning MR instruments is: ",MR_pruning_LD, ".  \n")
     log_info = update_log(log_info, tmp, verbose)
   } else {
-    tmp = paste0("The LD threshold used for pruning MR instruments is: ", format(MR_pruning_LD, scientific = T), ".  \n")
+    tmp = "Distance-based pruning will be used for MR instruments.  \n"
     log_info = update_log(log_info, tmp, verbose)
   }
 
@@ -438,18 +438,18 @@ bGWAS <- function(name,
     if(res_pruning_dist>1000) stop("res_pruning_dist : should be lower than 1Mb", call. = FALSE)
 
 
-    tmp = paste0("The distance used for pruning results is: ", format(MR_pruning_dist, scientific = T), ".  \n")
+    tmp = paste0("The distance used for pruning results is: ", MR_pruning_dist, "Kb.  \n")
     log_info = update_log(log_info, tmp, verbose)
 
     ## res_pruning_LD
     if(!is.numeric(res_pruning_LD)) stop("res_pruning_LD : non-numeric argument", call. = FALSE)
     if(res_pruning_LD<0) stop("res_pruning_LD : should be positive", call. = FALSE)
 
-    if(res_pruning_LD>1){
-      tmp = "Distance-based pruning will be used for results.  \n"
+    if(res_pruning_LD<1){
+      tmp = paste0("The LD threshold used for pruning results is: ", res_pruning_LD, ".  \n")
       log_info = update_log(log_info, tmp, verbose)
     } else {
-      tmp = paste0("The LD threshold used for pruning results is: ", format(res_pruning_LD, scientific = T), ".  \n")
+      tmp = "Distance-based pruning will be used for results.  \n"
       log_info = update_log(log_info, tmp, verbose)
     }
 
@@ -600,7 +600,10 @@ bGWAS <- function(name,
   log_info = update_log(log_info, tmp, verbose)
 
   log_info = apply(as.array(log_info), 1,function(x) gsub("\n", "", x, fixed=T))
-  write(log_info, paste0(name,".log"))
+
+  if(save_files){
+    write(log_info, paste0(name,".log"))
+  }
 
   results=list()
   results$log_info = log_info
