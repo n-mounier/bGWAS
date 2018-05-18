@@ -21,12 +21,14 @@
 #'              # NOT IMPLEMENTED YET
 #' @param MR_threshold The threshold used to select strong instruments for MR, should be lower
 #'        than 1e-5, \code{default=1e-5} (numeric)
+#' @param MR_pruning_dist
+#' @param MR_pruning_LD
 #' @param sign_method The method used to identify significant SNPs, should be \code{"p"} for
 #'        p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)
 #' @param sign_thresh The threshold used to identify significant SNPs, \code{default="5.10e-8"}
 #'        (numeric)
-#' @param prune_res A logical indicating if the results should be pruned (by distance, 100kb),
-#'        \code{default=FALSE}
+#' @param res_pruning_dist
+#' @param res_pruning_LD
 #' @param save_files A logical indicating if the results should be saved as files,
 #'        \code{default=FALSE}
 #' @param verbose  A logical indicating if information on progress should be reported,
@@ -118,9 +120,12 @@ bGWAS <- function(name,
                   prior_studies = NULL,
                   SNPs_list = NULL,
                   MR_threshold = 1e-5,
+                  MR_pruning_dist = 100,
+                  MR_pruning_LD = 0.3,
                   sign_method = "p",
                   sign_thresh = 5e-8,
-                  prune_res = FALSE,
+                  res_pruning_dist = 100,
+                  res_pruning_LD = 0,
                   save_files = FALSE,
                   verbose = TRUE) {
 
@@ -382,6 +387,28 @@ bGWAS <- function(name,
   tmp = paste0("The p-value threshold used for selecting MR instruments is: ", format(MR_threshold, scientific = T), ".  \n")
   log_info = update_log(log_info, tmp, verbose)
 
+  ## MR_pruning_dist
+  if(!is.numeric(MR_pruning_dist)) stop("MR_pruning_dist : non-numeric argument", call. = FALSE)
+  if(MR_pruning_dist<10) stop("MR_pruning_dist : should be higher than 10Kb", call. = FALSE)
+  if(MR_pruning_dist>1000) stop("MR_pruning_dist : should be lower than 1Mb", call. = FALSE)
+
+
+  tmp = paste0("The distance used for pruning MR instruments is: ", format(MR_pruning_dist, scientific = T), ".  \n")
+  log_info = update_log(log_info, tmp, verbose)
+
+
+
+  ## MR_pruning_LD
+  if(!is.numeric(MR_pruning_LD)) stop("MR_pruning_LD : non-numeric argument", call. = FALSE)
+  if(MR_pruning_LD<0) stop("MR_pruning_LD : should be positive", call. = FALSE)
+
+  if(MR_pruning_LD>1){
+    tmp = "Distance-based pruning will be used for MR instruments.  \n"
+    log_info = update_log(log_info, tmp, verbose)
+  } else {
+    tmp = paste0("The LD threshold used for pruning MR instruments is: ", format(MR_pruning_LD, scientific = T), ".  \n")
+    log_info = update_log(log_info, tmp, verbose)
+  }
 
   ## sign_method -> should not be "p" or "fdr"
   if(!sign_method %in% c("p", "fdr")) stop("sign_method : method not accepted, should be p or fdr", call. = FALSE)
@@ -399,12 +426,35 @@ bGWAS <- function(name,
   }
   log_info = update_log(log_info, tmp, verbose)
 
-  ## prune_res
-  if(!is.logical(prune_res)) stop("prune_res : should be logical", call. = FALSE)
-  if(prune_res){
-    tmp = "Significant SNPs will be pruned (distance pruning, 100kb) \n"
+  ## res_pruning_dist
+  if(!is.numeric(res_pruning_dist)) stop("res_pruning_dist : non-numeric argument", call. = FALSE)
+
+  if(res_pruning_dist==0){
+    tmp = "Results will not be pruned.  \n"
     log_info = update_log(log_info, tmp, verbose)
+  } else {
+    if(res_pruning_dist<10) stop("res_pruning_dist : should be higher than 10Kb", call. = FALSE)
+    if(res_pruning_dist>1000) stop("res_pruning_dist : should be lower than 1Mb", call. = FALSE)
+
+
+    tmp = paste0("The distance used for pruning results is: ", format(MR_pruning_dist, scientific = T), ".  \n")
+    log_info = update_log(log_info, tmp, verbose)
+
+    ## res_pruning_LD
+    if(!is.numeric(res_pruning_LD)) stop("res_pruning_LD : non-numeric argument", call. = FALSE)
+    if(res_pruning_LD<0) stop("res_pruning_LD : should be positive", call. = FALSE)
+
+    if(res_pruning_LD>1){
+      tmp = "Distance-based pruning will be used for results.  \n"
+      log_info = update_log(log_info, tmp, verbose)
+    } else {
+      tmp = paste0("The LD threshold used for pruning results is: ", format(res_pruning_LD, scientific = T), ".  \n")
+      log_info = update_log(log_info, tmp, verbose)
+    }
+
+
   }
+
 
 
   # Go into the analysis' directory
@@ -445,7 +495,7 @@ bGWAS <- function(name,
 
   # the "global z_matrix of strong instruments" for all GWASs already exists, just select the studies kept for the prior + prune + add the GWAS of interest
   # makeMR_ZMatrix() create a ZMatrix file and returns the log_info
-  matrix_MR = makeMR_ZMatrix(prior_studies, GWAS, MR_threshold, Z_matrices, save_files, verbose)
+  matrix_MR = makeMR_ZMatrix(prior_studies, GWAS, MR_threshold, MR_pruning_dist, MR_pruning_LD, Z_matrices, save_files, verbose)
   log_info = c(log_info,matrix_MR$log_info)
   # here, add potential stop() in function(s) and check for it
 
@@ -520,7 +570,7 @@ bGWAS <- function(name,
   log_info = update_log(log_info, tmp, verbose)
 
 
-  Results = get_significantSNPs(PriorWithBF$SNPs, sign_method, sign_thresh, prune_res, save_files, verbose)
+  Results = get_significantSNPs(PriorWithBF$SNPs, sign_method, sign_thresh, res_pruning_dist, res_pruning_LD, save_files, verbose)
   log_info = c(log_info, Results$log_info)
 
 
