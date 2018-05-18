@@ -66,7 +66,7 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
 
 
   # pruning results only if res_pruning_dist!=0
-  if(res_pruning_dist>0){
+  if(!is.null(res_pruning_dist)){
     tmp = "# Pruning significant SNPs... \n"
     Log = update_log(Log, tmp, verbose)
     ToPrune = PriorThr[,c(1,2,3,10)]

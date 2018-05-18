@@ -21,14 +21,15 @@
 #'              # NOT IMPLEMENTED YET
 #' @param MR_threshold The threshold used to select strong instruments for MR, should be lower
 #'        than 1e-5, \code{default=1e-5} (numeric)
-#' @param MR_pruning_dist
-#' @param MR_pruning_LD
+#' @param MR_pruning_dist The distance used for pruning MR instruments (in Kb), should be between 10 and 1000, \code{default=250} (numeric)
+#' @param MR_pruning_LD The LD threshold used for pruning MR instruments, should be between 0 and 1 (if>=1, distance-based pruning is used), \code{default=0.3} (numeric)
 #' @param sign_method The method used to identify significant SNPs, should be \code{"p"} for
 #'        p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)
 #' @param sign_thresh The threshold used to identify significant SNPs, \code{default="5.10e-8"}
 #'        (numeric)
-#' @param res_pruning_dist
-#' @param res_pruning_LD
+#' @param res_pruning_dist The distance used for pruning results (in Kb), should be between 10 and 1000, (if set to NULL, no pruning is done), \code{default=250} (numeric)
+#' @param res_pruning_LD The LD threshold used for pruning results, should be between 0 and 1 (if>=1, distance-based pruning is used), \code{default=0.3} (numeric)
+#' @param sign_method The method used to identify significant SNPs, should be \code{"p"} for
 #' @param save_files A logical indicating if the results should be saved as files,
 #'        \code{default=FALSE}
 #' @param verbose  A logical indicating if information on progress should be reported,
@@ -429,7 +430,7 @@ bGWAS <- function(name,
   ## res_pruning_dist
   if(!is.numeric(res_pruning_dist)) stop("res_pruning_dist : non-numeric argument", call. = FALSE)
 
-  if(res_pruning_dist==0){
+  if(is.null(res_pruning_dist)){
     tmp = "Results will not be pruned.  \n"
     log_info = update_log(log_info, tmp, verbose)
   } else {
