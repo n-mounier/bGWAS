@@ -314,7 +314,7 @@ extract_MRcoeffs_bGWAS <- function(obj){
   # global coeff / chromosomes coeff
   Res=data.frame(obj$significant_studies)
   for(c in 1:22){
-    CHRM = obj$all_MRcoeffs[Chrm==c]
+    CHRM = obj$all_MRcoeffs[chrm==c]
     Res[,paste0("chrm", c, "_estimate")] = CHRM$estimate[match(Res$study, CHRM$study)]
     Res[,paste0("chrm", c, "_std_error")] = CHRM$std_error[match(Res$study, CHRM$study)]
     Res[,paste0("chrm", c, "_P")] = CHRM$P[match(Res$study, CHRM$study)]
