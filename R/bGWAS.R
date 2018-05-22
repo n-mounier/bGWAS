@@ -21,14 +21,22 @@
 #'              # NOT IMPLEMENTED YET
 #' @param MR_threshold The threshold used to select strong instruments for MR, should be lower
 #'        than 1e-5, \code{default=1e-5} (numeric)
-#' @param MR_pruning_dist The distance used for pruning MR instruments (in Kb), should be between 10 and 1000, \code{default=250} (numeric)
-#' @param MR_pruning_LD The LD threshold used for pruning MR instruments, should be between 0 and 1 (if>=1, distance-based pruning is used), \code{default=0.3} (numeric)
+#' @param MR_pruning_dist The distance used for pruning MR instruments (in Kb), should be between 10 and 1000,
+#'        \code{default=250} (numeric)
+#' @param MR_pruning_LD The LD threshold used for pruning MR instruments, should be between 0 and 1
+#'        (if>=1, distance-based pruning is used), \code{default=0.3} (numeric)
+#' @param MR_shrinkage The p-value threshold used for shrinkage before performing MR, should be between
+#'        \code{MR_threshold} and 1, \code{default=1e-5} (numeric)
+#' @param prior_shrinkage The p-value threshold used for shrinkage before calculating the prior,
+#'        should be between \code{MR_threshold} and 1, \code{default=1e-5} (numeric)
 #' @param sign_method The method used to identify significant SNPs, should be \code{"p"} for
 #'        p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)
 #' @param sign_thresh The threshold used to identify significant SNPs, \code{default="5.10e-8"}
 #'        (numeric)
-#' @param res_pruning_dist The distance used for pruning results (in Kb), should be between 10 and 1000, (if set to NULL, no pruning is done), \code{default=250} (numeric)
-#' @param res_pruning_LD The LD threshold used for pruning results, should be between 0 and 1 (if>=1, distance-based pruning is used), \code{default=0.3} (numeric)
+#' @param res_pruning_dist The distance used for pruning results (in Kb), should be between 10 and 1000,
+#'        (if set to NULL, no pruning is done), \code{default=250} (numeric)
+#' @param res_pruning_LD The LD threshold used for pruning results, should be between 0 and 1
+#'        (if>=1, distance-based pruning is used), \code{default=0.3} (numeric)
 #' @param sign_method The method used to identify significant SNPs, should be \code{"p"} for
 #' @param save_files A logical indicating if the results should be saved as files,
 #'        \code{default=FALSE}
@@ -123,6 +131,8 @@ bGWAS <- function(name,
                   MR_threshold = 1e-5,
                   MR_pruning_dist = 100,
                   MR_pruning_LD = 0.3,
+                  MR_shrinkage = 1e-5,
+                  prior_shrinkage = 1e-5,
                   sign_method = "p",
                   sign_thresh = 5e-8,
                   res_pruning_dist = 100,
@@ -411,6 +421,35 @@ bGWAS <- function(name,
     log_info = update_log(log_info, tmp, verbose)
   }
 
+  ## MR_shrinkage, should be between MR_threshold and 1
+  if(!is.numeric(MR_shrinkage)) stop("MR_shrinkage : non-numeric argument", call. = FALSE)
+  if(MR_shrinkage<0) stop("MR_shrinkage : should be positive", call. = FALSE)
+  if(MR_shrinkage<MR_threshold) stop("MR_shrinkage : should be higher than the threshold used to select MR instruments", call. = FALSE)
+  if(MR_shrinkage>1) stop("MR_shrinkage : should not be higher than 1", call. = FALSE)
+
+  if(MR_shrinkage==1){
+    tmp = "No shrinkage applied before performing MR."
+    log_info = update_log(log_info, tmp, verbose)
+  } else {
+    tmp = paste0("All p-values lower than ",format(MR_shrinkage, scientific = T), " will be shrunk to 0 before performing MR.  \n")
+    log_info = update_log(log_info, tmp, verbose)
+  }
+
+  ## prior_shrinkage, should be between MR_threshold and 1
+  if(!is.numeric(prior_shrinkage)) stop("prior_shrinkage : non-numeric argument", call. = FALSE)
+  if(prior_shrinkage<0) stop("prior_shrinkage : should be positive", call. = FALSE)
+  if(prior_shrinkage<MR_threshold) stop("prior_shrinkage : should be higher than the threshold used to select MR instruments", call. = FALSE)
+  if(prior_shrinkage>1) stop("prior_shrinkage : should not be higher than 1", call. = FALSE)
+
+  if(prior_shrinkage==1){
+    tmp = "No shrinkage applied before performing calculating the prior."
+    log_info = update_log(log_info, tmp, verbose)
+  } else {
+    tmp = paste0("All p-values lower than ", format(prior_shrinkage, scientific = T), " will be shrunk to 0 before calculating the prior.  \n")
+    log_info = update_log(log_info, tmp, verbose)
+  }
+
+
   ## sign_method -> should not be "p" or "fdr"
   if(!sign_method %in% c("p", "fdr")) stop("sign_method : method not accepted, should be p or fdr", call. = FALSE)
 
@@ -505,7 +544,7 @@ bGWAS <- function(name,
   tmp = paste0("> Performing MR  \n")
   log_info = update_log(log_info, tmp, verbose)
 
-  res_MR = identify_studiesMR(matrix_MR$mat, save_files, verbose)
+  res_MR = identify_studiesMR(matrix_MR$mat, MR_shrinkage, save_files, verbose)
   log_info = c(log_info, res_MR$log_info)
   # if error/problem in identify_studiesMR
   if(isTRUE(res_MR$stop)){
@@ -534,7 +573,7 @@ bGWAS <- function(name,
   tmp = paste0("> Computing prior  \n")
   log_info = update_log(log_info, tmp, verbose)
 
-  Prior = compute_prior(res_MR$studies,matrix_MR$mat, matrix_all$mat, save_files, verbose)
+  Prior = compute_prior(res_MR$studies,matrix_MR$mat, matrix_all$mat, MR_shrinkage, prior_shrinkage, save_files, verbose)
   log_info = c(log_info, Prior$log_info)
   # if error/problem in compute_prior
   if(isTRUE(Prior$stop)){

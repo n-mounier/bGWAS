@@ -18,14 +18,14 @@
 
 
 
-identify_studiesMR <- function(ZMatrix, save_files=FALSE, verbose=FALSE){
+identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=FALSE){
 
   Log = c()
 
   if(save_files) Files_Info = data.table::fread("PriorGWASs.tsv")
 
 
-  scheme_INpXXtozero = 1e-5 # if p-value studies > 1e-5, Z-Score is set to zero
+  # if p-value studies > MR_shrinkage , Z-Score is set to zero
 
   # In the pipeline, should always be a data.table,
   # but for other cases, allow the use of a file
@@ -78,13 +78,13 @@ identify_studiesMR <- function(ZMatrix, save_files=FALSE, verbose=FALSE){
 
 
   # Set the z-scores to 0 for the regression if too low
-  if(scheme_INpXXtozero < 1.0) {
+  if(MR_shrinkage < 1.0) {
     for(column_of_zs in Prior_study_names) {
-      threshold = abs(qnorm(scheme_INpXXtozero/2))
+      threshold = abs(qnorm(MR_shrinkage/2))
       ZMatrix[c(abs(ZMatrix[,..column_of_zs]) < threshold) , column_of_zs] <- 0
     }
-    # tmp = "Z-scores were set to 0 if p-value > 1e-5 \n"
-    #  Log = update_log(Log, tmp, verbose)
+    tmp = paste0("Applying shrinkage (threshold = ", MR_shrinkage, ") before performing MR. \n")
+    Log = update_log(Log, tmp, verbose)
   }
 
 

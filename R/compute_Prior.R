@@ -16,12 +16,9 @@
 #  Function not exported, no need of extended documentation?
 
 
-compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, save_files=FALSE, verbose=FALSE){
+compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkage, prior_shrinkage, save_files=FALSE, verbose=FALSE){
 
   Log = c()
-
-  scheme_INpXXtozero = 1e-5
-  scheme_OUTpXXtozero = 1e-5
 
   scheme_PriorVar = T
 
@@ -63,15 +60,11 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, save_files=
   MR_ZMatrix= push.extreme.zs.back.a.little.towards.zero(MR_ZMatrix)
   All_ZMatrix = push.extreme.zs.back.a.little.towards.zero(All_ZMatrix)
   # Set the z-scores to 0 for the regression if too low
-  if(scheme_INpXXtozero < 1.0) {
+  if(MR_shrinkage < 1.0) {
     for(column_of_zs in selected_studies) {
-      threshold = abs(stats::qnorm(scheme_INpXXtozero/2))
+      threshold = abs(stats::qnorm(MR_shrinkage/2))
       MR_ZMatrix[c(abs(MR_ZMatrix[,..column_of_zs]) < threshold) , column_of_zs] <- 0
     }
-    #tmp = "Z-scores were set to 0 if p-value > 1e-5 \n"
-    #Log = c(Log, tmp)
-    #if(verbose) cat(tmp)
-
     # check how many chromosomes have non-zero zs
     # is that really interesting??
     data.table::rbindlist(lapply(selected_studies, function(column_of_zs) {
@@ -83,14 +76,16 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, save_files=
 #    }
   }
 
-  if(scheme_OUTpXXtozero < 1.0) {
+  if(prior_shrinkage < 1.0) {
     for(column_of_zs in selected_studies) {
-      threshold = abs(stats::qnorm(scheme_INpXXtozero/2))
+      threshold = abs(stats::qnorm(prior_shrinkage/2))
       All_ZMatrix[c(abs(All_ZMatrix[,..column_of_zs]) < threshold) , column_of_zs] <- 0
     }
+    tmp = paste0("Applying shrinkage (threshold = ", MR_shrinkage, ") before calculating the prior. \n")
+    Log = update_log(Log, tmp, verbose)
   }
 
-  NonZero_ZMatrix = All_ZMatrix[apply(All_ZMatrix[,6:ncol(All_ZMatrix)], 1, function(x) any(unlist(abs(x)>threshold))),]
+  NonZero_ZMatrix = All_ZMatrix[apply(All_ZMatrix[,6:(ncol(All_ZMatrix)-1)], 1, function(x) any(unlist(abs(x)>threshold))),1:(ncol(All_ZMatrix)-1)]
 
   generate.formula <- function(outcome, study_names ) {
     paste(paste0(outcome,' ~ -1 + '),paste(collapse=' + ', paste(sep='','`',study_names,'`')))
