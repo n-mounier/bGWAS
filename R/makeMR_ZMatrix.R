@@ -162,12 +162,12 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
     tmp = paste0("# Thresholding... \n")
     Log = update_log(Log, tmp, verbose)
     # DO NOT USE THE LAST COLUMN!!
-    SNPsToKeep = apply(ZMatrix[,-c(1:5,as.numeric(ncol(ZMatrix)))], 1, function(x) any(abs(x)>Zlimit))
+    SNPsToKeep = apply(ZMatrix[,-c(1:5,as.numeric(ncol(ZMatrix))), with=F], 1, function(x) any(abs(x)>Zlimit))
     ZMatrix=ZMatrix[SNPsToKeep,]
 
     # check that each study have at least one SNP surviving thresholding
     # not needed to check for the last column
-    StudiesToKeep = apply(ZMatrix[,-c(1:5,as.numeric(ncol(ZMatrix)))], 2, function(x) any(abs(x)>Zlimit))
+    StudiesToKeep = apply(ZMatrix[,-c(1:5,as.numeric(ncol(ZMatrix))), with=F], 2, function(x) any(abs(x)>Zlimit))
     if(!all(StudiesToKeep)){
       tmp = paste0(paste0(colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after thresholding) \n")
       if(save_files){
