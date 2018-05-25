@@ -86,6 +86,9 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
     }
     PriorThr =  PriorThr[PriorThr$rs %in% SNPsToKeep,]
 
+    tmp = paste0(format(nrow(PriorThr), big.mark = ",", scientific = F), " SNPs left \n")
+    Log = update_log(Log, tmp, verbose)
+
     tmp = "Done! \n"
     Log = update_log(Log, tmp, verbose)
   }
