@@ -139,7 +139,8 @@ bGWAS <- function(name,
                   res_pruning_LD = 0,
                   save_files = FALSE,
                   verbose = TRUE,
-                  sensitivity= F) {
+                  sensitivity= F,
+                  stop_after_MR=F) {
 
   # Path where the analysis has been launched
   InitPath = getwd()
@@ -557,6 +558,37 @@ bGWAS <- function(name,
     log_info = apply(as.array(log_info), 1,function(x) gsub("\n", "", x, fixed=T))
     write(log_info, paste0(name,".log"))
     return("Analysis stopped : see log file for more informations.")
+  }
+
+  if(stop_after_MR){
+    if(save_files){
+      setwd(InitPath)
+    }
+
+    if(TMP_FILE){
+      system(paste0("rm ", GWAS))
+      tmp = paste0("The temporary file \"", GWAS, "\" has been deleted \n")
+      log_info = update_log(log_info, tmp, verbose)
+    }
+
+    ### write log_info File ###
+    Time = as.integer((proc.time()-StartTime)[3])
+    minutes <- as.integer(trunc(Time/60))
+    seconds <- Time - minutes * 60
+    tmp = paste0("Time of the analysis: ", minutes, " minute(s) and ", seconds, " second(s).  \n")
+    log_info = update_log(log_info, tmp, verbose)
+
+    log_info = apply(as.array(log_info), 1,function(x) gsub("\n", "", x, fixed=T))
+
+    if(save_files){
+      write(log_info, paste0(name,".log"))
+    }
+
+    results=list()
+    results$log_info = log_info
+    results$significant_studies = res_MR$coeffs
+
+    return(results)
   }
 
 
