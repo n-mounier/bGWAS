@@ -18,7 +18,7 @@
 
 
 
-identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=FALSE){
+identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=FALSE, sensitivity=FALSE){
 
   Log = c()
 
@@ -334,6 +334,8 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
   rownames(coefs) <- NULL
   coefs = coefs[order(coefs$Pr...t..),,drop=F]
 
+
+
   colnames(coefs) = c("study", "estimate", "std_error", "T", "P")
 
   if(save_files){
@@ -346,6 +348,9 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
     Files_Info$multi_P = numeric()
     Files_Info$multi_P[match(coefs$study, Files_Info$File)] = coefs$P
   }
+  if(sensitivity){
+    Files_Info$R2_adj = summary(lm(data=ZMatrix, formula = generate.formula(All_study_names[length(All_study_names)], final_set_of_study_names)))$adj.r.squared
+  }
 
   tmp = paste0("Done! \n")
   Log = update_log(Log, tmp, verbose)
@@ -357,5 +362,10 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
   res$log_info = Log
   res$studies = data.table::data.table(study_selected=final_set_of_study_names)
   res$coeffs = coefs
+  if(sensitivity){
+    res$R2_adj = summary(lm(data=ZMatrix, formula = generate.formula(All_study_names[length(All_study_names)], final_set_of_study_names)))$adj.r.squared
+  }
+
+
   return(res)
 }

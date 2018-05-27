@@ -81,7 +81,7 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkag
       threshold = abs(stats::qnorm(prior_shrinkage/2))
       All_ZMatrix[c(abs(All_ZMatrix[,..column_of_zs]) < threshold) , column_of_zs] <- 0
     }
-    tmp = paste0("Applying shrinkage (threshold = ", MR_shrinkage, ") before calculating the prior. \n")
+    tmp = paste0("Applying shrinkage (threshold = ", prior_shrinkage, ") before calculating the prior. \n")
     Log = update_log(Log, tmp, verbose)
   }
 
