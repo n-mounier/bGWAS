@@ -479,7 +479,7 @@ bGWAS <- function(name,
     if(res_pruning_dist>1000) stop("res_pruning_dist : should be lower than 1Mb", call. = FALSE)
 
 
-    tmp = paste0("The distance used for pruning results is: ", MR_pruning_dist, "Kb.  \n")
+    tmp = paste0("The distance used for pruning results is: ", res_pruning_dist, "Kb.  \n")
     log_info = update_log(log_info, tmp, verbose)
 
     ## res_pruning_LD
