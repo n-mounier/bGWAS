@@ -22,14 +22,6 @@ request_BFandP <- function(Prior, sign_thresh, save_files=F, verbose=F) {
 
 
 
-  # Prior$BF =  dnorm(mean= Prior$fit    , sd=sqrt(
-  #   1+Prior$se**2
-  #   ) , x=Prior$obs) /
-  # dnorm(mean= 0.0       , sd=sqrt(
-  #   1
-  #   ) , x=Prior$obs)
-
-
   # calculate BF
   Prior$BF =  dnorm(mean= Prior$prior_estimate    , sd=sqrt(
     1+Prior$prior_std_error**2
