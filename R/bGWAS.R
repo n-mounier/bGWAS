@@ -22,9 +22,9 @@
 #' @param MR_threshold The threshold used to select strong instruments for MR, should be lower
 #'        than 1e-5, \code{default=1e-5} (numeric)
 #' @param MR_pruning_dist The distance used for pruning MR instruments (in Kb), should be between 10 and 1000,
-#'        \code{default=250} (numeric)
+#'        \code{default=500} (numeric)
 #' @param MR_pruning_LD The LD threshold used for pruning MR instruments, should be between 0 and 1
-#'        (if>=1, distance-based pruning is used), \code{default=0.3} (numeric)
+#'        (if>=1, distance-based pruning is used), \code{default=0.2} (numeric)
 #' @param MR_shrinkage The p-value threshold used for shrinkage before performing MR, should be between
 #'        \code{MR_threshold} and 1, \code{default=1e-5} (numeric)
 #' @param prior_shrinkage The p-value threshold used for shrinkage before calculating the prior,
@@ -34,7 +34,7 @@
 #' @param sign_thresh The threshold used to identify significant SNPs, \code{default="5e-8"}
 #'        (numeric)
 #' @param res_pruning_dist The distance used for pruning results (in Kb), should be between 10 and 1000,
-#'        (if set to NULL, no pruning is done), \code{default=250} (numeric)
+#'        (if set to NULL, no pruning is done), \code{default=500} (numeric)
 #' @param res_pruning_LD The LD threshold used for pruning results, should be between 0 and 1
 #'        (if>=1, distance-based pruning is used), \code{default=0} (numeric)
 #' @param sign_method The method used to identify significant SNPs, should be \code{"p"} for
@@ -129,17 +129,16 @@ bGWAS <- function(name,
                   prior_studies = NULL,
                   SNPs_list = NULL,
                   MR_threshold = 1e-5,
-                  MR_pruning_dist = 100,
-                  MR_pruning_LD = 0.3,
+                  MR_pruning_dist = 500,
+                  MR_pruning_LD = 0.2,
                   MR_shrinkage = 1e-5,
                   prior_shrinkage = 1e-5,
                   sign_method = "p",
                   sign_thresh = 5e-8,
-                  res_pruning_dist = 100,
+                  res_pruning_dist = 500,
                   res_pruning_LD = 0,
                   save_files = FALSE,
-                  verbose = TRUE,
-                  stop_after_MR = F) {
+                  verbose = TRUE) {
 
   # Path where the analysis has been launched
   InitPath = getwd()
@@ -559,37 +558,6 @@ bGWAS <- function(name,
     return("Analysis stopped : see log file for more informations.")
   }
 
-  if(stop_after_MR){
-    if(save_files){
-      setwd(InitPath)
-    }
-
-    if(TMP_FILE){
-      system(paste0("rm ", GWAS))
-      tmp = paste0("The temporary file \"", GWAS, "\" has been deleted \n")
-      log_info = update_log(log_info, tmp, verbose)
-    }
-
-    ### write log_info File ###
-    Time = as.integer((proc.time()-StartTime)[3])
-    minutes <- as.integer(trunc(Time/60))
-    seconds <- Time - minutes * 60
-    tmp = paste0("Time of the analysis: ", minutes, " minute(s) and ", seconds, " second(s).  \n")
-    log_info = update_log(log_info, tmp, verbose)
-
-    log_info = apply(as.array(log_info), 1,function(x) gsub("\n", "", x, fixed=T))
-
-    if(save_files){
-      write(log_info, paste0(name,".log"))
-    }
-
-    results=list()
-    results$log_info = log_info
-    results$significant_studies = res_MR$coeffs
-
-    return(results)
-  }
-
   # 4 : Compute Prior
   log_info = c(log_info, "", "")
   tmp = paste0("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n",
@@ -626,8 +594,7 @@ bGWAS <- function(name,
                "<<< Calculation of Bayes Factors and p-values >>>  \n")
   log_info = update_log(log_info, tmp, verbose)
 
-  # Compute BFs for 100 nulls + for our GWAS of Interest
-  # Calculate the p-values from these BFs (comparison with the nulls)
+
   # This script create a file containing all SNPs in common between prior file / imputed files
   tmp = paste0("> Calculating them for all SNPs  \n")
   log_info = update_log(log_info, tmp, verbose)
