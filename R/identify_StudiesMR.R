@@ -350,10 +350,92 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
   }
   if(sensitivity){
     Files_Info$R2_adj = summary(lm(data=ZMatrix, formula = generate.formula(All_study_names[length(All_study_names)], final_set_of_study_names)))$adj.r.squared
+    Files_Info$OoS_R2_adj_mean = numeric()
+    Files_Info$OoS_R2_adj_median = numeric()
+
+    tmp = "Getting out-of-sample R2 masking one chromosome \n"
+    Log = update_log(Log, tmp, verbose)
+
+    outcome = colnames(ZMatrix)[ncol(ZMatrix)]
+
+    generate.formula <- function(outcome, study_names ) {
+      paste(paste0(outcome,' ~ -1 + '),paste(collapse=' + ', paste(sep='','`',study_names,'`')))
+    }
+
+    for(chrm in 1:22) {
+      tmp = paste0("   Chromosome ", chrm, "\n")
+      Log = update_log(Log, tmp, verbose)
+      # create the dataset without this chromosome
+      train    =   ZMatrix$chrm != chrm
+      d_masked = ZMatrix[train,,drop=F]
+
+      tmp = "Running regression, \n"
+      Log = update_log(Log, tmp, verbose)
+
+
+      lm(data=d_masked, formula = generate.formula(outcome, final_set_of_study_names)
+      ) -> fit_masked # fit, without one chromosome
+      coefs <- data.frame(coef(summary(fit_masked)))
+
+      # stopifnot(length(dynamic.study.names) ==  nrow(coefs))
+      ## this can happen, if all non-0 Z-score of a study are one the same chromosome
+      ## but this should not be a problem
+      # just add some warning message here :
+      if(length(final_set_of_study_names) !=  nrow(coefs)){
+        missingSt = final_set_of_study_names[!final_set_of_study_names %in% rownames(coefs)]
+        tmp = paste0("No effect estimate when masking this chromosome for : ",
+                     paste0(missingSt, collapse=" - "),
+                     " (all SNPs having non-0 Z-scores are on this chromosome) \n")
+        Log = update_log(Log, tmp, verbose)
+
+      }
+      coefs = coefs[order(-coefs$Pr...t..),,drop=F]
+      # stopifnot(length(dynamic.study.names) ==  nrow(coefs))
+
+      stopifnot(nrow(coefs) >= 1)
+
+      coefs.DT =  data.table::data.table(chrm, data.table::data.table(coefs, keep.rownames=T))
+      data.table::setnames(coefs.DT, 'rn', 'study_name')
+      coefs.DT[ , study_name := gsub('`','',study_name) ]
+
+      # all.coefs = rbind(all.coefs, coefs.DT)
+
+      # check the predictions using data from the training set
+      #in_train = data.frame( CRG=d_masked[,..outcome], prd=predict.lm(fit_masked) )
+      #residual.variance.in.training=var(in_train[,1]-in_train$prd)
+
+
+      chrm_ = chrm
+
+      tmp = "Calculating out of sample prediction for SNPs on this chromosome, \n"
+      Log = update_log(Log, tmp, verbose)
+
+
+      # all SNPs we need to predict (the ones on this chromosome)
+      d_test             = ZMatrix[chrm==chrm_          ,,drop=T]
+
+
+      predict(fit_masked, d_test, se.fit=T) -> preds
+
+
+
+      test.outcome    <- d_test$lifegen_phase2_bothpl_alldr_2017_09_18.tsv_withZ.gz
+
+      SS.total      <- sum((test.outcome - mean(test.outcome))^2)
+      SS.regression <- sum((preds$fit - mean(test.outcome))^2)
+
+
+      # fraction of variability explained by the model : SS.regression/SS.total
+      Files_Info[,paste0("0oS_R2_adj_",chrm) := 1-(1-SS.regression/SS.total)*(nrow(d_masked)-1)/(nrow(d_masked)-length(final_set_of_study_names)-1)]
+
+      tmp = paste0("Done! \n")
+      Log = update_log(Log, tmp, verbose)
+    }
+    Files_Info$OoS_R2_adj_mean = mean(unlist(Files_Info[1,(ncol(Files_Info)-21):ncol(Files_Info)]))
+    Files_Info$OoS_R2_adj_median = median(unlist(Files_Info[1,(ncol(Files_Info)-21):ncol(Files_Info)]))
   }
 
-  tmp = paste0("Done! \n")
-  Log = update_log(Log, tmp, verbose)
+
 
 
   if(save_files)                write.table(Files_Info, file="PriorGWASs.tsv", sep="\t", quote=F, row.names=F )
