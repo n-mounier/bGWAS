@@ -85,7 +85,13 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkag
     Log = update_log(Log, tmp, verbose)
   }
 
-  NonZero_ZMatrix = All_ZMatrix[apply(All_ZMatrix[,6:(ncol(All_ZMatrix)-1)], 1, function(x) any(unlist(abs(x)>threshold))),1:(ncol(All_ZMatrix)-1)]
+  if(prior_shrinkage<1){
+    NonZero_ZMatrix = All_ZMatrix[apply(All_ZMatrix[,6:(ncol(All_ZMatrix)-1)], 1, function(x) any(unlist(abs(x)>threshold))),1:(ncol(All_ZMatrix)-1)]
+  }
+  else {
+    NonZero_ZMatrix = All_ZMatrix
+  }
+
 
   generate.formula <- function(outcome, study_names ) {
     paste(paste0(outcome,' ~ -1 + '),paste(collapse=' + ', paste(sep='','`',study_names,'`')))
