@@ -77,7 +77,7 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
       # Do pruning, chr by chr
       SNPsToKeep = c()
       for(chr in unique(ToPrune$chr_name)){
-        SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = res_pruning_dist*2, clump_r2 = res_pruning_LD)$SNP))
+        SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = res_pruning_dist, clump_r2 = res_pruning_LD)$SNP))
       }
     } else {# distance pruning
       tmp = paste0("   distance : ", res_pruning_dist, "Kb \n")
