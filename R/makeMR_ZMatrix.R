@@ -195,7 +195,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
   }) -> maxZ
   ToPrune = ZMatrix[,1:3]
   colnames(ToPrune) = c("SNP", "chr_name", "chr_start")
-  if(MR_pruning_LD<1){# LD-pruning
+  if(MR_pruning_LD>0){# LD-pruning
     tmp = paste0("   distance : ", MR_pruning_dist, "Kb", " - LD threshold : ", MR_pruning_LD, "\n")
     Log = update_log(Log, tmp, verbose)
     # get max Z-score and convert to p-value
