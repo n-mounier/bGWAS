@@ -139,8 +139,9 @@ bGWAS <- function(name,
                   res_pruning_LD = 0,
                   save_files = FALSE,
                   verbose = TRUE,
-                  power= F, # get out of sample adj R2 + use perm to get p-values
+                  use_permutations= F, # get out of sample adj R2 + use perm to get p-values
                   stop_after_MR=F) {
+
 
   # Path where the analysis has been launched
   InitPath = getwd()
@@ -546,7 +547,7 @@ bGWAS <- function(name,
   tmp = paste0("> Performing MR  \n")
   log_info = update_log(log_info, tmp, verbose)
 
-  res_MR = identify_studiesMR(matrix_MR$mat, MR_shrinkage, save_files, verbose, power)
+  res_MR = identify_studiesMR(matrix_MR$mat, MR_shrinkage, save_files, verbose)
   log_info = c(log_info, res_MR$log_info)
   # if error/problem in identify_studiesMR
   if(isTRUE(res_MR$stop)){
@@ -559,6 +560,7 @@ bGWAS <- function(name,
     write(log_info, paste0(name,".log"))
     return("Analysis stopped : see log file for more informations.")
   }
+
 
   if(stop_after_MR){
     if(save_files){
@@ -590,7 +592,6 @@ bGWAS <- function(name,
 
     return(results)
   }
-
 
 
   # 4 : Compute Prior
@@ -629,13 +630,12 @@ bGWAS <- function(name,
                "<<< Calculation of Bayes Factors and p-values >>>  \n")
   log_info = update_log(log_info, tmp, verbose)
 
-  # Compute BFs for 100 nulls + for our GWAS of Interest
-  # Calculate the p-values from these BFs (comparison with the nulls)
+
   # This script create a file containing all SNPs in common between prior file / imputed files
   tmp = paste0("> Calculating them for all SNPs  \n")
   log_info = update_log(log_info, tmp, verbose)
 
-  PriorWithBF = request_BFandP(Prior$prior, sign_thresh, use_perm=power, save_files, verbose)
+  PriorWithBF = request_BFandP(Prior$prior, sign_thresh, use_permutations, save_files, verbose)
   log_info = c(log_info, PriorWithBF$log_info)
 
 
@@ -686,10 +686,6 @@ bGWAS <- function(name,
   results$significant_studies = res_MR$coeffs
   results$all_MRcoeffs = Prior$all_coeffs
   results$nonZero_effects = Prior$non_zero
-  if(power){
-    results$R2_adj = res_MR$R2_adj
-  }
-
 
   class(results) = "bGWAS"
  return(results)
