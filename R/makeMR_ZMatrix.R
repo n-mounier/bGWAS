@@ -203,7 +203,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
     # Do pruning, chr by chr
     SNPsToKeep = c()
     for(chr in unique(ToPrune$chr_name)){
-      SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = MR_pruning_dist*2, clump_r2 = MR_pruning_LD)$SNP))
+      SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = MR_pruning_dist, clump_r2 = MR_pruning_LD)$SNP))
       }
     }
   else {# distance pruning

@@ -138,7 +138,10 @@ bGWAS <- function(name,
                   res_pruning_dist = 500,
                   res_pruning_LD = 0,
                   save_files = FALSE,
-                  verbose = TRUE) {
+                  verbose = TRUE,
+                  use_permutations= F, # get out of sample adj R2 + use perm to get p-values
+                  stop_after_MR=F) {
+
 
   # Path where the analysis has been launched
   InitPath = getwd()
@@ -477,7 +480,7 @@ bGWAS <- function(name,
     if(res_pruning_dist>1000) stop("res_pruning_dist : should be lower than 1Mb", call. = FALSE)
 
 
-    tmp = paste0("The distance used for pruning results is: ", MR_pruning_dist, "Kb.  \n")
+    tmp = paste0("The distance used for pruning results is: ", res_pruning_dist, "Kb.  \n")
     log_info = update_log(log_info, tmp, verbose)
 
     ## res_pruning_LD
@@ -558,6 +561,39 @@ bGWAS <- function(name,
     return("Analysis stopped : see log file for more informations.")
   }
 
+
+  if(stop_after_MR){
+    if(save_files){
+      setwd(InitPath)
+    }
+
+    if(TMP_FILE){
+      system(paste0("rm ", GWAS))
+      tmp = paste0("The temporary file \"", GWAS, "\" has been deleted \n")
+      log_info = update_log(log_info, tmp, verbose)
+    }
+
+    ### write log_info File ###
+    Time = as.integer((proc.time()-StartTime)[3])
+    minutes <- as.integer(trunc(Time/60))
+    seconds <- Time - minutes * 60
+    tmp = paste0("Time of the analysis: ", minutes, " minute(s) and ", seconds, " second(s).  \n")
+    log_info = update_log(log_info, tmp, verbose)
+
+    log_info = apply(as.array(log_info), 1,function(x) gsub("\n", "", x, fixed=T))
+
+    if(save_files){
+      write(log_info, paste0(name,".log"))
+    }
+
+    results=list()
+    results$log_info = log_info
+    results$significant_studies = res_MR$coeffs
+
+    return(results)
+  }
+
+
   # 4 : Compute Prior
   log_info = c(log_info, "", "")
   tmp = paste0("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n",
@@ -599,7 +635,7 @@ bGWAS <- function(name,
   tmp = paste0("> Calculating them for all SNPs  \n")
   log_info = update_log(log_info, tmp, verbose)
 
-  PriorWithBF = request_BFandP(Prior$prior, sign_thresh, save_files, verbose)
+  PriorWithBF = request_BFandP(Prior$prior, sign_thresh, use_permutations, save_files, verbose)
   log_info = c(log_info, PriorWithBF$log_info)
 
 
@@ -650,7 +686,6 @@ bGWAS <- function(name,
   results$significant_studies = res_MR$coeffs
   results$all_MRcoeffs = Prior$all_coeffs
   results$nonZero_effects = Prior$non_zero
-
 
   class(results) = "bGWAS"
  return(results)
