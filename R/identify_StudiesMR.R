@@ -18,7 +18,7 @@
 
 
 
-identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=FALSE, sensitivity=FALSE){
+identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=FALSE, power=FALSE){
 
   Log = c()
 
@@ -348,7 +348,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
     Files_Info$multi_P = numeric()
     Files_Info$multi_P[match(coefs$study, Files_Info$File)] = coefs$P
   }
-  if(sensitivity){
+  if(power){
     Files_Info$R2_adj = summary(lm(data=ZMatrix, formula = generate.formula(All_study_names[length(All_study_names)], final_set_of_study_names)))$adj.r.squared
     Files_Info$OoS_R2_adj_mean = numeric()
     Files_Info$OoS_R2_adj_median = numeric()
@@ -444,7 +444,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
   res$log_info = Log
   res$studies = data.table::data.table(study_selected=final_set_of_study_names)
   res$coeffs = coefs
-  if(sensitivity){
+  if(power){
     res$R2_adj = summary(lm(data=ZMatrix, formula = generate.formula(All_study_names[length(All_study_names)], final_set_of_study_names)))$adj.r.squared
   }
 
