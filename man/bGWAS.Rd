@@ -5,10 +5,11 @@
 \title{bGWAS - main function}
 \usage{
 bGWAS(name, GWAS, Z_matrices = "~/ZMatrices/", prior_studies = NULL,
-  SNPs_list = NULL, MR_threshold = 1e-05, MR_pruning_dist = 100,
-  MR_pruning_LD = 0.3, MR_shrinkage = 1e-05, prior_shrinkage = 1e-05,
-  sign_method = "p", sign_thresh = 5e-08, res_pruning_dist = 100,
-  res_pruning_LD = 0, save_files = FALSE, verbose = TRUE)
+  SNPs_list = NULL, MR_threshold = 1e-05, MR_pruning_dist = 500,
+  MR_pruning_LD = 0.2, MR_shrinkage = 1e-05, prior_shrinkage = 1e-05,
+  stop_after_prior = FALSE, sign_method = "p", sign_thresh = 5e-08,
+  use_permutations = FALSE, res_pruning_dist = 500, res_pruning_LD = 0,
+  save_files = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{name}{The name of the analysis (character)}
@@ -31,10 +32,10 @@ conventionnal GWAS (character)
 than 1e-5, \code{default=1e-5} (numeric)}
 
 \item{MR_pruning_dist}{The distance used for pruning MR instruments (in Kb), should be between 10 and 1000,
-\code{default=250} (numeric)}
+\code{default=500} (numeric)}
 
 \item{MR_pruning_LD}{The LD threshold used for pruning MR instruments, should be between 0 and 1
-(if>=1, distance-based pruning is used), \code{default=0.3} (numeric)}
+(if>=1, distance-based pruning is used), \code{default=0.2} (numeric)}
 
 \item{MR_shrinkage}{The p-value threshold used for shrinkage before performing MR, should be between
 \code{MR_threshold} and 1, \code{default=1e-5} (numeric)}
@@ -45,14 +46,14 @@ should be between \code{MR_threshold} and 1, \code{default=1e-5} (numeric)}
 \item{sign_method}{The method used to identify significant SNPs, should be \code{"p"} for
 p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)}
 
-\item{sign_thresh}{The threshold used to identify significant SNPs, \code{default="5.10e-8"}
+\item{sign_thresh}{The threshold used to identify significant SNPs, \code{default="5e-8"}
 (numeric)}
 
 \item{res_pruning_dist}{The distance used for pruning results (in Kb), should be between 10 and 1000,
-(if set to NULL, no pruning is done), \code{default=250} (numeric)}
+(if set to NULL, no pruning is done), \code{default=500} (numeric)}
 
 \item{res_pruning_LD}{The LD threshold used for pruning results, should be between 0 and 1
-(if>=1, distance-based pruning is used), \code{default=0.3} (numeric)}
+(if>=1, distance-based pruning is used), \code{default=0} (numeric)}
 
 \item{save_files}{A logical indicating if the results should be saved as files,
 \code{default=FALSE}}

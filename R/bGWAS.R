@@ -20,24 +20,29 @@
 #'        conventionnal GWAS (character)
 #'              # NOT IMPLEMENTED YET
 #' @param MR_threshold The threshold used to select strong instruments for MR, should be lower
-#'        than 1e-5, \code{default=1e-5} (numeric)
+#'        than 1e-5, \code{default=1e-6} (numeric)
 #' @param MR_pruning_dist The distance used for pruning MR instruments (in Kb), should be between 10 and 1000,
 #'        \code{default=500} (numeric)
 #' @param MR_pruning_LD The LD threshold used for pruning MR instruments, should be between 0 and 1
-#'        (if>=1, distance-based pruning is used), \code{default=0.2} (numeric)
+#'        (if 0, distance-based pruning is used), \code{default=0} (numeric)
 #' @param MR_shrinkage The p-value threshold used for shrinkage before performing MR, should be between
-#'        \code{MR_threshold} and 1, \code{default=1e-5} (numeric)
+#'        \code{MR_threshold} and 1 (no shrinkage), \code{default=1} (numeric)
 #' @param prior_shrinkage The p-value threshold used for shrinkage before calculating the prior,
 #'        should be between \code{MR_threshold} and 1, \code{default=1e-5} (numeric)
+#' @param stop_after_prior A logical indicating if the analysis should be stopped after calculating the prior
+#'        (no BF / P- est\code{TRUE},  \code{default=FALSE}
 #' @param sign_method The method used to identify significant SNPs, should be \code{"p"} for
 #'        p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)
 #' @param sign_thresh The threshold used to identify significant SNPs, \code{default="5e-8"}
 #'        (numeric)
+#' @param use_permutations  A logical indicating if BF p-values should be estimated using the permutation
+#'        approach,  \code{default=FALSE}
 #' @param res_pruning_dist The distance used for pruning results (in Kb), should be between 10 and 1000,
 #'        (if set to NULL, no pruning is done), \code{default=500} (numeric)
 #' @param res_pruning_LD The LD threshold used for pruning results, should be between 0 and 1
-#'        (if>=1, distance-based pruning is used), \code{default=0} (numeric)
+#'        (if 0, distance-based pruning is used), \code{default=0} (numeric)
 #' @param sign_method The method used to identify significant SNPs, should be \code{"p"} for
+#'        p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)
 #' @param save_files A logical indicating if the results should be saved as files,
 #'        \code{default=FALSE}
 #' @param verbose  A logical indicating if information on progress should be reported,
@@ -128,19 +133,19 @@ bGWAS <- function(name,
                   Z_matrices = "~/ZMatrices/",
                   prior_studies = NULL,
                   SNPs_list = NULL,
-                  MR_threshold = 1e-5,
+                  MR_threshold = 1e-6,
                   MR_pruning_dist = 500,
-                  MR_pruning_LD = 0.2,
-                  MR_shrinkage = 1e-5,
+                  MR_pruning_LD = 0,
+                  MR_shrinkage = 1,
                   prior_shrinkage = 1e-5,
+                  stop_after_prior =FALSE,
                   sign_method = "p",
                   sign_thresh = 5e-8,
+                  use_permutations= FALSE,
                   res_pruning_dist = 500,
                   res_pruning_LD = 0,
                   save_files = FALSE,
-                  verbose = TRUE,
-                  use_permutations= F, # get out of sample adj R2 + use perm to get p-values
-                  stop_after_MR=F) {
+                  verbose = TRUE) {
 
 
   # Path where the analysis has been launched
@@ -416,7 +421,7 @@ bGWAS <- function(name,
   if(!is.numeric(MR_pruning_LD)) stop("MR_pruning_LD : non-numeric argument", call. = FALSE)
   if(MR_pruning_LD<0) stop("MR_pruning_LD : should be positive", call. = FALSE)
 
-  if(MR_pruning_LD<1){
+  if(MR_pruning_LD>0){
     tmp = paste0("The LD threshold used for pruning MR instruments is: ",MR_pruning_LD, ".  \n")
     log_info = update_log(log_info, tmp, verbose)
   } else {
@@ -487,7 +492,7 @@ bGWAS <- function(name,
     if(!is.numeric(res_pruning_LD)) stop("res_pruning_LD : non-numeric argument", call. = FALSE)
     if(res_pruning_LD<0) stop("res_pruning_LD : should be positive", call. = FALSE)
 
-    if(res_pruning_LD<1){
+    if(res_pruning_LD>0){
       tmp = paste0("The LD threshold used for pruning results is: ", res_pruning_LD, ".  \n")
       log_info = update_log(log_info, tmp, verbose)
     } else {
@@ -562,7 +567,7 @@ bGWAS <- function(name,
   }
 
 
-  if(stop_after_MR){
+  if(stop_after_prior){
     if(save_files){
       setwd(InitPath)
     }
