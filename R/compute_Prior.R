@@ -224,6 +224,15 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkag
   }
   colnames(all.priors)[6:8] = c("observed_Z", "prior_estimate", "prior_std_error")
 
+  ## we need to add one to the prior variance to account for the fact that we are
+  ## predicting a noisy variable : observedZ ~ N(trueZ, 1)
+  all.priors$prior_std_error = sqrt(all.priors$prior_std_error**2 + 1)
+
+
+  ## also add the posterior
+  all.priors$posterior_estimate = (all.priors$prior_std_error**2/(all.priors$prior_std_error**2+1)) *
+                           ((all.priors$prior_estimate/all.priors$prior_std_error**2)+all.priors$observed_Z)
+  all.priors$posterior_std_error = sqrt(all.priors$prior_std_error**2/(all.priors$prior_std_error**2+1))
 
 
 
