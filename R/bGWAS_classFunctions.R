@@ -19,12 +19,16 @@ print.bGWAS <- function(obj) {
 
   cat("\n-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ \n \n")
 
-  if(length(obj$significant_SNPs)==1){
-    cat(length(obj$significant_SNPs), "significant SNP identified : \n ")
-  } else {
-    cat(length(obj$significant_SNPs), "significant SNPs identified : \n ")
-  }
-  cat(obj$significant_SNPs, sep=", ")
+  if(length(obj$significant_SNPs)==0){
+    cat("No significant SNP identified, because the analysis has been limited to prior estimation")
+  } else
+    if(length(obj$significant_SNPs)==1){
+      cat(length(obj$significant_SNPs), "significant SNP identified : \n ")
+      cat(obj$significant_SNPs, sep=", ")
+    } else {
+      cat(length(obj$significant_SNPs), "significant SNPs identified : \n ")
+      cat(obj$significant_SNPs, sep=", ")
+    }
   # independant ? which threshold ? get info in log
   cat("\n\n-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ ")
 
@@ -84,6 +88,9 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
 
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
+  if(length(obj$significant_SNPs)==0){
+    stop("Manhattan plot can't be displayed, because the analysis has been limited to prior estimation", call. = F)
+  }
   if(!is.logical(save_file)) stop("save_file : should be logical")
   # if no name, use the one from the analysis (in log file)
   if(save_file && is.null(file_name)){
@@ -284,6 +291,9 @@ extract_results_bGWAS <- function(obj, SNPs="significant"){
   if(SNPs=="all"){
     Res = obj$all_BFs
   } else {
+    if(length(obj$significant_SNPs)==0){
+      stop("You can't extract \"significants\" results , because the analysis has been limited to prior estimation", call. = F)
+    }
     Res = obj$all_BFs[rs %in% obj$significant_SNPs,]
   }
 
@@ -341,15 +351,13 @@ extract_MRcoeffs_bGWAS <- function(obj){
 
 
 
-library(data.table)
-library(gplots)
-library("RColorBrewer")
-col=colorRampPalette(c("blue", "white", "red"))(16*13)
-## ALIGNEMENT !!!
 
 
 heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
 
+
+  col=grDevices::colorRampPalette(c("blue", "white", "red"))(16*13)
+  ## ALIGNEMENT !!!
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
   if(!is.logical(save_file)) stop("save_file : should be logical")
@@ -366,15 +374,17 @@ heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
   if(save_file) grDevices::png(file_name, width = 20, height = 12, units = "cm", res = 500)
 
   Effects = obj$nonZero_effects
+  SNPs = obj$significant_SNPs
   # + keep only top hits !
-  Effects = Effects[Effects$rs %in% obj$significant_SNPs,]
+  Effects = Effects[match(obj$significant_SNPs, Effects$rs),]
   # what if a SNP is a hit but has no significant effect from any risk factor ? Add a line with all 0 ?
+
 
   # sign = POS if the risk factor has a positive effect on our trait
   #        NEG if the risk factor has a negative effect on our trait
   Effects_Aligned = Effects[,6:(ncol(obj$nonZero_effects)-1)]
 
-  Sign = ifelse(obj$significant_studies$Estimate[match(colnames(Effects_Aligned), obj$significant_studies$Study)]>0, "POS", "NEG")
+  Sign = ifelse(obj$significant_studies$estimate[match(colnames(Effects_Aligned), obj$significant_studies$study)]>0, "POS", "NEG")
   for(t in 1:ncol(Effects_Aligned)){
     if(Sign[t]=="NEG"){
       tName = colnames(Effects_Aligned)[t]
@@ -393,7 +403,7 @@ heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
   # Add Order ???
 
   # Heatmap : beta, aligned risk scores
-  col=colorRampPalette(c("blue", "white", "red"))(16*13)
+  col=grDevices::colorRampPalette(c("blue", "white", "red"))(16*13)
   SNPsAlleles = paste(Effects$rs, Effects$alt, sep=" - ")
 
   gplots::heatmap.2(as.matrix(Effects_Aligned), Rowv=as.dendrogram(rc), Colv=as.dendrogram(cc),
@@ -404,13 +414,13 @@ heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
             key.xlab="Z-Score")
 
 
-  gplots::heatmap.2(as.matrix(Effects_Aligned), Rowv=as.dendrogram(rc), Colv=as.dendrogram(cc),#, reorder(dendo, Order),
-            dendrogram="col", col=col, trace="none",
-            margins=c(12, 0),labCol=colnames(Effects_Aligned), labRow=rep("", nrow(Effects_Aligned)) , cexCol=0.7, cex=0.5,
+ # gplots::heatmap.2(as.matrix(Effects_Aligned), Rowv=as.dendrogram(rc), Colv=as.dendrogram(cc),#, reorder(dendo, Order),
+ #           dendrogram="col", col=col, trace="none",
+ #           margins=c(12, 0),labCol=colnames(Effects_Aligned), labRow=rep("", nrow(Effects_Aligned)) , cexCol=0.7, cex=0.5,
             #lhei=c(2,4),
-            lwid=c(1.5,3.5), keysize=0.75, key.par = list(cex=0.5)) #keysize=0.9)
-  heatmap(as.matrix(Effects_Aligned), Rowv=as.dendrogram(rc), Colv=as.dendrogram(cc),
-          col = col, margins=c(14,0),labCol=colnames(Effects_Aligned), labRow=rep("", nrow(Effects_Aligned)))
+ #           lwid=c(1.5,3.5), keysize=0.75, key.par = list(cex=0.5)) #keysize=0.9)
+ # heatmap(as.matrix(Effects_Aligned), Rowv=as.dendrogram(rc), Colv=as.dendrogram(cc),
+ #         col = col, margins=c(14,0),labCol=colnames(Effects_Aligned), labRow=rep("", nrow(Effects_Aligned)))
 
 
 
