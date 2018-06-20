@@ -14,6 +14,9 @@
 
 makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
                            MR_threshold, MR_pruning_dist, MR_pruning_LD, path="~/ZMatrices", save_files=F, verbose=F) {
+  platform = .Platform$OS.type
+  if(platform=="windows") stop("Windows is not supported yet", call. = FALSE)
+
   Log = c()
   tmp = paste0("# Loading the ZMatrix... \n")
   Log = update_log(Log, tmp, verbose)
@@ -24,21 +27,13 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
   if(!is.null(prior_studies)){
     tmp = paste0("Selecting studies :\n")
     Log = update_log(Log, tmp, verbose)
-    if(grepl("macOS", sessionInfo()$running)){
+    if(platform == "unix"){
       ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=c(1:5, prior_studies+5), showProgress = FALSE)
-    } else if(grepl("Linux", sessionInfo()$running)){
-      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=c(1:5, prior_studies+5), showProgress = FALSE)
-    } else {
-      stop("Only UNIX and MAC OS are supported")
     }
 
   } else {
-    if(grepl("macOS", sessionInfo()$running)) {
+    if(platform == "unix") {
       ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), showProgress = FALSE)
-    } else if(grepl("Linux", sessionInfo()$running)){
-      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), showProgress = FALSE)
-    } else {
-      stop("Only UNIX and MAC OS are supported")
     }
   }
 
@@ -55,12 +50,8 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
     tmp = paste0("# Adding data from the conventional GWAS (ID=", GWAS, "): \n \"", list_files(IDs = GWAS) , "\" \n")
     Log = update_log(Log, tmp, verbose)
 
-    if(grepl("macOS", sessionInfo()$running)){
+    if(platform == "unix"){
       GWASData=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5), showProgress = FALSE)
-    } else if(grepl("Linux", sessionInfo()$running)){
-      GWASData=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5), showProgress = FALSE)
-    } else {
-      stop("Only UNIX and MAC OS are supported")
     }
 
     # no need to check for alignment of alleles, just subset and rename the column
