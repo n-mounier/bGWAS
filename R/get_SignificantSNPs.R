@@ -69,7 +69,7 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
   if(!is.null(res_pruning_dist)){
     tmp = "# Pruning significant SNPs... \n"
     Log = update_log(Log, tmp, verbose)
-    ToPrune = PriorThr[,c(1,2,3,10)]
+    ToPrune = PriorThr[,c(1,2,3,12)]
     colnames(ToPrune) = c("SNP", "chr_name", "chr_start", "pval.exposure")
     if(res_pruning_LD>0){# LD-pruning
       tmp = paste0("   distance : ", res_pruning_dist, "Kb", " - LD threshold : ", res_pruning_LD, "\n")
