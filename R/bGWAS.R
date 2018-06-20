@@ -570,7 +570,8 @@ bGWAS <- function(name,
   # 4 : Compute Prior
   log_info = c(log_info, "", "")
   tmp = paste0("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n",
-               "<<< Estimation of the prior >>>  \n")
+                       "<<< Estimation of the prior >>>  \n")
+
   log_info = update_log(log_info, tmp, verbose)
 
   tmp = paste0("> Creating the full Z-Matrix  \n")
