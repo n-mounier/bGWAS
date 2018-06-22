@@ -18,6 +18,9 @@
 
 
 makeFull_ZMatrix <- function(studies=NULL, GWAS,  Z_matrices="~/Z_matrices", save_files=F, verbose=F) {
+  platform = .Platform$OS.type
+  if(platform=="windows") stop("Windows is not supported yet", call. = FALSE)
+
   Log = c()
   tmp = paste0("# Loading the ZMatrix... \n")
   Log = update_log(Log, tmp, verbose)
@@ -26,12 +29,8 @@ makeFull_ZMatrix <- function(studies=NULL, GWAS,  Z_matrices="~/Z_matrices", sav
   tmp = paste0("Selecting studies :\n")
   Log = update_log(Log, tmp, verbose)
 
-  if(grepl("macOS", sessionInfo()$running)) {
+  if(platform == "unix") {
     ZMatrix=data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, studies+5 ), showProgress = FALSE)
-  } else if(grepl("Linux", sessionInfo()$running)){
-    ZMatrix=data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, studies+5 ), showProgress = FALSE)
-  } else {
-    stop("Only UNIL and MAC OS are supported")
   }
   tmp = paste0(ncol(ZMatrix)-5, " studies \n")
   Log = update_log(Log, tmp, verbose)
@@ -48,14 +47,9 @@ makeFull_ZMatrix <- function(studies=NULL, GWAS,  Z_matrices="~/Z_matrices", sav
     Log = update_log(Log, tmp, verbose)
 
 
-    if(grepl("macOS", sessionInfo()$running)){
+    if(platform == "unix"){
       GWASData=data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5))
-    } else if(grepl("Linux", sessionInfo()$running)){
-      GWASData=data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5))
-    } else {
-      stop("Only UNIL and MAC OS are supported")
     }
-    t
     # no need to check for alignment of alleles, just subset and rename the column
     # keep the SNPs in our pruned matrix and order them correctly
     GWASData = GWASData[match(ZMatrix$rs,GWASData$rs),]

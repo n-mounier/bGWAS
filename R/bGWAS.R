@@ -155,10 +155,8 @@ bGWAS <- function(name,
 
   # platform identification : used in the main function
   # automatically re-detected when needed by other sub-functions
-  platform = c("Linux", "macOS", "W")[c(grepl("Linux", utils::sessionInfo()$running)
-                                        , grepl("macOS", utils::sessionInfo()$running)
-                                        , grepl("Windows", utils::sessionInfo()$running))]
-  if(platform=="W") stop("Windows is not supported yet", call. = FALSE)
+  platform = .Platform$OS.type
+  if(platform=="windows") stop("Windows is not supported yet", call. = FALSE)
 
   # initialization of log_info file
   log_info = c()
@@ -233,7 +231,7 @@ bGWAS <- function(name,
       HeaderGWAS = colnames(data.table::fread(GWAS, nrows = 1, showProgress = FALSE))
     } else if(grepl(".gz", GWAS)) {
       # ...if tar.gz
-      if(platform %in% c("Linux", "macOS")) HeaderGWAS = colnames(data.table::fread(paste0("zcat < ", GWAS), nrows = 1, showProgress = FALSE))
+      if(platform == "unix") HeaderGWAS = colnames(data.table::fread(paste0("zcat < ", GWAS), nrows = 1, showProgress = FALSE))
     }
 
     if(all(!HeaderGWAS %in% c("rsid", "snpid", "snp", "rnpid", "rs"))) stop("GWAS : no SNPID column", call. = FALSE)
@@ -253,7 +251,7 @@ bGWAS <- function(name,
           DataGWAS = data.table::fread(GWAS, showProgress = FALSE)
         } else if(grepl(".gz", GWAS)) {
           # ...if tar.gz
-          if(platform %in% c("Linux", "macOS"))  DataGWAS = data.table::fread(paste0("zcat < ", GWAS), showProgress = FALSE)
+          if(platform == "unix")  DataGWAS = data.table::fread(paste0("zcat < ", GWAS), showProgress = FALSE)
         }
         # calculate Z
         DataGWAS$Z = DataGWAS[,HeaderGWAS[HeaderGWAS %in% c("b", "beta", "beta1")], with=F] /
@@ -505,6 +503,7 @@ bGWAS <- function(name,
 
 
 
+
   # Go into the analysis' directory
   if(save_files){
     dir.create(Dir)
@@ -572,6 +571,7 @@ bGWAS <- function(name,
   log_info = c(log_info, "", "")
   tmp = paste0("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n",
                        "<<< Estimation of the prior >>>  \n")
+
   log_info = update_log(log_info, tmp, verbose)
 
   tmp = paste0("> Creating the full Z-Matrix  \n")
@@ -700,5 +700,5 @@ bGWAS <- function(name,
   results$nonZero_effects = Prior$non_zero
 
   class(results) = "bGWAS"
- return(results)
+  return(results)
 }

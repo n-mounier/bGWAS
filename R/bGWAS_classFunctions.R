@@ -286,13 +286,13 @@ if(save_file) grDevices::dev.off()
 extract_results_bGWAS <- function(obj, SNPs="significant"){
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
-  if(!SNPs %in% c("all", "significant")) stop("SNPs : should be \"all\" or \"significants\".")
+  if(!SNPs %in% c("all", "significant")) stop("SNPs : should be \"all\" or \"significant\".")
 
   if(SNPs=="all"){
     Res = obj$all_BFs
   } else {
     if(length(obj$significant_SNPs)==0){
-      stop("You can't extract \"significants\" results , because the analysis has been limited to prior estimation", call. = F)
+      stop("You can't extract \"significant\" results , because the analysis has been limited to prior estimation", call. = F)
     }
     Res = obj$all_BFs[rs %in% obj$significant_SNPs,]
   }
