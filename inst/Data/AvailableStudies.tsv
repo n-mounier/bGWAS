@@ -1,57 +1,1 @@
-File	ID	Trait	Consortium	Reference	MedianSampleSize	Comments
-All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq.gz	1	Body mass index	GIANT	https://www.ncbi.nlm.nih.gov/pubmed/25673413	NA	
-bip1.scz1.ruderfer2014..ANY	2	Schizophrenia	PGC	https://www.ncbi.nlm.nih.gov/pubmed/24280982	NA	
-bip1.scz1.ruderfer2014..bp_v_scz	3	Bipolar vs Schizophrenia	PGC	https://www.ncbi.nlm.nih.gov/pubmed/24280982	NA	
-bip1.scz1.ruderfer2014..scz_only	4	Bipolar disorder	PGC	https://www.ncbi.nlm.nih.gov/pubmed/24280982	NA	
-cardiogram_gwas_results.txt	5	Coronary Artery Disease	CARDIoGRAM	https://www.ncbi.nlm.nih.gov/pubmed/21378990	NA	CARDIoGRAM GWAS is a meta-analysis of 22 GWAS studies of European descent_
-DIAGRAMv3.2012DEC17.zip	6	Type 2 diabetes	DIAGRAM	https://www.ncbi.nlm.nih.gov/pubmed/22885922	NA	"http://www.diagram-consortium.org/about.html : UK (WTCCC), DGI and FUSION groups + DGDG, KORA, Rotterdam, DeCODE, EUROSPAN + the Framingham, ARIC and NHS studies http://www.diagram-consortium.org/downloads/DIAGRAMv3_GWAS.pdf"
-DIAGRAMv3.2013MAY07.zip	7	Type 2 diabetes	DIAGRAM	??	NA	"http://www.diagram-consortium.org/about.html : UK (WTCCC), DGI and FUSION groups + DGDG, KORA, Rotterdam, DeCODE, EUROSPAN + the Framingham, ARIC and NHS studies "
-EDUyears_2016_sumstat.txt	8	Education level	SSGAC	? https://www.ncbi.nlm.nih.gov/pubmed/27225129	293723	
-ENGAGE1000G_FG.txt.gz	9	Glucose	ENGAGE	https://www.ncbi.nlm.nih.gov/pubmed/26132169	NA	
-gcan_meta.out.gz	10	Anorexia	PGC	https://www.ncbi.nlm.nih.gov/pubmed/24514567	NA	
-GPC_1.NEO_OPENNESS.full.txt	11	Personality	GPC	https://www.ncbi.nlm.nih.gov/pubmed/21173776	NA	
-GPC_2.EXTRAVERSION.zip	12	Personality	GPC	https://www.ncbi.nlm.nih.gov/pubmed/26362575	NA	
-GPC_2.NEUROTICISM.zip	13	Personality	GPC	https://www.ncbi.nlm.nih.gov/pubmed/25993607	NA	
-ibd_cd.txt	14	Crohns disease	IBD	? https://www.ncbi.nlm.nih.gov/pubmed/21102463	NA	
-ibd_uc.txt	15	Ulcerative Colitis	IBD	? https://www.ncbi.nlm.nih.gov/pubmed/21297633	NA	
-jointGwasMc_HDL.txt.gz	16	Cholesterol-HDL	GLGC	https://www.ncbi.nlm.nih.gov/pubmed/24097068	NA	
-jointGwasMc_LDL.txt.gz	17	Cholesterol-LDL	GLGC	https://www.ncbi.nlm.nih.gov/pubmed/24097068	NA	
-jointGwasMc_TC.txt.gz	18	Cholesterol-total	GLGC	https://www.ncbi.nlm.nih.gov/pubmed/24097068	NA	
-jointGwasMc_TG.txt.gz	19	Triglycerides	GLGC	https://www.ncbi.nlm.nih.gov/pubmed/24097068	NA	
-MAGIC_FastingGlucose.txt.gz	20	Glucose	MAGIC	https://www.ncbi.nlm.nih.gov/pubmed/20081858	NA	
-MAGIC_ln_FastingInsulin.txt	21	Insulin	MAGIC	https://www.ncbi.nlm.nih.gov/pubmed/20081858	NA	
-MAGIC_ln_HOMA_B.txt	22	HOMA	MAGIC	https://www.ncbi.nlm.nih.gov/pubmed/20081858	NA	
-MAGIC_ln_HOMA_IR.txt	23	HOMA-IR	MAGIC	https://www.ncbi.nlm.nih.gov/pubmed/20081858	NA	
-MAGIC_Manning_et_al_FastingGlucose_MainEffect.txt...BMI	24	Glucose	MAGIC	https://www.ncbi.nlm.nih.gov/pubmed/22581228	NA	
-MAGIC_Manning_et_al_FastingGlucose_MainEffect.txt...PLAIN	25	Glucose	MAGIC	??	NA	
-MAGIC_Manning_et_al_lnFastingInsulin_MainEffect.txt...BMI	26	Insulin	MAGIC	https://www.ncbi.nlm.nih.gov/pubmed/22581228	NA	
-MAGIC_Manning_et_al_lnFastingInsulin_MainEffect.txt...PLAIN	27	Insulin	MAGIC	??	NA	
-META_STAGE1_GWASHR_SUMSTATS.txt	28	Heart Rate	HRgene	https://www.ncbi.nlm.nih.gov/pubmed/23583979	92355	
-MetaSum.height	29	Height	GIANT	??	NA	
-pgc.cross.aut	30	Autism	PGC	? https://www.ncbi.nlm.nih.gov/pubmed/23453885	NA	Check that the files on the PGC website are the same (even if different names)
-pgc.cross.BIP11.2013_05.txt	31	Bipolar disorder	PGC	??	NA	
-pgc.cross.full.2013_03	32	Cross Disorder	PGC	??	NA	
-pgc.cross.mdd	33	Major Depressive Disorder	PGC	??	NA	
-pgc.cross.scoring.5files..add_scz.zip	34	ADHD	PGC	??	NA	
-pgc.cross.scoring.5files..aut_bip.zip	35	Bipolar disorder	PGC	??	NA	
-pgc.cross.scoring.5files..bip_scz.zip	36	Autism	PGC	??	NA	
-pgc.cross.scoring.5files..mdd_scz.zip	37	Bipolar disorder	PGC	??	NA	
-pgc.cross.scoring.5files..scz_bip.zip	38	Schizophrenia	PGC	??	NA	
-pgc.cross.scz	39	Schizophrenia	PGC	??	NA	
-pgc.mdd.2012_04	40	Major Depressive Disorder	PGC	??	NA	
-pgc.scz.2012_04	41	Schizophrenia	PGC	??	NA	
-pgcasdeuro	42	Autism	PGC	??	10263	
-phs000089.pha002868.txt.ugz	43	Parkinsons	X	https://www.ncbi.nlm.nih.gov/pubmed/19915575	NA	"1,713 cases and 3,978 controls"
-phs000124.pha002845.txt.ugz	44	Neuroblastoma	X	https://www.ncbi.nlm.nih.gov/pubmed/18463370	NA	"1,032 cases and 2,043 controls"
-phs000124.pha002895.txt.ugz	45	Neuroblastoma	X	https://www.ncbi.nlm.nih.gov/pubmed/23222812	NA	"1,627 cases and 3,254 controls"
-phs000171.pha002861.txt.ugz	46	Multiple Sclerosis	X	https://www.ncbi.nlm.nih.gov/pubmed/19010793	NA	Ã¦978 cases and 883 controls
-DBP	47	Blood Pressure	ICBP	??	NA	From Peter
-SBP	48	Blood Pressure	ICBP	??	NA	From Peter
-scz.swe.pgc1.2013_11b.zip	49	Schizophrenia	PGC	??	NA	
-scz2.snp.results.txt	50	Schizophrenia	PGC	??	NA	
-SSGAC_College_Rietveld2013_publicrelease.txt	51	Education level	SSGAC	https://www.ncbi.nlm.nih.gov/pubmed/23722424	95427	
-tag.cpd.tbl.gz	52	Smoking	TAG	https://www.ncbi.nlm.nih.gov/pubmed/20418890	NA	
-tag.evrsmk.tbl.gz	53	Smoking	TAG	https://www.ncbi.nlm.nih.gov/pubmed/20418890	NA	
-tag.former.tbl.gz	54	Smoking	TAG	https://www.ncbi.nlm.nih.gov/pubmed/20418890	NA	
-tag.logonset.tbl.gz	55	Smoking	TAG	https://www.ncbi.nlm.nih.gov/pubmed/20418890	NA	
-TransEthnic_T2D_GWAS.MegaMeta.2014OCT16.zip	56	Type 2 diabetes	"DIAGRAM, AGEN-T2D, SAT2D, MAT2D"	https://www.ncbi.nlm.nih.gov/pubmed/24509480	NA	http://www.diagram-consortium.org/downloads/DIAGRAM_TransEthnic_T2D_GWAS.pdf
+File	ID	Trait	Consortium	Reference	MedianSampleSize	CommentsAll_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq.gz	1	Body mass index	GIANT	https://www.ncbi.nlm.nih.gov/pubmed/25673413	NA	bip1.scz1.ruderfer2014..ANY	2	Schizophrenia	PGC	https://www.ncbi.nlm.nih.gov/pubmed/24280982	NA	bip1.scz1.ruderfer2014..bp_v_scz	3	Bipolar vs Schizophrenia	PGC	https://www.ncbi.nlm.nih.gov/pubmed/24280982	NA	bip1.scz1.ruderfer2014..scz_only	4	Bipolar disorder	PGC	https://www.ncbi.nlm.nih.gov/pubmed/24280982	NA	cardiogram_gwas_results.txt	5	Coronary Artery Disease	CARDIoGRAM	https://www.ncbi.nlm.nih.gov/pubmed/21378990	NA	CARDIoGRAM GWAS is a meta-analysis of 22 GWAS studies of European descent_DIAGRAMv3.2012DEC17.zip	6	Type 2 diabetes	DIAGRAM	https://www.ncbi.nlm.nih.gov/pubmed/22885922	NA	"http://www.diagram-consortium.org/about.html : UK (WTCCC), DGI and FUSION groups + DGDG, KORA, Rotterdam, DeCODE, EUROSPAN + the Framingham, ARIC and NHS studies http://www.diagram-consortium.org/downloads/DIAGRAMv3_GWAS.pdf"DIAGRAMv3.2013MAY07.zip	7	Type 2 diabetes	DIAGRAM	??	NA	"http://www.diagram-consortium.org/about.html : UK (WTCCC), DGI and FUSION groups + DGDG, KORA, Rotterdam, DeCODE, EUROSPAN + the Framingham, ARIC and NHS studies "EDUyears_2016_sumstat.txt	8	Education level	SSGAC	? https://www.ncbi.nlm.nih.gov/pubmed/27225129	293723	ENGAGE1000G_FG.txt.gz	9	Glucose	ENGAGE	https://www.ncbi.nlm.nih.gov/pubmed/26132169	NA	gcan_meta.out.gz	10	Anorexia	PGC	https://www.ncbi.nlm.nih.gov/pubmed/24514567	NA	GPC_1.NEO_OPENNESS.full.txt	11	Personality	GPC	https://www.ncbi.nlm.nih.gov/pubmed/21173776	NA	GPC_2.EXTRAVERSION.zip	12	Personality	GPC	https://www.ncbi.nlm.nih.gov/pubmed/26362575	NA	GPC_2.NEUROTICISM.zip	13	Personality	GPC	https://www.ncbi.nlm.nih.gov/pubmed/25993607	NA	ibd_cd.txt	14	Crohns disease	IBD	? https://www.ncbi.nlm.nih.gov/pubmed/21102463	NA	ibd_uc.txt	15	Ulcerative Colitis	IBD	? https://www.ncbi.nlm.nih.gov/pubmed/21297633	NA	jointGwasMc_HDL.txt.gz	16	Cholesterol-HDL	GLGC	https://www.ncbi.nlm.nih.gov/pubmed/24097068	NA	jointGwasMc_LDL.txt.gz	17	Cholesterol-LDL	GLGC	https://www.ncbi.nlm.nih.gov/pubmed/24097068	NA	jointGwasMc_TC.txt.gz	18	Cholesterol-total	GLGC	https://www.ncbi.nlm.nih.gov/pubmed/24097068	NA	jointGwasMc_TG.txt.gz	19	Triglycerides	GLGC	https://www.ncbi.nlm.nih.gov/pubmed/24097068	NA	MAGIC_FastingGlucose.txt.gz	20	Glucose	MAGIC	https://www.ncbi.nlm.nih.gov/pubmed/20081858	NA	MAGIC_ln_FastingInsulin.txt	21	Insulin	MAGIC	https://www.ncbi.nlm.nih.gov/pubmed/20081858	NA	MAGIC_ln_HOMA_B.txt	22	HOMA	MAGIC	https://www.ncbi.nlm.nih.gov/pubmed/20081858	NA	MAGIC_ln_HOMA_IR.txt	23	HOMA-IR	MAGIC	https://www.ncbi.nlm.nih.gov/pubmed/20081858	NA	MAGIC_Manning_et_al_FastingGlucose_MainEffect.txt...BMI	24	Glucose	MAGIC	https://www.ncbi.nlm.nih.gov/pubmed/22581228	NA	MAGIC_Manning_et_al_FastingGlucose_MainEffect.txt...PLAIN	25	Glucose	MAGIC	??	NA	MAGIC_Manning_et_al_lnFastingInsulin_MainEffect.txt...BMI	26	Insulin	MAGIC	https://www.ncbi.nlm.nih.gov/pubmed/22581228	NA	MAGIC_Manning_et_al_lnFastingInsulin_MainEffect.txt...PLAIN	27	Insulin	MAGIC	??	NA	META_STAGE1_GWASHR_SUMSTATS.txt	28	Heart Rate	HRgene	https://www.ncbi.nlm.nih.gov/pubmed/23583979	92355	MetaSum.height	29	Height	GIANT	??	NA	pgc.cross.aut	30	Autism	PGC	? https://www.ncbi.nlm.nih.gov/pubmed/23453885	NA	Check that the files on the PGC website are the same (even if different names)pgc.cross.BIP11.2013_05.txt	31	Bipolar disorder	PGC	??	NA	pgc.cross.full.2013_03	32	Cross Disorder	PGC	??	NA	pgc.cross.mdd	33	Major Depressive Disorder	PGC	??	NA	pgc.cross.scoring.5files..add_scz.zip	34	ADHD	PGC	??	NA	pgc.cross.scoring.5files..aut_bip.zip	35	Bipolar disorder	PGC	??	NA	pgc.cross.scoring.5files..bip_scz.zip	36	Autism	PGC	??	NA	pgc.cross.scoring.5files..mdd_scz.zip	37	Bipolar disorder	PGC	??	NA	pgc.cross.scoring.5files..scz_bip.zip	38	Schizophrenia	PGC	??	NA	pgc.cross.scz	39	Schizophrenia	PGC	??	NA	pgc.mdd.2012_04	40	Major Depressive Disorder	PGC	??	NA	pgc.scz.2012_04	41	Schizophrenia	PGC	??	NA	pgcasdeuro	42	Autism	PGC	??	10263	phs000089.pha002868.txt.ugz	43	Parkinsons	X	https://www.ncbi.nlm.nih.gov/pubmed/19915575	NA	"1,713 cases and 3,978 controls"phs000124.pha002845.txt.ugz	44	Neuroblastoma	X	https://www.ncbi.nlm.nih.gov/pubmed/18463370	NA	"1,032 cases and 2,043 controls"phs000124.pha002895.txt.ugz	45	Neuroblastoma	X	https://www.ncbi.nlm.nih.gov/pubmed/23222812	NA	"1,627 cases and 3,254 controls"phs000171.pha002861.txt.ugz	46	Multiple Sclerosis	X	https://www.ncbi.nlm.nih.gov/pubmed/19010793	NA	æ978 cases and 883 controlsphs000585.pha003588.txt.gz	47	Blood Pressure	ICBP	??	NA	Direction issuephs000585.pha003589.txt.gz	48	Blood Pressure	ICBP	??	NA	Direction issuephs000585.pha003590.txt.gz	49	Blood Pressure	ICBP	??	NA	Direction issuephs000585.pha003591.txt.gz	50	Blood Pressure	ICBP	??	NA	Direction issuescz.swe.pgc1.2013_11b.zip	51	Schizophrenia	PGC	??	NA	scz2.snp.results.txt	52	Schizophrenia	PGC	??	NA	SSGAC_College_Rietveld2013_publicrelease.txt	53	Education level	SSGAC	https://www.ncbi.nlm.nih.gov/pubmed/23722424	95427	tag.cpd.tbl.gz	54	Smoking	TAG	https://www.ncbi.nlm.nih.gov/pubmed/20418890	NA	tag.evrsmk.tbl.gz	55	Smoking	TAG	https://www.ncbi.nlm.nih.gov/pubmed/20418890	NA	tag.former.tbl.gz	56	Smoking	TAG	https://www.ncbi.nlm.nih.gov/pubmed/20418890	NA	tag.logonset.tbl.gz	57	Smoking	TAG	https://www.ncbi.nlm.nih.gov/pubmed/20418890	NA	TransEthnic_T2D_GWAS.MegaMeta.2014OCT16.zip	58	Type 2 diabetes	"DIAGRAM, AGEN-T2D, SAT2D, MAT2D"	https://www.ncbi.nlm.nih.gov/pubmed/24509480	NA	http://www.diagram-consortium.org/downloads/DIAGRAM_TransEthnic_T2D_GWAS.pdf
