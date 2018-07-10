@@ -111,6 +111,7 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkag
   tmp = "# Calculating the prior chromosome by chromosome... \n"
   Log = update_log(Log, tmp, verbose)
 
+  R2=numeric(22)
 
   for(chrm in 1:22) {
     tmp = paste0("   Chromosome ", chrm, "\n")
@@ -221,8 +222,40 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkag
 
     all.priors = rbind(all.priors, nice.table)
 
+    tmp = "Calculating out of sample prediction for SNPs on this chromosome, \n"
+    Log = update_log(Log, tmp, verbose)
+
+    outcome = colnames(MR_ZMatrix)[ncol(MR_ZMatrix)]
+
+
+    # all SNPs we need to predict (the ones on this chromosome)
+    d_test             = MR_ZMatrix[chrm==chrm_          ,,drop=T]
+
+
+    predict(fit_masked, d_test, se.fit=T) -> preds
+
+
+
+    test.outcome    <- as.numeric(unlist(d_test[,..outcome]))
+
+    SS.total      <- sum((test.outcome - mean(test.outcome))^2)
+    SS.regression <- sum((preds$fit - mean(test.outcome))^2)
+
+
+    # fraction of variability explained by the model : SS.regression/SS.total
+    R2_chrm =  1-(1-SS.regression/SS.total)*(nrow(d_masked)-1)/(nrow(d_masked)-length(dynamic.study.names)-1)
+    tmp = paste0("Adjusted R-squared : ", round(R2_chrm, 4), "\n")
+    Log = update_log(Log, tmp, verbose)
+
+    R2[chrm] =R2_chrm
+
   }
   colnames(all.priors)[6:8] = c("observed_Z", "prior_estimate", "prior_std_error")
+
+  tmp = paste0("## Mean out-of-sample adjusted R-squared across all chromosomes is ", round(mean(R2), 4), "\n")
+  Log = update_log(Log, tmp, verbose)
+  tmp = paste0("## Median out-of-sample adjusted R-squared across all chromosomes is ", round(median(R2), 4), "\n")
+  Log = update_log(Log, tmp, verbose)
 
   ## we need to add one to the prior variance to account for the fact that we are
   ## predicting a noisy variable : observedZ ~ N(trueZ, 1)

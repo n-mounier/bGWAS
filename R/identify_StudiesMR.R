@@ -336,6 +336,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
 
 
 
+
   colnames(coefs) = c("study", "estimate", "std_error", "T", "P")
 
   if(save_files){
@@ -348,9 +349,15 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
     Files_Info$multi_P = numeric()
     Files_Info$multi_P[match(coefs$study, Files_Info$File)] = coefs$P
   }
+  outcome = colnames(ZMatrix)[ncol(ZMatrix)]
 
-
-
+  tmp = paste0("Estimating adjusted R-squared: \n")
+  Log = update_log(Log, tmp, verbose)
+  R2_Multi = summary(lm(data=ZMatrix, formula = generate.formula(outcome, final_set_of_study_names)))$adj.r.squared
+  tmp = paste0("- in-sample adjusted R-squared for the all-chromosomes multivariate regression is ", R2_Multi, " \n")
+  Log = update_log(Log, tmp, verbose)
+  tmp = paste0("- out-of-sample adjusted R-squared, by chromosome, for the multivariate regression will be estimated when calculating the prior. \n")
+  Log = update_log(Log, tmp, verbose)
 
 
   if(save_files)                write.table(Files_Info, file="PriorGWASs.tsv", sep="\t", quote=F, row.names=F )
