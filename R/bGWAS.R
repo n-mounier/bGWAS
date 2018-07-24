@@ -193,13 +193,21 @@ bGWAS <- function(name,
 
   ## ZMatrices
  if (is.character(Z_matrices)){
-    if(!file.exists(paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz"))) stop("No ZMatrix_Imputed.csv.gz file in specified Z_matrices folder", call. = FALSE)
-    if(!file.exists(paste0(Z_matrices, "/ZMatrix_NotImputed.csv.gz"))) stop("No ZMatrix_NotImputed.csv.gz file in specified Z_matrices folder", call. = FALSE)
-    # Define if the path is relative or not
-    if(!substr(Z_matrices,1,1) %in% c("/", "~")){
-      Z_matrices=paste0(InitPath, "/", Z_matrices)
-    }
-  } else stop("Z_matrices : wrong format, should be character", call. = FALSE)
+   if(!file.exists(paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz"))) stop("No \"ZMatrix_Imputed.csv.gz\" file in specified Z_matrices folder", call. = FALSE)
+   if(!file.exists(paste0(Z_matrices, "/ZMatrix_NotImputed.csv.gz"))) stop("No \"ZMatrix_NotImputed.csv.gz\" file in specified Z_matrices folder", call. = FALSE)
+   if(!file.exists(paste0(Z_matrices, "/AvailableStudies.tsv"))) stop("No \"AvailableStudies.tsv\" file in specified Z_matrices folder", call. = FALSE)
+
+   # Define if the path is relative or not
+   if(!substr(Z_matrices,1,1) %in% c("/", "~")){
+     Z_matrices=paste0(InitPath, "/", Z_matrices)
+   }
+ } else stop("Z_matrices : wrong format, should be character", call. = FALSE)
+
+  MR_Files =  colnames(data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_NotImputed.csv.gz")), nrows=0, showProgress = FALSE))[-(1:5)]
+  Prior_Files =  colnames(data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz")), nrows=0, showProgress = FALSE))[-(1:5)]
+  List_Files = list_files(Z_matrices=Z_matrices)
+  if(!all(MR_Files==Prior_Files)) stop("Z_matrices : columns unconsistent between of the two files")
+  if(!all(MR_Files==List_Files))  stop("Z_matrices : columns unconsistent with \"AvailableStudies.tsv\"")
 
   tmp = paste0("The Z-Matrix files are stored in \"", Z_matrices, "\".  \n")
   log_info = update_log(log_info, tmp, verbose)
