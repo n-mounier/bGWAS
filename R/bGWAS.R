@@ -210,9 +210,9 @@ bGWAS <- function(name,
   ## GWAS of interest, should be a path to a GWAS file (format ? .tar.gz or file ?), a data.frame or an ID
   TMP_FILE = F # flag : is a temporary file with Z-scores created ??
   if(is.numeric(GWAS)) { # if it is an ID
-    if(!GWAS %in% c(1:length(list_files()))) stop("The ID specified as a conventional GWAS is not in the list", call. = FALSE)
+    if(!GWAS %in% c(1:length(list_files(Z_matrices = Z_matrices)))) stop("The ID specified as a conventional GWAS is not in the list", call. = FALSE)
     tmp = paste0("The conventional GWAS used as input is:",
-                 list_files(IDs=GWAS), " (ID = ",  GWAS,").  \n")
+                 list_files(IDs=GWAS, Z_matrices = Z_matrices), " (ID = ",  GWAS,").  \n")
     log_info = update_log(log_info, tmp, verbose)
   } else if(is.character(GWAS)) { # if it is a file
     # First, does the file exists ?
@@ -384,12 +384,12 @@ bGWAS <- function(name,
   ## prior_studies
   # check that all the files required exist in our list of studies
   # should be specified as "File ID"
-  if(is.null(prior_studies)) prior_studies = c(1:length(list_files()))
-  if(!all(prior_studies %in% c(1:length(list_files())))) stop("prior_studies : all the IDs provided should belong to the ones available", call. = FALSE)
+  if(is.null(prior_studies)) prior_studies = c(1:length(list_files(Z_matrices = Z_matrices)))
+  if(!all(prior_studies %in% c(1:length(list_files(Z_matrices = Z_matrices))))) stop("prior_studies : all the IDs provided should belong to the ones available", call. = FALSE)
   # if GWAS from data, make sure to remove it
   if(is.numeric(GWAS) && GWAS %in% prior_studies){
     prior_studies = prior_studies[-GWAS]
-    tmp = paste0("The study ", list_files(IDs=GWAS), " (ID=", GWAS, ") has been removed from the studies used to build the prior since it is used as conventionnal GWAS. \n")
+    tmp = paste0("The study ", list_files(IDs=GWAS, Z_matrices = Z_matrices), " (ID=", GWAS, ") has been removed from the studies used to build the prior since it is used as conventionnal GWAS. \n")
     log_info = update_log(log_info, tmp, verbose)
 ### TO BE DONE
     # check that the user did not use exactly the same study for GWAS and for Prior,
@@ -516,7 +516,7 @@ bGWAS <- function(name,
     tmp = paste0("# Initializing the summary information file\n")
     log_info = update_log(log_info, tmp, verbose)
 
-    Files_Info = list_priorGWASs()
+    Files_Info = list_priorGWASs(Z_matrices = Z_matrices)
     # keep only interesting columns + add "Status" column
     Files_Info = Files_Info[, c(1,3:6)]
     Files_Info$status= "Exluded by user"
@@ -576,14 +576,14 @@ bGWAS <- function(name,
 
   tmp = paste0("> Creating the full Z-Matrix  \n")
   log_info = update_log(log_info, tmp, verbose)
-  Studies = select_priorGWASs(include_files=res_MR$studies$study_selected)
+  Studies = select_priorGWASs(include_files=res_MR$studies$study_selected, Z_matrices = Z_matrices)
   matrix_all = makeFull_ZMatrix(Studies, GWAS, Z_matrices, save_files, verbose)
   log_info = c(log_info,matrix_all$log_info)
 
   tmp = paste0("> Computing prior  \n")
   log_info = update_log(log_info, tmp, verbose)
 
-  Prior = compute_prior(res_MR$studies,matrix_MR$mat, matrix_all$mat, MR_shrinkage, prior_shrinkage, save_files, verbose)
+  Prior = compute_prior(res_MR$studies,matrix_MR$mat, matrix_all$mat, MR_shrinkage, prior_shrinkage, Z_matrices, save_files, verbose)
   log_info = c(log_info, Prior$log_info)
   # if error/problem in compute_prior
   if(isTRUE(Prior$stop)){

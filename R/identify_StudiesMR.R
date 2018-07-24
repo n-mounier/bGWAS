@@ -125,7 +125,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
     too.high=which(uni.coefs.collection$r.squared>0.7)
     Names = uni.coefs.collection[too.high,"nm"]
     r2 = uni.coefs.collection[too.high,"r.squared"]
-    S = list_priorGWASs()
+    S = list_priorGWASs(Z_matrices = Z_matrices)
     IDs = S$ID[match(Names$nm, S$File)]
     Ref = paste0(Names$nm, " (ID = ", IDs, " - r2 = ", r2$r.squared, ")")
 

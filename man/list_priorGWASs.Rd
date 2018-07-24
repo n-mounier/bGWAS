@@ -4,7 +4,7 @@
 \alias{list_priorGWASs}
 \title{Get list of studies that can be used to build the prior}
 \usage{
-list_priorGWASs(IDs = NULL, verbose = F)
+list_priorGWASs(IDs = NULL, Z_matrices = "~/ZMatrices/", verbose = F)
 }
 \arguments{
 \item{IDs}{numeric,}

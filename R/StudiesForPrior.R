@@ -10,9 +10,10 @@
 #' @return Data.Frame of details for all available studies
 #' @export
 
-list_priorGWASs <- function(IDs=NULL, verbose=F) {
+list_priorGWASs <- function(IDs=NULL, Z_matrices = "~/ZMatrices/", verbose=F) {
   if(!is.null(IDs) && !is.numeric(IDs)) stop("ID : should be numeric")
-  Studies = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), showProgress = FALSE)
+  #Studies = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), showProgress = FALSE)
+  Studies = data.table::fread(paste0(Z_matrices, "/AvailableStudies.tsv"), showProgress = FALSE)
   if(!is.null(IDs)){
     Studies=Studies[IDs, ]
   }
@@ -26,16 +27,18 @@ list_priorGWASs <- function(IDs=NULL, verbose=F) {
 # #' @param IDs The IDs of the files to be listed, by default=NULL, list all files (numeric)
 # #' @return List of files
 
-list_files <- function(IDs=NULL, verbose=F) {
+list_files <- function(IDs=NULL, Z_matrices = "~/ZMatrices/", verbose=F) {
   if(is.null(IDs)) {
-    Files = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "File", showProgress = FALSE)$File
+    Files = data.table::fread(paste0(Z_matrices, "/AvailableStudies.tsv"), select = "File", showProgress = FALSE)
+
+    #Files = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "File", showProgress = FALSE)$File
   } else {
     # check that the IDs exists
     Studies = list_priorGWASs()
     if(!all(IDs %in% Studies$ID)) print("Please check the IDs, some of them do not match")
     Files = Studies$File[match(IDs, Studies$ID)]
   }
-  return(Files)
+  return(Files$File)
 }
 
 
@@ -44,8 +47,8 @@ list_files <- function(IDs=NULL, verbose=F) {
 # #' Get list of traits with available GWAS summary statistics
 # #' @return List of traits
 
-list_traits <- function(verbose=F) {
-  Traits = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "Trait", showProgress = FALSE)$Trait
+list_traits <- function(Z_matrices = "~/ZMatrices/", verbose=F) {
+  Traits = data.table::fread(paste0(Z_matrices, "/AvailableStudies.tsv"), select = "Trait", showProgress = FALSE)$Trait
   return(unique(Traits))
 }
 
@@ -56,8 +59,8 @@ list_traits <- function(verbose=F) {
 # #' @return List of consortia
 
 
-list_consortia <- function(verbose=F) {
-  Consortia = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "Consortium", showProgress = FALSE)$Consortium
+list_consortia <- function(Z_matrices = "~/ZMatrices/", verbose=F) {
+  Consortia = data.table::fread(paste0(Z_matrices, "/AvailableStudies.tsv"), select = "Consortium", showProgress = FALSE)$Consortium
   return(unique(Consortia))
 }
 
@@ -84,17 +87,17 @@ list_consortia <- function(verbose=F) {
 
 
 select_priorGWASs <- function(include_files=NULL, include_traits=NULL, includeConsortia=NULL,
-                          exclude_files=NULL, exclude_traits=NULL, excludeConsortia=NULL, verbose=F) {
+                          exclude_files=NULL, exclude_traits=NULL, excludeConsortia=NULL, Z_matrices = "~/ZMatrices/", verbose=F) {
   # Check parameters
   if(is.null(c(include_files,include_traits,includeConsortia, exclude_files,exclude_traits,excludeConsortia))) stop("You did not specify any criteria for the selection.")
-  Studies = list_priorGWASs()
+  Studies = list_priorGWASs(Z_matrices = Z_matrices)
 
-  if(!all(include_files %in% list_files())) stop("Some files specified in Files are not correct")
-  if(!all(exclude_files %in% list_files())) stop("Some files specified in Files are not correct")
-  if(!all(include_traits %in% list_traits())) stop("Some traits in Traits specified are not correct")
-  if(!all(exclude_traits %in% list_traits())) stop("Some traits in Traits specified are not correct")
-  if(!all(includeConsortia %in% list_consortia())) stop("Some consortia specified in Consortia are not correct")
-  if(!all(excludeConsortia %in% list_consortia())) stop("Some consortia specified in Consortia are not correct")
+  if(!all(include_files %in% list_files(Z_matrices = Z_matrices))) stop("Some files specified in Files are not correct")
+  if(!all(exclude_files %in% list_files(Z_matrices = Z_matrices))) stop("Some files specified in Files are not correct")
+  if(!all(include_traits %in% list_traits(Z_matrices))) stop("Some traits in Traits specified are not correct")
+  if(!all(exclude_traits %in% list_traits(Z_matrices))) stop("Some traits in Traits specified are not correct")
+  if(!all(includeConsortia %in% list_consortia(Z_matrices))) stop("Some consortia specified in Consortia are not correct")
+  if(!all(excludeConsortia %in% list_consortia(Z_matrices))) stop("Some consortia specified in Consortia are not correct")
 
   # Should not be possible to include / exclude the same file given different criteria
   # or it could...

@@ -6,7 +6,7 @@
 \usage{
 select_priorGWASs(include_files = NULL, include_traits = NULL,
   includeConsortia = NULL, exclude_files = NULL, exclude_traits = NULL,
-  excludeConsortia = NULL, verbose = F)
+  excludeConsortia = NULL, Z_matrices = "~/ZMatrices/", verbose = F)
 }
 \arguments{
 \item{include_files}{list of file names}

@@ -126,6 +126,7 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
                                "BF_P" ) ,
                    snp = "rs",
                    col = c("gray10", "gray60"),
+                   cex = 0.6,
                    suggestiveline = FALSE,
                    genomewideline = -log10(threshold),
                    highlight = NULL,
@@ -212,7 +213,8 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
 
   coeffs = obj$significant_studies
   # add the trait name (if multiple studies for a same trait, add " - X" )
-  all_studies =  list_priorGWASs()
+  Z_matrices = strsplit(obj$log_info[stringr::str_detect(obj$log_info, "The Z-Matrix files are stored in \"")], "\"")[[1]][2]
+  all_studies =  list_priorGWASs(Z_matrices = Z_matrices)
   coeffs$Trait = unlist(all_studies[match(coeffs$study, all_studies$File), "Trait"])
   if(length(unique(coeffs$Trait))!=nrow(coeffs)){
     for(t in unique(coeffs$Trait)){
@@ -435,3 +437,155 @@ update_log <- function(log_obj, text, verbose=F){
   if(verbose) cat(text)
   return(log_obj)
 }
+
+
+
+
+
+
+# miami_plot_bGWAS() <- function (obj, P1, P2, threshold_min){
+#   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
+#   if(is.null(obj$all_MRcoeffs)) stop("The prior has not been created using Prior GWASs, there are no coefficients to extract")
+#
+#   # add corrected ? "Difference"
+#   if(!P1 %in% c("Obs", "Prior", "Posterior", "Difference")) stop("P1: should be \"Obs\", \"Prior\", \"Posterior\" or \"Difference\".")
+#   if(!P2 %in% c("Obs", "Prior", "Posterior", "Difference")) stop("P2: should be \"Obs\", \"Prior\", \"Posterior\" or \"Difference\".")
+#   if(P1==P2) stop("P1 and P2 should be different!.")
+#
+#   if(!is.numeric(threshold)) stop("threshold: should be numeric.")
+#
+#   # 1) Identify columns and get P-values
+#   myData = obj$all_BFs[,1:3]
+#   if(P1=="Obs"){
+#     myData$P1 = 2*pnorm(-abs(obj$all_BFs$observed_Z))
+#   } else if(P1=="Prior"){
+#     ZPrior = obj$all_BFs$prior_estimate/ obj$all_BFs$prior_std_error
+#     myData$P1 = 2*pnorm(-abs(ZPrior))
+#   } else if(P1=="Posterior"){
+#     ZPosterior = obj$all_BFs$posterior_estimate/ obj$all_BFs$posterior_std_error
+#     myData$P1 = 2*pnorm(-abs(ZPosterior))
+#   } else if(P1=="Difference"){
+#     ZDiff = (obj$all_BFs$observed_Z-obj$all_BFs$prior_estimate)/sqrt(1^2+obj$all_BFs$prior_std_error^2)
+#     myData$P1 = 2*pnorm(-abs(ZDiff))
+#   }
+#   if(P2=="Obs"){
+#     myData$P2 = 2*pnorm(-abs(obj$all_BFs$observed_Z))
+#   } else if(P2=="Prior"){
+#     ZPrior = obj$all_BFs$prior_estimate/ obj$all_BFs$prior_std_error
+#     myData$P2 = 2*pnorm(-abs(ZPrior))
+#   } else if(P2=="Posterior"){
+#     ZPosterior = obj$all_BFs$posterior_estimate/ obj$all_BFs$posterior_std_error
+#     myData$P2 = 2*pnorm(-abs(ZPosterior))
+#   } else if(P2=="Difference"){
+#     ZDiff = (obj$all_BFs$observed_Z-obj$all_BFs$prior_estimate)/sqrt(1^2+obj$all_BFs$prior_std_error^2)
+#     myData$P2 = 2*pnorm(-abs(ZDiff))
+#   }
+#
+#   # 2) threshold
+#   myData = myData[myData$P1 < threshold | myData$P2 < threshold,]
+#   myData$P1 = -log10(myData$P1)
+#   myData$P2 =  log10(myData$P2)
+#   d = data.frame(rs=rep(myData$rs,2),CHR=rep(myData$chrm,2), BP=rep(myData$pos,2),
+#                       P=c(myData$P1, myData$P2))
+#
+#
+#   #if (!is.null(x[[snp]]))
+#   #  d = transform(d, SNP = x[[snp]])
+#   #d <- subset(d, (is.numeric(CHR) & is.numeric(BP) & is.numeric(P)))
+#   d <- d[order(d$CHR, d$BP), ]
+#
+#   d$pos = NA
+#   d$index = NA
+#   ind = 0
+#   for (i in unique(d$CHR)) {
+#     ind = ind + 1
+#     d[d$CHR == i, ]$index = ind
+#   }
+#   nchr = length(unique(d$CHR))
+#   if (nchr == 1) {
+#     d$pos = d$BP
+#     ticks = floor(length(d$pos))/2 + 1
+#     xlabel = paste("Chromosome", unique(d$CHR), "position")
+#     labs = ticks
+#   }  else {
+#     lastbase = 0
+#     ticks = NULL
+#     for (i in unique(d$index)) {
+#       if (i == 1) {
+#         d[d$index == i, ]$pos = d[d$index == i, ]$BP
+#       }      else {
+#         lastbase = lastbase + tail(subset(d, index ==
+#                                             i - 1)$BP, 1)
+#         d[d$index == i, ]$pos = d[d$index == i, ]$BP +
+#           lastbase
+#       }
+#       ticks = c(ticks, (min(d[d$index == i, ]$pos) + max(d[d$index ==
+#                                                              i, ]$pos))/2 + 1)
+#     }
+#     xlabel = "Chromosome"
+#     labs <- unique(d$CHR)
+#   }
+#   xmax = ceiling(max(d$pos) * 1.03)
+#   xmin = floor(max(d$pos) * -0.03)
+#   def_args <- list(xaxt = "n", bty = "n", xaxs = "i", yaxs = "i",
+#                    las = 1, pch = 20, xlim = c(xmin, xmax), ylim = c(ceiling(-max(d$P)),
+#                                                                      ceiling(max(d$P))), xlab = xlabel, ylab = expression(-log[10](italic(p))))
+#   dotargs <- NULL
+#   do.call("plot", c(NA, dotargs, def_args[!names(def_args) %in%
+#                                             names(dotargs)]))
+#
+#     axis(1, at = ticks, labels = labs)
+#
+#   col = rep(c("grey", "black"), max(d$CHR))
+#   if (nchr == 1) {
+#     with(d, points(pos, P, pch = 20, col = col[1], ...))
+#   } else {
+#     icol = 1
+#     for (i in unique(d$index)) {
+#       with(d[d$index == unique(d$index)[i], ], points(pos,
+#                                                       P, col = col[icol], pch = 20))
+#       icol = icol + 1
+#     }
+#   }
+#
+#
+#   if (suggestiveline)
+#     abline(h = suggestiveline, col = "blue")
+#   if (genomewideline)
+#     abline(h = genomewideline, col = "red")
+#   if (!is.null(highlight)) {
+#     if (any(!(highlight %in% d$SNP)))
+#       warning("You're trying to highlight SNPs that don't exist in your results.")
+#     d.highlight = d[which(d$SNP %in% highlight), ]
+#     with(d.highlight, points(pos, logp, col = "green3", pch = 20,
+#                              ...))
+#   }
+#   if (!is.null(annotatePval)) {
+#     topHits = subset(d, P <= annotatePval)
+#     par(xpd = TRUE)
+#     if (annotateTop == FALSE) {
+#       with(subset(d, P <= annotatePval), textxy(pos, -log10(P),
+#                                                 offset = 0.625, labs = topHits$SNP, cex = 0.45),
+#            ...)
+#     }
+#     else {
+#       topHits <- topHits[order(topHits$P), ]
+#       topSNPs <- NULL
+#       for (i in unique(topHits$CHR)) {
+#         chrSNPs <- topHits[topHits$CHR == i, ]
+#         topSNPs <- rbind(topSNPs, chrSNPs[1, ])
+#       }
+#       textxy(topSNPs$pos, -log10(topSNPs$P), offset = 0.625,
+#              labs = topSNPs$SNP, cex = 0.5, ...)
+#     }
+#   }
+#   par(xpd = FALSE)
+# }
+
+get_RSquared <- function(obj){ # obj should be a bGWAS object
+  Line =  obj$log_info[stringr::str_detect(obj$log_info, "Median out-of-sample adjusted R-squared across all chromosomes is ")]
+  R2 = as.numeric(stringr::str_split(Line, "is ")[[1]][2])
+  return(R2)
+}
+
+

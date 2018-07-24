@@ -16,7 +16,7 @@
 #  Function not exported, no need of extended documentation?
 
 
-compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkage, prior_shrinkage, save_files=FALSE, verbose=FALSE){
+compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkage, prior_shrinkage, Z_matrices, save_files=FALSE, verbose=FALSE){
 
   Log = c()
 
@@ -31,12 +31,12 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkag
   # but for other cases, allow the use of a file
   if(data.table::is.data.table(selected_studies)){ # ok, but still need to check that the format is ok
     # i.e. all the studies listed are part of list_files()
-    if(!all(selected_studies$study_selected %in% list_files())) stop("The studies are not in our list", call. = FALSE)
+    if(!all(selected_studies$study_selected %in% list_files(Z_matrices = Z_matrices))) stop("The studies are not in our list", call. = FALSE)
     selected_studies = selected_studies$study_selected
   } else if(is.character(selected_studies)){ # TO BE DONE
     selected_studies <- data.table::fread(selected_studies,showProgress = FALSE)
     # check that the studies names are part of list file
-    if(!all(selected_studies %in% list_files())) stop("The studies are not in our list",  call. = FALSE)
+    if(!all(selected_studies %in% list_files(Z_matrices = Z_matrices))) stop("The studies are not in our list",  call. = FALSE)
   } else {
     stop("Selected Studies provided not correct",  call. = FALSE)
   }
