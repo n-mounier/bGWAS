@@ -6,6 +6,8 @@
 #'
 #' Get list of studies with available GWAS summary statistics
 #' @param IDs numeric,
+#' @param Z_matrices The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
+#'        (character)
 #' @param verbose boolean, default = FALSE
 #' @return Data.Frame of details for all available studies
 #' @export
@@ -25,6 +27,9 @@ list_priorGWASs <- function(IDs=NULL, Z_matrices = "~/ZMatrices/", verbose=F) {
 # #'
 # #' Get list of studies with available GWAS summary statistics
 # #' @param IDs The IDs of the files to be listed, by default=NULL, list all files (numeric)
+# #' @param Z_matrices The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
+# #'        (character)
+# #' @param verbose boolean, default = FALSE
 # #' @return List of files
 
 list_files <- function(IDs=NULL, Z_matrices = "~/ZMatrices/", verbose=F) {
@@ -45,6 +50,9 @@ list_files <- function(IDs=NULL, Z_matrices = "~/ZMatrices/", verbose=F) {
 # #' Get traits from studies that can be used to build the prior
 # #'
 # #' Get list of traits with available GWAS summary statistics
+# #' @param Z_matrices The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
+# #'        (character)
+# #' @param verbose boolean, default = FALSE
 # #' @return List of traits
 
 list_traits <- function(Z_matrices = "~/ZMatrices/", verbose=F) {
@@ -56,6 +64,9 @@ list_traits <- function(Z_matrices = "~/ZMatrices/", verbose=F) {
 # #' Get consortia from studies that can be used to build the prior
 # #'
 # #' Get list of consortia with available GWAS summary statistics
+# #' @param Z_matrices The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
+# #'        (character)
+# #' @param verbose boolean, default = FALSE
 # #' @return List of consortia
 
 
@@ -76,7 +87,9 @@ list_consortia <- function(Z_matrices = "~/ZMatrices/", verbose=F) {
 #' @param exclude_files list of file names
 #' @param exclude_traits list of trait
 #' @param exclude_consortium vector, list of consortium ### TO BE DONE?
-#' @param verbose boolean
+#' @param Z_matrices The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
+#'        (character)
+#' @param verbose boolean, default = FALSE
 #' @return IDs of studies that meet the criteria
 #' @examples
 #'   AllStudies = list_priorGWASs()

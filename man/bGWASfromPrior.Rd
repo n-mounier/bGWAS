@@ -2,32 +2,66 @@
 % Please edit documentation in R/bGWASfromPrior.R
 \name{bGWASfromPrior}
 \alias{bGWASfromPrior}
-\title{bGWAS - Main Function, using pre-computed prior}
+\title{bGWAS - using pre-computed priors}
 \usage{
-bGWASfromPrior(Name, GWAS, IncludeForPrior = NULL, ListOfSNPs = NULL,
-  MRthreshold = 1e-04, OutPath = getwd(), saveFiles = T, verbose = F)
+bGWASfromPrior(name, GWAS, SNPs_list = NULL, sign_method = "p",
+  sign_thresh = 5e-08, prune_res = FALSE, save_files = FALSE,
+  verbose = FALSE)
 }
 \arguments{
-\item{Name}{character, name of your analysis}
+\item{name}{The name of the analysis (character)}
 
-\item{GWAS}{character, path to your conventionnal GWAS of interest - columns needed :}
+\item{GWAS}{The path to the conventional GWAS of interest, the ID of the GWAS from the
+list of studies available (prior GWASs), or a data.frame (character, numeric or data.frame)}
 
-\item{IncludeForPrior}{vector, list of files to include when creating the prior, by default=NULL, will include all the studies available.
-See XXX for the full list.}
+\item{SNPs_list, }{The path to a file containing the rsids of the SNPs to use ,
+\code{default=NULL}, will use all the SNPs in common between prior GWASs and the
+conventionnal GWAS (character)
+      # NOT IMPLEMENTED YET}
 
-\item{MRthreshold}{numeric, threshold used to select strong instruments for MR, should be lower than 1e-5, by default=1e-5}
+\item{sign_method}{The method used to identify significant SNPs, should be \code{"p"} for
+p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)}
 
-\item{OutPath}{character, path to the outputs, needed if saveFiles is TRUE, by default, current working dictory}
+\item{sign_thresh}{The threshold used to identify significant SNPs, \code{default="5.10e-8"}
+(numeric)}
 
-\item{saveFiles}{boolean,}
+\item{prune_res}{A logical indicating if the results should be pruned (by distance, 500kb),
+\code{default=FALSE}}
 
-\item{verbose}{boolean,}
+\item{save_files}{A logical indicating if the results should be saved as files,
+\code{default=FALSE}}
 
-\item{GWAS}{character or numeric, path to your conventionnal GWAS of interest or ID of the GWAS}
+\item{verbose}{A logical indicating if information on progress should be reported,
+\code{default=FALSE}}
 }
 \value{
-Value Res
+\code{bGWAS}() returns an object of class "bGWAS". \cr
+Additionnaly, if \code{save_files=T}, several files are created... \cr
+... in your working directory :
+\itemize{
+\item  "\code{name}.log" - log file
+}
+... in the folder \code{./name/} :
+\itemize{
+\item "PriorBFp.csv" - contains BF and p-values estimated for all SNPs
+\item "SignificantSNPs.csv" - contains BF and p-values estimated for a subset of SNPs
+}
 }
 \description{
-Performs a bayesian GWAS
+Performs a Bayesian GWAS from Summary Statistics, comparing prior effects provided
+by the user, to observed Z-scores
+}
+\details{
+\code{Name} and \code{GWAS} are required arguments.
+If \code{GWAS} is a path to a file (regular or .gz) or a data.frame, it should contain the following
+columns : \cr
+SNPID (rs numbers) should be : \code{rs}, \code{rsid}, \code{snp}, \code{snpid}, \code{rnpid} \cr
+A1 should be : \code{a1}, \code{alt}, \code{alts} \cr
+A2 should be : \code{a2}, \code{a0}, \code{ref} \cr
+Z should be : \code{z}, \code{Z}, \code{zscore} \cr
+If Z is not present, it can be calculated from BETA and SE, in this case, a temporary
+gzipped file is created and removed after the analysis. \cr
+BETA should be : \code{b}, \code{beta}, \code{beta1} \cr
+SE should be : \code{se}, \code{std} \cr
+## ADD column PriorEffect/PriorSE
 }

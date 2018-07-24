@@ -17,7 +17,10 @@ select_priorGWASs(include_files = NULL, include_traits = NULL,
 
 \item{exclude_traits}{list of trait}
 
-\item{verbose}{boolean}
+\item{Z_matrices}{The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
+(character)}
+
+\item{verbose}{boolean, default = FALSE}
 
 \item{include_consortium}{vector, list of consortium ### TO BE DONE?}
 

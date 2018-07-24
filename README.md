@@ -6,7 +6,7 @@
 We are currently implementing new functions, to make the approach more robust, more flexible and faster. Check the NEWS to learn more about what has been modified.
     
     
-:warning: If you downloaded the Z-Matrix files before 25/02/2018, they are obsolete, you need to delete the old ones and download the new ones!   
+:warning: If you downloaded the Z-Matrix files before 24/07/2018, they are obsolete, you need to delete the old ones and download the new ones!   
 
 ## Overview
 [//]:*******
@@ -57,7 +57,8 @@ If you want to use the **`bGWAS()`** function to calculate prior Z-scores, you s
 * Download Z-Matrix files (Size ~ 2.09 GB):   
 These files contains the Z-scores for all prior GWASs (before and after imputation) :   
 Z-scores before imputation are used for multivariate MR,   
-Z-scores after imputation are used to calculate the prior Z-scores.
+Z-scores after imputation are used to calculate the prior Z-scores,
+A file containing information about the prior GWASs available.
 ``` bash
 wget --no-check-certificate https://drive.switch.ch/index.php/s/BpRrDXvFPbnKCM6/download -O ZMatrices.tar.gz
 tar xzvf ZMatrices.tar.gz
