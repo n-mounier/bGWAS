@@ -206,7 +206,7 @@ bGWAS <- function(name,
   MR_Files =  colnames(data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_NotImputed.csv.gz")), nrows=0, showProgress = FALSE))[-(1:5)]
   Prior_Files =  colnames(data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz")), nrows=0, showProgress = FALSE))[-(1:5)]
   List_Files = list_files(Z_matrices=Z_matrices)
-  if(!all(MR_Files==Prior_Files)) stop("Z_matrices : columns unconsistent between of the two files")
+  if(!all(MR_Files==Prior_Files)) stop("Z_matrices : columns unconsistent between the two files")
   if(!all(MR_Files==List_Files))  stop("Z_matrices : columns unconsistent with \"AvailableStudies.tsv\"")
 
   tmp = paste0("The Z-Matrix files are stored in \"", Z_matrices, "\".  \n")
