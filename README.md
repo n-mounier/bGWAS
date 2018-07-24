@@ -60,7 +60,7 @@ Z-scores before imputation are used for multivariate MR,
 Z-scores after imputation are used to calculate the prior Z-scores,
 A file containing information about the prior GWASs available.
 ``` bash
-wget --no-check-certificate https://drive.switch.ch/index.php/s/BpRrDXvFPbnKCM6/download -O ZMatrices.tar.gz
+wget --no-check-certificate https://drive.switch.ch/index.php/s/dZvJ9Y8rtMuITjK/download -O ZMatrices.tar.gz
 tar xzvf ZMatrices.tar.gz
 ```
   
