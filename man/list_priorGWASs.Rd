@@ -9,6 +9,9 @@ list_priorGWASs(IDs = NULL, Z_matrices = "~/ZMatrices/", verbose = F)
 \arguments{
 \item{IDs}{numeric,}
 
+\item{Z_matrices}{The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
+(character)}
+
 \item{verbose}{boolean, default = FALSE}
 }
 \value{
