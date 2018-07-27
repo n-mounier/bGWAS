@@ -47,7 +47,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
   # from the conventionnal GWAS when pruning
   # Add conventional GWAS column, at the end (make sure alleles are aligned)
   if(is.numeric(GWAS)){  # if GWAS from our data
-    tmp = paste0("# Adding data from the conventional GWAS (ID=", GWAS, "): \n \"", list_files(IDs = GWAS, Z_matrices = Z_matrices) , "\" \n")
+    tmp = paste0("# Adding data from the conventional GWAS (ID=", GWAS, "): \n \"", list_files(IDs = GWAS, Z_matrices = path) , "\" \n")
     Log = update_log(Log, tmp, verbose)
 
     if(platform == "unix"){
@@ -57,7 +57,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
     # no need to check for alignment of alleles, just subset and rename the column
     # keep the SNPs in our pruned matrix and order them correctly
     GWASData = GWASData[match(ZMatrix$rs,GWASData$rs),]
-    ZMatrix[,  list_files(IDs = GWAS, Z_matrices = Z_matrices)  := GWASData[,6]]
+    ZMatrix[,  list_files(IDs = GWAS, Z_matrices = path)  := GWASData[,6]]
 
     tmp = "Done! \n"
     Log = update_log(Log, tmp, verbose)
