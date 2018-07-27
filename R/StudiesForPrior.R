@@ -39,7 +39,7 @@ list_files <- function(IDs=NULL, Z_matrices = "~/ZMatrices/", verbose=F) {
     #Files = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "File", showProgress = FALSE)$File
   } else {
     # check that the IDs exists
-    Studies = list_priorGWASs()
+    Studies = list_priorGWASs(Z_matrices=Z_matrices)
     if(!all(IDs %in% Studies$ID)) print("Please check the IDs, some of them do not match")
     Files = Studies$File[match(IDs, Studies$ID)]
   }
