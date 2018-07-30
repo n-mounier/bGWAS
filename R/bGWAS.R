@@ -1,7 +1,5 @@
 ###### Main Function ######
 
-
-
 #' bGWAS - main function
 #'
 #' Performs a Bayesian GWAS from Summary Statistics, using publicly available results
@@ -15,10 +13,6 @@
 #'        (character)
 #' @param prior_studies The IDs of prior GWASs to use for the analysis, \code{default=NULL},
 #'        will include all the prior GWASs available (numeric vector)
-#' @param SNPs_list, The path to a file containing the rsids of the SNPs to use ,
-#'        \code{default=NULL}, will use all the SNPs in common between prior GWASs and the
-#'        conventionnal GWAS (character)
-#'              # NOT IMPLEMENTED YET
 #' @param MR_threshold The threshold used to select strong instruments for MR, should be lower
 #'        than 1e-5, \code{default=1e-6} (numeric)
 #' @param MR_pruning_dist The distance used for pruning MR instruments (in Kb), should be between 10 and 1000,
@@ -132,7 +126,6 @@ bGWAS <- function(name,
                   GWAS,
                   Z_matrices = "~/ZMatrices/",
                   prior_studies = NULL,
-                  SNPs_list = NULL,
                   MR_threshold = 1e-6,
                   MR_pruning_dist = 500,
                   MR_pruning_LD = 0,
@@ -370,23 +363,6 @@ bGWAS <- function(name,
   }
 
 
-
-### TO BE DONE
-  ## ListOfSNPs
-  # We should have at least XX SNPs / check Linux-MAC for Zcat
-  # Also check the number or SNPs in common in the file if ListOfSNPs not specified ?
-#  if(!is.null(SNPs_list)){
-#    if(!is.character(SNPs_list)) stop("SNPs_list : non character")
-#    OurSNPsMR = data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=1, showProgress = FALSE)
-#    commonMR = table(ListOfSNPs %in% OurSNPsMR$rs)["TRUE"]
-#    if(commonMR<20) stop("ListOfSNPs : You should provide at least 20 SNPs that can be used as strong instruments for MR")
-#    OurSNPsAll = data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=1, showProgress = FALSE)
-#    commonAll = table(ListOfSNPs %in% OurSNPsAll$rs)["TRUE"]
-#    tmp = paste0(length(ListOfSNPs), " SNPs provided \n")
-#    tmp = c(tmp, paste0(commonMR, " can be used for MR \n"))
-#    tmp = c(tmp, paste0(commonAll, " can be used to compute prior \n"))
-#    log_info = update_log(log_info, tmp, verbose)
-#  }
 
 
   ## prior_studies
