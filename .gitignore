@@ -1,7 +1,7 @@
 # Files ignored by git
 
 .Rproj.user
-.Rproj
+bGWAS.Rproj
 .Rhistory
 .RData
 .Ruserdata
