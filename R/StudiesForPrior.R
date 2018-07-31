@@ -15,7 +15,7 @@
 list_priorGWASs <- function(IDs=NULL, Z_matrices = "~/ZMatrices/", verbose=F) {
   if(!is.null(IDs) && !is.numeric(IDs)) stop("ID : should be numeric")
   #Studies = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), showProgress = FALSE)
-  Studies = data.table::fread(paste0(Z_matrices, "/AvailableStudies.tsv"), showProgress = FALSE)
+  Studies = data.table::fread(paste0(Z_matrices, "/AvailableStudies.tsv"), showProgress = FALSE, data.table = F)
   if(!is.null(IDs)){
     Studies=Studies[IDs, ]
   }
@@ -34,14 +34,14 @@ list_priorGWASs <- function(IDs=NULL, Z_matrices = "~/ZMatrices/", verbose=F) {
 
 list_files <- function(IDs=NULL, Z_matrices = "~/ZMatrices/", verbose=F) {
   if(is.null(IDs)) {
-    Files = data.table::fread(paste0(Z_matrices, "/AvailableStudies.tsv"), select = "File", showProgress = FALSE)
+    Files = data.table::fread(paste0(Z_matrices, "/AvailableStudies.tsv"), select = "File", showProgress = FALSE, data.table=F)
 
     #Files = data.table::fread(system.file("Data/AvailableStudies.tsv", package="bGWAS"), select = "File", showProgress = FALSE)$File
   } else {
     # check that the IDs exists
     Studies = list_priorGWASs(Z_matrices=Z_matrices)
     if(!all(IDs %in% Studies$ID)) print("Please check the IDs, some of them do not match")
-    Files = Studies[match(IDs, Studies$ID)]
+    Files = subset(Studies, ID %in% IDs)
   }
   return(Files$File)
 }
@@ -56,7 +56,7 @@ list_files <- function(IDs=NULL, Z_matrices = "~/ZMatrices/", verbose=F) {
 # #' @return List of traits
 
 list_traits <- function(Z_matrices = "~/ZMatrices/", verbose=F) {
-  Traits = data.table::fread(paste0(Z_matrices, "/AvailableStudies.tsv"), select = "Trait", showProgress = FALSE)$Trait
+  Traits = data.table::fread(paste0(Z_matrices, "/AvailableStudies.tsv"), select = "Trait", showProgress = FALSE, data.table = F)$Trait
   return(unique(Traits))
 }
 
@@ -71,7 +71,7 @@ list_traits <- function(Z_matrices = "~/ZMatrices/", verbose=F) {
 
 
 list_consortia <- function(Z_matrices = "~/ZMatrices/", verbose=F) {
-  Consortia = data.table::fread(paste0(Z_matrices, "/AvailableStudies.tsv"), select = "Consortium", showProgress = FALSE)$Consortium
+  Consortia = data.table::fread(paste0(Z_matrices, "/AvailableStudies.tsv"), select = "Consortium", showProgress = FALSE, data.table=F)$Consortium
   return(unique(Consortia))
 }
 
@@ -128,7 +128,7 @@ select_priorGWASs <- function(include_files=NULL, include_traits=NULL, includeCo
   # if inclusion criteria
   if(!is.null(includeConsortia) | !is.null(include_traits) | !is.null(include_files)){
     AllStudies = Studies
-    Studies = Studies[Trait=="",] # create empty data table
+    Studies = Studies[0,] # create empty data table
     n = nrow(Studies)
 
     ## A : do all inclusion
