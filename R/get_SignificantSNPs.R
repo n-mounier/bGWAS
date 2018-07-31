@@ -34,8 +34,8 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
     Log = update_log(Log, tmp, verbose)
 
 
-    Prior[, fdr := p.adjust(BF_P, method='fdr')]
-    PriorThr = Prior[fdr<sign_thresh]
+    Prior$fdr = p.adjust(Prior$BF_P, method='fdr')
+    PriorThr = subset(Prior, fdr<sign_thresh)
 
     tmp = paste0(format(nrow(PriorThr), big.mark = ",", scientific = F), " SNPs left \n")
     Log = update_log(Log, tmp, verbose)
@@ -52,7 +52,7 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
     Log = update_log(Log, tmp, verbose)
 
 
-    PriorThr = Prior[BF_P<sign_thresh]
+    PriorThr = subset(Prior, BF_P<sign_thresh)
 
     tmp = paste0(format(nrow(PriorThr), big.mark = ",", scientific = F), " SNPs left \n")
     Log = update_log(Log, tmp, verbose)
