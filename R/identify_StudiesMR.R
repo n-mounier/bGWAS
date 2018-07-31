@@ -18,7 +18,7 @@
 
 
 
-identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=FALSE){
+identify_studiesMR <- function(ZMatrix, MR_shrinkage, Z_Matrices, save_files=FALSE, verbose=FALSE){
 
   Log = c()
 
@@ -27,16 +27,6 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
 
   # if p-value studies > MR_shrinkage , Z-Score is set to zero
 
-  # In the pipeline, should always be a data.table,
-  # but for other cases, allow the use of a file
-  if(data.table::is.data.table(ZMatrix)){ # ok if it comes from the pipeline, but still need to check that the format is ok
-    if(!all(c("rs", "chrm", "pos", "alt", "ref") %in% colnames(ZMatrix))) stop("There is something wrong with colnames of the matrix")
-  } else if(is.character(ZMatrix)){
-    # TO BE DONE
-
-  } else {
-    stop("ZMatrix provided not correct")
-  }
 
   # function to truncate extreme z-scores
   push.extreme.zs.back.a.little.towards.zero <- function(d) { # Some z-scores are just too far from zero
@@ -81,7 +71,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
   if(MR_shrinkage < 1.0) {
     for(column_of_zs in Prior_study_names) {
       threshold = abs(qnorm(MR_shrinkage/2))
-      ZMatrix[c(abs(ZMatrix[,..column_of_zs]) < threshold) , column_of_zs] <- 0
+      ZMatrix[abs(ZMatrix[,column_of_zs]) < threshold , column_of_zs] <- 0
     }
     tmp = paste0("Applying shrinkage (threshold = ", MR_shrinkage, ") before performing MR. \n")
     Log = update_log(Log, tmp, verbose)
@@ -238,7 +228,6 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
   lm(data=ZMatrix, formula = generate.formula(All_study_names[length(All_study_names)], significant.studies)) %>%summary %>%coef %>% data.table::data.table(keep.rownames=T) -> coefs
   data.table::setnames(coefs,"rn","nm")
   coefs[, nm := gsub("`","",nm)]
-  na.fail(coefs)
   studies_to_remove = NULL
   reasons = NULL
 
@@ -276,6 +265,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
   }
 
   # Check directionality
+  suppressWarnings({
   uni.coefs.collection[ significant.studies ] -> corresponding.uvar.coefs
   mycoefs = coefs[coefs$nm %in% significant.studies]
   mycoefs$nm = as.character(mycoefs$nm)
@@ -306,6 +296,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
       return(res)
       }
   }
+})
 
   if(!is.null(studies_to_removeD)){
     if(save_files){ # add Status : Direction
@@ -354,7 +345,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
   tmp = paste0("Estimating adjusted R-squared: \n")
   Log = update_log(Log, tmp, verbose)
   R2_Multi = summary(lm(data=ZMatrix, formula = generate.formula(outcome, final_set_of_study_names)))$adj.r.squared
-  tmp = paste0("- in-sample adjusted R-squared for the all-chromosomes multivariate regression is ", R2_Multi, " \n")
+  tmp = paste0("- in-sample adjusted R-squared for the all-chromosomes multivariate regression is ", round(R2_Multi,4), " \n")
   Log = update_log(Log, tmp, verbose)
   tmp = paste0("- out-of-sample adjusted R-squared, by chromosome, for the multivariate regression will be estimated when calculating the prior. \n")
   Log = update_log(Log, tmp, verbose)
@@ -364,7 +355,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, save_files=FALSE, verbose=
 
   res=list()
   res$log_info = Log
-  res$studies = data.table::data.table(study_selected=final_set_of_study_names)
+  res$studies = final_set_of_study_names
   res$coeffs = coefs
 
 
