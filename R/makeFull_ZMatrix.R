@@ -30,7 +30,7 @@ makeFull_ZMatrix <- function(studies=NULL, GWAS,  Z_matrices="~/Z_matrices", sav
   Log = update_log(Log, tmp, verbose)
 
   if(platform == "unix") {
-    ZMatrix=data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, studies+5 ), showProgress = FALSE)
+    ZMatrix=data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, studies+5 ), showProgress = FALSE, data.table = F)
   }
   tmp = paste0(ncol(ZMatrix)-5, " studies \n")
   Log = update_log(Log, tmp, verbose)
@@ -48,12 +48,13 @@ makeFull_ZMatrix <- function(studies=NULL, GWAS,  Z_matrices="~/Z_matrices", sav
 
 
     if(platform == "unix"){
-      GWASData=data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5))
+      GWASData=data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5), showProgress = F, data.table = F)
     }
     # no need to check for alignment of alleles, just subset and rename the column
     # keep the SNPs in our pruned matrix and order them correctly
     GWASData = GWASData[match(ZMatrix$rs,GWASData$rs),]
-    ZMatrix[,  list_files(IDs = GWAS, Z_matrices = Z_matrices)  := GWASData[,6]]
+    ZMatrix$outcome =  GWASData[,6]
+    colnames(ZMatrix)[ncol(ZMatrix)]= list_files(IDs = GWAS, Z_matrices = path)
 
     tmp = "Done! \n"
     Log = update_log(Log, tmp, verbose)
@@ -64,34 +65,33 @@ makeFull_ZMatrix <- function(studies=NULL, GWAS,  Z_matrices="~/Z_matrices", sav
 
 
     if(!grepl(".gz", GWAS)){
-      GWASData = data.table::fread(GWAS, showProgress = FALSE)
+      GWASData = data.table::fread(GWAS, showProgress = FALSE, data.table=F)
     } else if(grepl(".gz", GWAS)) {
       # if tar.gz
-      GWASData = data.table::fread(paste0("zcat < ", GWAS), showProgress = FALSE)
+      GWASData = data.table::fread(paste0("zcat < ", GWAS), showProgress = FALSE, data.table = F)
     }
 
-    rs = match(colnames(GWASData),c("snpid", "snp", "rnpid", "rs", "rsid"))
-    rs = which(!is.na(rs))
-    alt = match(colnames(GWASData),c("a1", "alts", "alt"))
-    alt = which(!is.na(alt))
-    ref = match(colnames(GWASData),c("a2", "ref", "a0"))
-    ref = which(!is.na(ref))
-    z = match(colnames(GWASData),c("z", "Z", "zscore"))
-    z = which(!is.na(z))
+    SNPID = match(colnames(GWASData),c("snpid", "snp", "rnpid", "rs", "rsid"))
+    SNPID = which(!is.na(SNPID))[1]
+    ALT = match(colnames(GWASData),c("a1", "alts", "alt"))
+    ALT = which(!is.na(ALT))[1]
+    REF = match(colnames(GWASData),c("a2", "ref", "a0"))
+    REF = which(!is.na(REF))[1]
+    ZSTAT = match(colnames(GWASData),c("z", "Z", "zscore"))
+    ZSTAT = which(!is.na(ZSTAT))[1]
 
-    # keep the SNPs in our pruned matrix and order them correctly
-    GWASData = GWASData[match(ZMatrix$rs, unlist(GWASData[,..rs])),]
+    # keep the SNPs in our Z matrix and order them correctly
+    GWASData = GWASData[match(ZMatrix$rs, GWASData[,SNPID]),]
     # check alignment
-    aligned = which(GWASData[,..alt, with=F] == ZMatrix$alt &
-                      GWASData[,..ref, with=F] == ZMatrix$ref)
-    swapped = which(GWASData[,..ref, with=F] == ZMatrix$alt &
-                      GWASData[,..alt, with=F] == ZMatrix$ref)
-   # weird = c(1:nrow(GWASData))[!c(1:nrow(GWASData)) %in% c(aligned, swapped)]
+    aligned = which(GWASData[,ALT] == ZMatrix$alt &
+                      GWASData[,REF] == ZMatrix$ref)
+    swapped = which(GWASData[,REF] == ZMatrix$alt &
+                      GWASData[,ALT] == ZMatrix$ref)
+    #  weird = c(1:nrow(GWAS))[!c(1:nrow(GWAS)) %in% c(aligned, swapped)]
 
-    GWASData[, myZ:= numeric()]
-    GWASData[aligned, myZ:= GWASData[aligned, ..z, with=F]]
-    GWASData[swapped, myZ:= -GWASData[swapped, ..z, with=F]]
-
+    GWASData$myZ = NA
+    GWASData[aligned, "myZ"] =  GWASData[aligned, ZSTAT]
+    GWASData[swapped, "myZ"] = -GWASData[swapped, ZSTAT]
 
     ZMatrix[, strsplit(GWAS, "/")[[1]][ length(strsplit(GWAS, "/")[[1]])]] = GWASData$myZ
 
@@ -104,28 +104,28 @@ makeFull_ZMatrix <- function(studies=NULL, GWAS,  Z_matrices="~/Z_matrices", sav
                  "\" \n")
     Log = update_log(Log, tmp, verbose)
 
+    SNPID = match(colnames(GWAS),c("snpid", "snp", "rnpid", "rs", "rsid"))
+    SNPID = which(!is.na(SNPID))[1]
+    ALT = match(colnames(GWAS),c("a1", "alts", "alt"))
+    ALT = which(!is.na(ALT))[1]
+    REF = match(colnames(GWAS),c("a2", "ref", "a0"))
+    REF = which(!is.na(REF))[1]
+    ZSTAT = match(colnames(GWAS),c("z", "Z", "zscore"))
+    ZSTAT = which(!is.na(ZSTAT))[1]
 
-    rs = match(colnames(GWAS),c("snpid", "snp", "rnpid", "rs", "rsid"))
-    rs = which(!is.na(rs))
-    alt = match(colnames(GWAS),c("a1", "alts", "alt"))
-    alt = which(!is.na(alt))
-    ref = match(colnames(GWAS),c("a2", "ref", "a0"))
-    ref = which(!is.na(ref))
-    z = match(colnames(GWAS),c("z", "Z", "zscore"))
-    z = which(!is.na(z))
-
-    # keep the SNPs in our pruned matrix and order them correctly
-    GWAS = GWAS[match(ZMatrix$rs, unlist(GWAS[,..rs])),]
+    # keep the SNPs in our Z matrix and order them correctly
+    GWAS = GWAS[match(ZMatrix$rs, GWAS[,SNPID]),]
     # check alignment
-    aligned = which(GWAS[,..alt, with=F] == ZMatrix$alt &
-                      GWAS[,..ref, with=F] == ZMatrix$ref)
-    swapped = which(GWAS[,..ref, with=F] == ZMatrix$alt &
-                      GWAS[,..alt, with=F] == ZMatrix$ref)
-    #weird = c(1:nrow(GWAS))[!c(1:nrow(GWAS)) %in% c(aligned, swapped)]
+    aligned = which(GWAS[,ALT] == ZMatrix$alt &
+                      GWAS[,REF] == ZMatrix$ref)
+    swapped = which(GWAS[,REF] == ZMatrix$alt &
+                      GWAS[,ALT] == ZMatrix$ref)
 
-    GWAS[, myZ:= numeric()]
-    GWAS[aligned, myZ:= GWAS[aligned, ..z, with=F]]
-    GWAS[swapped, myZ:= -GWAS[swapped, ..z, with=F]]
+    GWAS$myZ = NA
+    GWAS[aligned, "myZ"] =  GWAS[aligned, ZSTAT]
+    GWAS[swapped, "myZ"] = -GWAS[swapped, ZSTAT]
+
+
 
     ZMatrix[, GName] = GWAS$myZ
 
@@ -136,19 +136,9 @@ makeFull_ZMatrix <- function(studies=NULL, GWAS,  Z_matrices="~/Z_matrices", sav
 
 
 
-  ZMatrix = ZMatrix[complete.cases(ZMatrix)]
+  ZMatrix = ZMatrix[complete.cases(ZMatrix),]
   tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific=F), " SNPs in common between prior studies and the conventional GWAS \n")
   Log = update_log(Log, tmp, verbose)
-
-
-  # write ZMatrix
-  # only if write.file=T
-  # if(save_files){
-  #   write.table(ZMatrix, file= "Full_ZMatrix.csv", sep=",", row.names=F, quote=F)
-  #   tmp = "The file \"Full_ZMatrix.csv\" has been successfully created \n"
-  #   Log = c(Log, tmp)
-  #   if(verbose) cat(tmp)
-  # }
 
   res=list()
   res$log_info = Log
