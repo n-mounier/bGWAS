@@ -5,11 +5,11 @@
 \title{bGWAS - main function}
 \usage{
 bGWAS(name, GWAS, Z_matrices = "~/ZMatrices/", prior_studies = NULL,
-  SNPs_list = NULL, MR_threshold = 1e-06, MR_pruning_dist = 500,
-  MR_pruning_LD = 0, MR_shrinkage = 1, prior_shrinkage = 1e-05,
-  stop_after_prior = FALSE, sign_method = "p", sign_thresh = 5e-08,
-  use_permutations = FALSE, res_pruning_dist = 500, res_pruning_LD = 0,
-  save_files = FALSE, verbose = TRUE)
+  MR_threshold = 1e-06, MR_pruning_dist = 500, MR_pruning_LD = 0,
+  MR_shrinkage = 1, prior_shrinkage = 1, stop_after_prior = FALSE,
+  sign_method = "p", sign_thresh = 5e-08, use_permutations = FALSE,
+  res_pruning_dist = 500, res_pruning_LD = 0, save_files = FALSE,
+  verbose = TRUE)
 }
 \arguments{
 \item{name}{The name of the analysis (character)}
@@ -22,11 +22,6 @@ list of studies available (prior GWASs), or a data.frame (character, numeric or 
 
 \item{prior_studies}{The IDs of prior GWASs to use for the analysis, \code{default=NULL},
 will include all the prior GWASs available (numeric vector)}
-
-\item{SNPs_list, }{The path to a file containing the rsids of the SNPs to use ,
-\code{default=NULL}, will use all the SNPs in common between prior GWASs and the
-conventionnal GWAS (character)
-      # NOT IMPLEMENTED YET}
 
 \item{MR_threshold}{The threshold used to select strong instruments for MR, should be lower
 than 1e-5, \code{default=1e-6} (numeric)}
