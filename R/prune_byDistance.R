@@ -23,27 +23,19 @@ prune_byDistance <- function(data, prune.dist=100, byP=T) {
   # if byP = T : stat = p-value -> min is better
   # if byP = F : stat = Zstat, beta.. -> max is better
 
-     # data should be ordered by chrm/pos
-     data <- data[order(data[,2], data[,3])]
-     # order the SNPs from the best, to the worst
      if(byP){
        SNP_order = order(data[,4])
      } else {
        SNP_order =  order(-data[,4])
      }
-
-     if(byP){
-       SNP_order = order(data[,4])
-     } else {
-       SNP_order =  order(-data[,4])
-     }
-     data = data[SNP_order]
+     data = data[SNP_order,]
      snp=0
      while(T){
        snp=snp+1
        ToRemove=which(data$chr_name==data$chr_name[snp] & abs(data$chr_start - data$chr_start[snp])<prune.dist*1000)
-       if(length(ToRemove)>1){ToRemove = ToRemove[-1]
-       data = data[-ToRemove]
+       if(length(ToRemove)>1){
+         ToRemove = ToRemove[-1]
+         data = data[-ToRemove,]
        }
        if(snp==nrow(data)) break
      }
