@@ -143,13 +143,13 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
   if(annotate){ # significant SNPs from the analysis
     # extract them
     value = ifelse(method=="FDR", "fdr", "BF_P")
-    SNPs_to_plot = obj$all_BFs[rs %in% obj$significant_SNPs,
-                               c("rs", "chrm", "pos", value), with=F]
+    SNPs_to_plot = subset(obj$all_BFs, rs %in% obj$significant_SNPs,
+                               c("rs", "chrm", "pos", value))
     all = obj$all_BFs[,c("rs", "chrm", "pos")]
     all <- all[order(all$chrm, all$pos), ]
 
     # y = -log10(p) ou -log10(fdr)
-    SNPs_to_plot$y = -log10(SNPs_to_plot[,..value, with=F]) - 0.3 # to make sure all SNPs names are in plotting windows
+    SNPs_to_plot$y = -log10(SNPs_to_plot[,value]) - 0.3 # to make sure all SNPs names are in plotting windows
      # x = have to look at all SNPs chr/pos
     get_posx <- function(snp, all){
       chr = as.numeric(snp[2])
@@ -296,7 +296,7 @@ extract_results_bGWAS <- function(obj, SNPs="significant"){
     if(length(obj$significant_SNPs)==0){
       stop("You can't extract \"significant\" results , because the analysis has been limited to prior estimation", call. = F)
     }
-    Res = obj$all_BFs[rs %in% obj$significant_SNPs,]
+    Res = subset(obj$all_BFs, rs %in% obj$significant_SNPs)
   }
 
   return(Res)
@@ -326,7 +326,7 @@ extract_MRcoeffs_bGWAS <- function(obj){
   # global coeff / chromosomes coeff
   Res=data.frame(obj$significant_studies)
   for(c in 1:22){
-    CHRM = obj$all_MRcoeffs[chrm==c]
+    CHRM = subset(obj$all_MRcoeffs, chrm==c)
     Res[,paste0("chrm", c, "_estimate")] = CHRM$estimate[match(Res$study, CHRM$study)]
     Res[,paste0("chrm", c, "_std_error")] = CHRM$std_error[match(Res$study, CHRM$study)]
     Res[,paste0("chrm", c, "_P")] = CHRM$P[match(Res$study, CHRM$study)]
