@@ -214,7 +214,6 @@ request_BFandP <- function(Prior, sign_thresh, use_perm = F, save_files=F, verbo
       # + more quantiles for smaller p (identify the number of quantiles needed to keep the right order)
       start_quantile = 0
       for(wind in 1:n_window){
-        print(wind)
         min_w = (wind-1)*size_window+1
         max_w = ifelse(wind!=n_window,  wind*size_window, nrow(res) )
 
