@@ -145,11 +145,12 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
 
   # select based on threshold if different from 1e-5 and removed rows without any Z-Score ok
 
+  # ZLimit should be define even if threshold == 1e-5 to remove studies without strong instruments after pruning
+  Zlimit = qnorm(MR_threshold/2, lower.tail = F)
 
   if(MR_threshold != 1e-5 ){
     tmp = paste0("# Thresholding... \n")
     Log = update_log(Log, tmp, verbose)
-    Zlimit = qnorm(MR_threshold/2, lower.tail = F)
     # DO NOT USE THE LAST COLUMN!!
     SNPsToKeep = apply(ZMatrix[,-c(1:5,as.numeric(ncol(ZMatrix)))], 1, function(x) any(abs(x)>Zlimit))
     ZMatrix=ZMatrix[SNPsToKeep,]
