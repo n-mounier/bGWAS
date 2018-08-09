@@ -139,73 +139,73 @@ bGWAS <- function(name,
                   res_pruning_LD = 0,
                   save_files = FALSE,
                   verbose = TRUE) {
-
-
+  
+  
   # Path where the analysis has been launched
   InitPath = getwd()
-
+  
   StartTime =  proc.time()
-
+  
   # platform identification : used in the main function
   # automatically re-detected when needed by other sub-functions
   platform = .Platform$OS.type
   if(platform=="windows") stop("Windows is not supported yet", call. = FALSE)
-
+  
   # initialization of log_info file
   log_info = c()
-
+  
   ## Be chatty ?
   if(!is.logical(verbose)) stop("verbose : should be logical", call. = FALSE)
-
+  
   tmp = paste0("<<< Preparation of analysis >>> \n")
   log_info = update_log(log_info, tmp, verbose)
-
+  
   ### check the parameters ###
   tmp = paste0("> Checking parameters \n")
   log_info = update_log(log_info, tmp, verbose)
-
+  
   ## Name of analysis
   if(!is.character(name)) stop("name : non-character argument", call. = FALSE) # should be a string
-
+  
   tmp = paste0("The name of your analysis is: \"", name, "\". \n")
   log_info = update_log(log_info, tmp, verbose)
-
+  
   ### create the directory to store the results ###
   Dir = file.path(InitPath, name)
-
+  
   #  if the directory already exists : error
   if(file.exists(file.path(InitPath, paste0(name, ".log")))) stop("You already run an analysis with the same name in that directory,
-                                                    please specify another name or choose another directory to run the analysis", call. = FALSE)
+                                                                  please specify another name or choose another directory to run the analysis", call. = FALSE)
   if(save_files){
     if(dir.exists(Dir)) stop("You already run an analysis with the same name in that directory,
-                                                 please specify another name or choose another directory to run the analysis", call. = FALSE)
+                             please specify another name or choose another directory to run the analysis", call. = FALSE)
   }
-
-
+  
+  
   ## ZMatrices
   if (is.character(Z_matrices)){
     if(!file.exists(paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz"))) stop("No \"ZMatrix_Imputed.csv.gz\" file in specified Z_matrices folder", call. = FALSE)
     if(!file.exists(paste0(Z_matrices, "/ZMatrix_NotImputed.csv.gz"))) stop("No \"ZMatrix_NotImputed.csv.gz\" file in specified Z_matrices folder", call. = FALSE)
     if(!file.exists(paste0(Z_matrices, "/AvailableStudies.tsv"))) stop("No \"AvailableStudies.tsv\" file in specified Z_matrices folder", call. = FALSE)
-
-   # Define if the path is relative or not
-   if(!substr(Z_matrices,1,1) %in% c("/", "~")){
-     Z_matrices=paste0(InitPath, "/", Z_matrices)
-   }
- } else stop("Z_matrices : wrong format, should be character", call. = FALSE)
-
+    
+    # Define if the path is relative or not
+    if(!substr(Z_matrices,1,1) %in% c("/", "~")){
+      Z_matrices=paste0(InitPath, "/", Z_matrices)
+    }
+  } else stop("Z_matrices : wrong format, should be character", call. = FALSE)
+  
   MR_Files =  colnames(data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_NotImputed.csv.gz")), nrows=0, showProgress = FALSE))[-(1:5)]
   Prior_Files =  colnames(data.table::fread(paste0("zcat < ",paste0(Z_matrices, "/ZMatrix_Imputed.csv.gz")), nrows=0, showProgress = FALSE))[-(1:5)]
   List_Files = list_files(Z_matrices=Z_matrices)
   if(!all(MR_Files==Prior_Files)) stop("Z_matrices : columns unconsistent between the two files")
   if(!all(MR_Files==List_Files))  stop("Z_matrices : columns unconsistent with \"AvailableStudies.tsv\"")
-
+  
   tmp = paste0("The Z-Matrix files are stored in \"", Z_matrices, "\".  \n")
   log_info = update_log(log_info, tmp, verbose)
-
-
-
-
+  
+  
+  
+  
   ## GWAS of interest, should be a path to a GWAS file (format ? .tar.gz or file ?), a data.frame or an ID
   # TMP_FILE = F # flag : is a temporary file with Z-scores created ??
   # DO NOT CREATE A TEMP FILE ANYMORE, JUST STORE IT AS A DATA.FRAME
@@ -224,7 +224,7 @@ bGWAS <- function(name,
     tmp = paste0("The conventional GWAS used as input is: \"",
                  strsplit(GWAS, "/")[[1]][length(strsplit(GWAS, "/")[[1]])], "\".  \n")
     log_info = update_log(log_info, tmp, verbose)
-
+    
     # Check colnames...
     if(!grepl(".gz", GWAS)){
       # ...if regular file
@@ -233,7 +233,7 @@ bGWAS <- function(name,
       # ...if tar.gz
       if(platform == "unix") HeaderGWAS = colnames(data.table::fread(paste0("zcat < ", GWAS), nrows = 1, showProgress = FALSE, data.table=F))
     }
-
+    
     if(all(!HeaderGWAS %in% c("rsid", "snpid", "snp", "rnpid", "rs"))) stop("GWAS : no SNPID column", call. = FALSE)
     # how to deal with multiple rsid / snpid columns ???
     # here, we don't care, we need at least one
@@ -287,8 +287,8 @@ bGWAS <- function(name,
     }
     tmp = paste(tmp, collapse= " - ")
     log_info = update_log(log_info, tmp, verbose)
-
-
+    
+    
   } else if(is.data.frame(GWAS)){ # if data.frame
     # add attribute GName to the data.frame, to be re-used in other subfunctions
     attributes(GWAS)$GName =  deparse(substitute(GWAS)) # get the "name" of the object used as an argument in the function
@@ -298,9 +298,9 @@ bGWAS <- function(name,
     tmp = paste0("The conventional GWAS used as input the object: \"",
                  attributes(GWAS)$GName, "\".  \n")
     log_info = update_log(log_info, tmp, verbose)
-
+    
     HeaderGWAS = colnames(GWAS)
-
+    
     if(all(!HeaderGWAS %in% c("rsid", "snpid", "snp", "rnpid", "rs"))) stop("GWAS : no SNPID column", call. = FALSE)
     # how to deal with multiple rsid / snpid columns ???
     # here, we don't care, we need at least one, so we use the first one
@@ -345,24 +345,24 @@ bGWAS <- function(name,
       }
       tmp = c(tmp, paste0("Z column, ok  \n"))
     }
-
+    
     tmp = paste(tmp, collapse= " - ")
     log_info = update_log(log_info, tmp, verbose)
   } else stop("GWAS : unrecognized format", call. = FALSE)
-
+  
   tmp = paste0("The analysis will be run in the folder: \"", InitPath, "\".  \n")
   log_info = update_log(log_info, tmp, verbose)
-
+  
   ## save_files
   if(!is.logical(save_files)) stop("save_files should be logical", call. = FALSE)
   if(save_files){
     tmp = paste0("Files will be saved in: \"", InitPath, "/", name, "\".  \n")
     log_info = update_log(log_info, tmp, verbose)
   }
-
-
-
-
+  
+  
+  
+  
   ## prior_studies
   # check that all the files required exist in our list of studies
   # should be specified as "File ID"
@@ -374,15 +374,17 @@ bGWAS <- function(name,
     prior_studies = prior_studies[-(which(prior_studies == GWAS))]
     tmp = paste0("The study ", list_files(IDs=GWAS, Z_matrices = Z_matrices), " (ID=", GWAS, ") has been removed from the studies used to build the prior since it is used as conventionnal GWAS. \n")
     log_info = update_log(log_info, tmp, verbose)
-
+    
     # remove GWAS(s) for the same trait if needed
     Info = list_priorGWASs(Z_matrices = Z_matrices)
     trait = subset(Info, ID==GWAS, "Trait", drop=T)
     ToExclude = subset(Info, Trait==trait, "ID", drop=T)
     if(GWAS %in% ToExclude) ToExclude=ToExclude[-which(ToExclude==GWAS)]
     if(any(ToExclude %in% prior_studies)){
+      ToExclude = ToExclude[ToExclude %in% prior_studies]
       nbToExclude = sum(prior_studies %in% ToExclude)
       prior_studies = prior_studies[-(which(prior_studies %in% ToExclude))]
+      removed = ToExclude
       if(nbToExclude==1){
         tmp = paste0("The study ", list_files(IDs=ToExclude, Z_matrices = Z_matrices), " has been removed from the studies used to build the prior since it's a GWAS for the same trait as the study used as conventionnal GWAS. \n")
       }else{
@@ -390,36 +392,36 @@ bGWAS <- function(name,
       }
       log_info = update_log(log_info, tmp, verbose)
     }
-
+    
     # check that the user did not use exactly the same study for GWAS and for Prior,
     # in this case the prior study is removed here... and we don't have any study left
     if(length(prior_studies)==0) stop("You did not select any prior GWAS different from your conventionnal GWAS")
-
+    
   }
-
-
+  
+  
   ## MR_threshold -> should not be larger than 10-5, can only be more stringent
   if(!is.numeric(MR_threshold)) stop("MR_threshold : non-numeric argument", call. = FALSE)
   if(MR_threshold>10^5) stop("MR_threshold : superior to the threshold limit (10^-5)", call. = FALSE)
-
+  
   tmp = paste0("The p-value threshold used for selecting MR instruments is: ", format(MR_threshold, scientific = T), ".  \n")
   log_info = update_log(log_info, tmp, verbose)
-
+  
   ## MR_pruning_dist
   if(!is.numeric(MR_pruning_dist)) stop("MR_pruning_dist : non-numeric argument", call. = FALSE)
   if(MR_pruning_dist<10) stop("MR_pruning_dist : should be higher than 10Kb", call. = FALSE)
   if(MR_pruning_dist>1000) stop("MR_pruning_dist : should be lower than 1Mb", call. = FALSE)
-
-
+  
+  
   tmp = paste0("The distance used for pruning MR instruments is: ", MR_pruning_dist, "Kb.  \n")
   log_info = update_log(log_info, tmp, verbose)
-
-
-
+  
+  
+  
   ## MR_pruning_LD
   if(!is.numeric(MR_pruning_LD)) stop("MR_pruning_LD : non-numeric argument", call. = FALSE)
   if(MR_pruning_LD<0) stop("MR_pruning_LD : should be positive", call. = FALSE)
-
+  
   if(MR_pruning_LD>0){
     tmp = paste0("The LD threshold used for pruning MR instruments is: ",MR_pruning_LD, ".  \n")
     log_info = update_log(log_info, tmp, verbose)
@@ -427,13 +429,13 @@ bGWAS <- function(name,
     tmp = "Distance-based pruning will be used for MR instruments.  \n"
     log_info = update_log(log_info, tmp, verbose)
   }
-
+  
   ## MR_shrinkage, should be between MR_threshold and 1
   if(!is.numeric(MR_shrinkage)) stop("MR_shrinkage : non-numeric argument", call. = FALSE)
   if(MR_shrinkage<0) stop("MR_shrinkage : should be positive", call. = FALSE)
   if(MR_shrinkage<MR_threshold) stop("MR_shrinkage : should be higher than the threshold used to select MR instruments", call. = FALSE)
   if(MR_shrinkage>1) stop("MR_shrinkage : should not be higher than 1", call. = FALSE)
-
+  
   if(MR_shrinkage==1){
     tmp = "No shrinkage applied before performing MR."
     log_info = update_log(log_info, tmp, verbose)
@@ -441,13 +443,13 @@ bGWAS <- function(name,
     tmp = paste0("All p-values lower than ",format(MR_shrinkage, scientific = T), " will be shrunk to 0 before performing MR.  \n")
     log_info = update_log(log_info, tmp, verbose)
   }
-
+  
   ## prior_shrinkage, should be between MR_threshold and 1
   if(!is.numeric(prior_shrinkage)) stop("prior_shrinkage : non-numeric argument", call. = FALSE)
   if(prior_shrinkage<0) stop("prior_shrinkage : should be positive", call. = FALSE)
   if(prior_shrinkage<MR_threshold) stop("prior_shrinkage : should be higher than the threshold used to select MR instruments", call. = FALSE)
   if(prior_shrinkage>1) stop("prior_shrinkage : should not be higher than 1", call. = FALSE)
-
+  
   if(prior_shrinkage==1){
     tmp = "No shrinkage applied before performing calculating the prior."
     log_info = update_log(log_info, tmp, verbose)
@@ -455,15 +457,15 @@ bGWAS <- function(name,
     tmp = paste0("All p-values lower than ", format(prior_shrinkage, scientific = T), " will be shrunk to 0 before calculating the prior.  \n")
     log_info = update_log(log_info, tmp, verbose)
   }
-
-
+  
+  
   ## sign_method -> should not be "p" or "fdr"
   if(!sign_method %in% c("p", "fdr")) stop("sign_method : method not accepted, should be p or fdr", call. = FALSE)
-
+  
   ## sign_thresh -> should be numeric and lower (or equal) to 1
   if(!is.numeric(sign_thresh)) stop("sign_thresh : non numeric threshold", call. = FALSE)
   if(sign_thresh>1) stop("sign_thresh : a threshold higher than 1 does not make sense", call. = FALSE)
-
+  
   if(sign_method=="p"){
     tmp = paste0("Significant SNPs will be identified according to p-value. The threshold used is :",
                  format(sign_thresh, scientific = T), ".  \n")
@@ -472,25 +474,25 @@ bGWAS <- function(name,
                  format(sign_thresh, scientific = T), ".  \n")
   }
   log_info = update_log(log_info, tmp, verbose)
-
+  
   ## res_pruning_dist
   if(!is.numeric(res_pruning_dist)) stop("res_pruning_dist : non-numeric argument", call. = FALSE)
-
+  
   if(is.null(res_pruning_dist)){
     tmp = "Results will not be pruned.  \n"
     log_info = update_log(log_info, tmp, verbose)
   } else {
     if(res_pruning_dist<10) stop("res_pruning_dist : should be higher than 10Kb", call. = FALSE)
     if(res_pruning_dist>1000) stop("res_pruning_dist : should be lower than 1Mb", call. = FALSE)
-
-
+    
+    
     tmp = paste0("The distance used for pruning results is: ", res_pruning_dist, "Kb.  \n")
     log_info = update_log(log_info, tmp, verbose)
-
+    
     ## res_pruning_LD
     if(!is.numeric(res_pruning_LD)) stop("res_pruning_LD : non-numeric argument", call. = FALSE)
     if(res_pruning_LD<0) stop("res_pruning_LD : should be positive", call. = FALSE)
-
+    
     if(res_pruning_LD>0){
       tmp = paste0("The LD threshold used for pruning results is: ", res_pruning_LD, ".  \n")
       log_info = update_log(log_info, tmp, verbose)
@@ -498,125 +500,125 @@ bGWAS <- function(name,
       tmp = "Distance-based pruning will be used for results.  \n"
       log_info = update_log(log_info, tmp, verbose)
     }
-
-
+    
+    
   }
-
-
-
-
+  
+  
+  
+  
   # Go into the analysis' directory
   if(save_files){
     dir.create(Dir)
     setwd(Dir)
   }
-
+  
   ### 1 : create "Summarize_file" ###
-
+  
   if(save_files){
     tmp = paste0("# Initializing the summary information file\n")
     log_info = update_log(log_info, tmp, verbose)
-
+    
     Files_Info = list_priorGWASs(Z_matrices = Z_matrices)
     # keep only interesting columns + add "Status" column
     Files_Info = Files_Info[, c(1,3:6)]
     Files_Info$status= "Exluded by user"
     Files_Info[prior_studies, "status"] = "USED"
     if(is.numeric(GWAS))  Files_Info[GWAS, "status"] = "Conventionnal GWAS"
-
+    
     utils::write.table(Files_Info, file="PriorGWASs.tsv", sep="\t", quote=F, row.names=F )
-
+    
     tmp = paste0("List of files : ", Dir, "/PriorGWASs.csv has been successfully created.  \n")
     log_info = update_log(log_info, tmp, verbose)
   }
-
+  
   # 2 : Z-Matrix for MR
   log_info = c(log_info, "", "")
   tmp = paste0("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n",
                "<<< Identification of significant studies for MR >>>  \n")
   log_info = update_log(log_info, tmp, verbose)
-
+  
   # We should keep the Z-Matrix creation outside of the study identification function
   # so that we can quickly re-run the second part using a file containing the Z-Matrix
   tmp = "> Creating the Z-Matrix of strong instruments \n"
   log_info = update_log(log_info, tmp, verbose)
-
+  
   # the "global z_matrix of strong instruments" for all GWASs already exists, just select the studies kept for the prior + prune + add the GWAS of interest
   # makeMR_ZMatrix() create a ZMatrix file and returns the log_info
   matrix_MR = makeMR_ZMatrix(prior_studies, GWAS, MR_threshold, MR_pruning_dist, MR_pruning_LD, Z_matrices, save_files, verbose)
   log_info = c(log_info,matrix_MR$log_info)
   # here, add potential stop() in function(s) and check for it
-
-
+  
+  
   log_info=c(log_info,"")
   tmp = paste0("> Performing MR  \n")
   log_info = update_log(log_info, tmp, verbose)
-
+  
   res_MR = identify_studiesMR(matrix_MR$mat, MR_shrinkage, Z_Matrices, save_files, verbose)
   log_info = c(log_info, res_MR$log_info)
   # if error/problem in identify_studiesMR
   if(isTRUE(res_MR$stop)){
-
+    
     if(save_files){
       setwd(InitPath)
     }
-
+    
     log_info = apply(as.array(log_info), 1,function(x) gsub("\n", "", x, fixed=T))
     write(log_info, paste0(name,".log"))
     return("Analysis stopped : see log file for more informations.")
   }
-
-
+  
+  
   # 3 : make MR ZMat
   # 4 : Compute Prior
   log_info = c(log_info, "", "")
   tmp = paste0("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n",
-                       "<<< Estimation of the prior >>>  \n")
-
+               "<<< Estimation of the prior >>>  \n")
+  
   log_info = update_log(log_info, tmp, verbose)
-
+  
   tmp = paste0("> Creating the full Z-Matrix  \n")
   log_info = update_log(log_info, tmp, verbose)
   Studies = select_priorGWASs(include_files=res_MR$studies, Z_matrices = Z_matrices)
   matrix_all = makeFull_ZMatrix(Studies, GWAS, Z_matrices, save_files, verbose)
   log_info = c(log_info,matrix_all$log_info)
-
+  
   tmp = paste0("> Computing prior  \n")
   log_info = update_log(log_info, tmp, verbose)
-
+  
   Prior = compute_prior(res_MR$studies,matrix_MR$mat, matrix_all$mat, MR_shrinkage, prior_shrinkage, Z_matrices, save_files, verbose)
   log_info = c(log_info, Prior$log_info)
   # if error/problem in compute_prior
   if(isTRUE(Prior$stop)){
-
+    
     if(save_files){
       setwd(InitPath)
     }
-
+    
     log_info = apply(as.array(log_info), 1,function(x) gsub("\n", "", x, fixed=T))
     write(log_info, paste0(name,".log"))
     return("Analysis stopped : see log file for more informations.")
   }
-
+  
   if(stop_after_prior){
     if(save_files){
       setwd(InitPath)
     }
     rm(ZMatrix, envir = .GlobalEnv)
-
+    
     ### write log_info File ###
     Time = as.integer((proc.time()-StartTime)[3])
     minutes <- as.integer(trunc(Time/60))
     seconds <- Time - minutes * 60
     tmp = paste0("Time of the analysis: ", minutes, " minute(s) and ", seconds, " second(s).  \n")
     log_info = update_log(log_info, tmp, verbose)
-
+    
     log_info = apply(as.array(log_info), 1,function(x) gsub("\n", "", x, fixed=T))
-
+    
     if(save_files){
       write(log_info, paste0(name,".log"))
     }
-
+    
     results=list()
     results$log_info = log_info
     results$significant_SNPs = NULL
@@ -624,63 +626,63 @@ bGWAS <- function(name,
     results$significant_studies = res_MR$coeffs
     results$all_MRcoeffs = Prior$all_coeffs
     results$nonZero_effects = Prior$non_zero
-
+    
     class(results) = "bGWAS"
-
+    
     return(results)
   }
-
-
+  
+  
   ##### COMPUTE THE BAYES FACTOR AND THE P-VALUE #####
   log_info = c(log_info, "", "")
   tmp = paste0("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n",
                "<<< Calculation of Bayes Factors and p-values >>>  \n")
   log_info = update_log(log_info, tmp, verbose)
-
-
+  
+  
   # This script create a file containing all SNPs in common between prior file / imputed files
   tmp = paste0("> Calculating them for all SNPs  \n")
   log_info = update_log(log_info, tmp, verbose)
-
+  
   PriorWithBF = request_BFandP(Prior$prior, sign_thresh, use_permutations, save_files, verbose)
   log_info = c(log_info, PriorWithBF$log_info)
-
-
-
+  
+  
+  
   ##### IDENTIFY SIGNIFICANT SNPS AT 5% FDR + PRUNING #####
   tmp = paste0("> Pruning and identifying significant SNPs \n")
   log_info = update_log(log_info, tmp, verbose)
-
-
+  
+  
   Results = get_significantSNPs(PriorWithBF$SNPs, sign_method, sign_thresh, res_pruning_dist, res_pruning_LD, save_files, verbose)
   log_info = c(log_info, Results$log_info)
-
-
-
+  
+  
+  
   ### go back to inital folder ###
   log_info = c(log_info, "", "")
   tmp = "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n"
   log_info = update_log(log_info, tmp, verbose)
-
+  
   if(save_files){
     setwd(InitPath)
   }
   rm(ZMatrix, envir = .GlobalEnv)
-
-
+  
+  
   ### write log_info File ###
   Time = as.integer((proc.time()-StartTime)[3])
   minutes <- as.integer(trunc(Time/60))
   seconds <- Time - minutes * 60
   tmp = paste0("Time of the analysis: ", minutes, " minute(s) and ", seconds, " second(s).  \n")
   log_info = update_log(log_info, tmp, verbose)
-
+  
   log_info = apply(as.array(log_info), 1,function(x) gsub("\n", "", x, fixed=T))
-
+  
   if(save_files){
     write(log_info, paste0(name,".log"))
   }
-
+  
   results=list()
   results$log_info = log_info
   results$significant_SNPs = Results$SNPs
@@ -688,7 +690,7 @@ bGWAS <- function(name,
   results$significant_studies = res_MR$coeffs
   results$all_MRcoeffs = Prior$all_coeffs
   results$nonZero_effects = Prior$non_zero
-
+  
   class(results) = "bGWAS"
   return(results)
-}
+  }
