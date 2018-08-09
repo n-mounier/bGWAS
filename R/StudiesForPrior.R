@@ -161,7 +161,7 @@ select_priorGWASs <- function(include_files=NULL, include_traits=NULL, includeCo
   ## B : do all exclusion
   # 1st : selection based on Study Name
   if(!is.null(exclude_files)){
-    Studies = Studies[!(File %in% exclude_files),]
+    Studies = Studies[!(Studies$File %in% exclude_files),]
     Crit = c(Crit, c("exclusion of files"))
     nS = n - nrow(Studies)
     n = nrow(Studies)
@@ -169,7 +169,7 @@ select_priorGWASs <- function(include_files=NULL, include_traits=NULL, includeCo
   }
   # 2nd : selection based on Trait
   if(!is.null(exclude_traits)){
-    Studies = Studies[!(Trait %in% exclude_traits),]
+    Studies = Studies[!(Studies$Trait %in% exclude_traits),]
     Crit = c(Crit, c("exclusion of traits"))
     nT = n - nrow(Studies)
     n = nrow(Studies)
