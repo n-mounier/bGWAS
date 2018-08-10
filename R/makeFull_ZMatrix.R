@@ -54,7 +54,7 @@ makeFull_ZMatrix <- function(studies=NULL, GWAS,  Z_matrices="~/Z_matrices", sav
     # keep the SNPs in our pruned matrix and order them correctly
     GWASData = GWASData[match(ZMatrix$rs,GWASData$rs),]
     ZMatrix$outcome =  GWASData[,6]
-    colnames(ZMatrix)[ncol(ZMatrix)]= list_files(IDs = GWAS, Z_matrices = path)
+    colnames(ZMatrix)[ncol(ZMatrix)]= list_files(IDs = GWAS, Z_matrices = Z_matrices)
 
     tmp = "Done! \n"
     Log = update_log(Log, tmp, verbose)
