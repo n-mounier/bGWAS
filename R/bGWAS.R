@@ -374,7 +374,8 @@ bGWAS <- function(name,
     prior_studies = prior_studies[-(which(prior_studies == GWAS))]
     tmp = paste0("The study ", list_files(IDs=GWAS, Z_matrices = Z_matrices), " (ID=", GWAS, ") has been removed from the studies used to build the prior since it is used as conventionnal GWAS. \n")
     log_info = update_log(log_info, tmp, verbose)
-    
+  }
+  if(is.numeric(GWAS)){
     # remove GWAS(s) for the same trait if needed
     Info = list_priorGWASs(Z_matrices = Z_matrices)
     trait = subset(Info, ID==GWAS, "Trait", drop=T)

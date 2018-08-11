@@ -3,9 +3,9 @@
 ## Changes
 - Modification of the way BF p-values are estimated 
 
-We modified the already implemented distribution approachto be usable even if no shrinkage has been applied.   
-This approach uses a percentile approximation for SNPs with low BF, the full formula in the area near significance to avoid false positives/negatives, and a better approximation (using more quantiles) for significant SNPs, to ensure that the highest a BF, the smallest the respective p-value.   
-This method is fast (between 15 and 30 minutes, depending of the dataset), more accurate than the permutation approach () and flexible, since it automatically determine the number of quantiles needed to keep the BF/p-value ordering consistent.
+We modified the already implemented distribution approach to be usable even if no shrinkage has been applied.   
+This approach uses a quantile approximation for all SNPs. The quantiles used are non-linear to get a better approximation (more quantiles for low/high prior values, because using only a 100 linealrly distributed quantiles (percentiles), we can't capture correctly the effect of low/high prior values on the p-values - but the weight are proportionnal to the number of prior values falling in these intervals).    
+This method is fast (between 15 and 30 minutes, depending of the dataset), more accurate than the permutation approach (for small p-values in particular) and reproducible (no randomness involved).
 
 - Modification of the way Z-Matrices are handled   
 
