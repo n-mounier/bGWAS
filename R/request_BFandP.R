@@ -157,10 +157,30 @@ request_BFandP <- function(Prior, sign_thresh, use_perm = F, save_files=F, verbo
       return(p)
     }
     
-    # Get all p-values for a vector of BFs
-    get_pValue<- function(BF, Data){ # BF : vector of values - Data : data.frame with prior_estimate and prior_std_error columns
-      res=data.frame(BF=BF)
-      res$my_p=NA
+    ## Get p-value, for one BF value, using all priors ("true value")
+    get_fullP <- function(BF, Data){ # BF : value - Data : data.frame with prior_estimate and prior_std_error columns
+      suppressWarnings({
+        a = pnorm( (-Data$prior_estimate/(Data$prior_std_error**2)) +
+                     sqrt(1+Data$prior_std_error**2)/(Data$prior_std_error**2) *
+                     sqrt(Data$prior_estimate**2 + 2*Data$prior_std_error**2 * log(BF * sqrt(1+Data$prior_std_error**2))), lower.tail=F) +
+          pnorm((-Data$prior_estimate/(Data$prior_std_error**2)) -
+                  sqrt(1+Data$prior_std_error**2)/(Data$prior_std_error**2) *
+                  sqrt(Data$prior_estimate**2 + 2*Data$prior_std_error**2 * log(BF * sqrt(1+Data$prior_std_error**2))), lower.tail=T)
+      })
+      a[is.na(a)]=1 # if NA -> replace by 1, that means that the polynome has no real solution and Pr(allBF>BF)=1
+      p=mean(a) # here, we use all the prior values, so we can use an unweighted mean
+      return(p)
+    }
+    
+    # Get all p-values for a vector of BFs, return a list with 2 elements : "pValue" & "log_info"
+    get_pValue<- function(BF, Data, sign_thr=5e-8, verbose=F){ # BF : vector of values - Data : data.frame with prior_estimate and prior_std_error columns
+      Log=c()
+      
+      tmp = "... getting approximated p-values using non-linear quantiles  \n"
+      Log = update_log(Log, tmp, verbose)
+      
+      d=data.frame(BF=BF)
+      d$my_p=NA
       
       # here, we define quantiles on the 10^... scale
       # from 0 to 0.5, and then from 0.5 to 1
@@ -189,9 +209,55 @@ request_BFandP <- function(Prior, sign_thresh, use_perm = F, save_files=F, verbo
       sigma2 = mean(Data$prior_std_error**2)
       
       # apply the function to each BF, using the parameters estimated just before
-      res$my_p = apply(res, 1, function(x) get_OneP(x[1], quantiles, sigma2, wghts))
+      d$my_p = apply(d, 1, function(x) get_OneP(x[1], quantiles, sigma2, wghts))
       
-      return(res$my_p)
+      tmp = "... checking p-values near significance threshold  \n"
+      Log = update_log(Log, tmp, verbose)
+      
+      # check if we have some false positive / false negative
+      count_corrected=0
+      # Identify last non-significant SNP
+      snp = min(which(d$my_p>sign_thr))
+      p_true = get_fullP(d$BF[snp], Data)
+      NeedToCorrect = T
+      while(NeedToCorrect){
+        if(p_true<sign_thr){
+          d$my_p[snp] = p_true
+          count_corrected = count_corrected+1
+          snp=snp+1
+          p_true = get_fullP(d$BF[snp], Data)
+        } else {
+          NeedToCorrect=F
+        }
+      }
+      
+      
+      # Identify first significant SNP
+      snp = max(which(d$my_p<sign_thr))
+      p_true = get_fullP(d$BF[snp], Data)
+      NeedToCorrect = T
+      while(NeedToCorrect){
+        if(p_true>sign_thr){
+          d$my_p[snp] = p_true
+          count_corrected = count_corrected+1
+          snp=snp-1
+          p_true = get_fullP(d$BF[snp], Data)
+        } else {
+          NeedToCorrect=F
+        }
+      }
+      
+      if(count_corrected==0) tmp = "    everything is ok!  \n"
+      if(count_corrected==1)  tmp = paste0("   ", count_corrected," p-value has been re-estimated using the exact formula.  \n")
+      if(count_corrected>1)  tmp = paste0("   ", count_corrected, " p-values have been re-estimated using the exact formula.  \n")
+      
+      Log = update_log(Log, tmp, verbose)
+      
+      res = list()
+      res$pValue = d$my_p
+      res$log_info = Log
+      
+      return(res)
       
       
     }
@@ -199,7 +265,10 @@ request_BFandP <- function(Prior, sign_thresh, use_perm = F, save_files=F, verbo
     
 
     Prior = Prior[order(-Prior$BF),]
-    Prior$BF_P = get_pValue(Prior$BF, Prior)
+    PVal = get_pValue(Prior$BF, Prior, sign_thresh, verbose)
+    Prior$BF_P = PVal$pValue
+    
+    Log=c(Log, PVal$log_info)
 
   }
 
