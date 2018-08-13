@@ -8,7 +8,9 @@
 #' @export
 print.bGWAS <- function(obj) {
   cat("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ \n \n ")
-
+  cat (paste0(" Analysis : \"",strsplit(strsplit(obj$log_info[
+    grep("The name of your analysis is: ", obj$log_info)],
+    "The name of your analysis is: \"", fixed=T)[[1]][2], "\"", fixed=T)[[1]][1],"\" \n"))
   cat( "bGWAS performed on", format( nrow(obj$all_BFs) , big.mark = "," , scientific = F) ,
                                     "SNPs \n \n" )
 
