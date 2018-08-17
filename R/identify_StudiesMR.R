@@ -265,38 +265,33 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, Z_Matrices, save_files=FAL
   }
 
   # Check directionality
-  suppressWarnings({
   uni.coefs.collection[ significant.studies ] -> corresponding.uvar.coefs
   mycoefs = coefs[coefs$nm %in% significant.studies]
   mycoefs$nm = as.character(mycoefs$nm)
   stopifnot(mycoefs$nm == corresponding.uvar.coefs$nm)
-  (mycoefs$Estimate / corresponding.uvar.coefs$Estimate) -> look.for.magnitude.of.diference
-  studies_to_removeD = NULL
-  while( min(look.for.magnitude.of.diference) < 0) {
-    which.min(look.for.magnitude.of.diference) -> study.with.biggest.sign.difference
-    studies_to_remove <- c(studies_to_remove, coefs$nm[study.with.biggest.sign.difference])
-    studies_to_removeD <- c(studies_to_removeD, coefs$nm[study.with.biggest.sign.difference])
-    reasons          <- c(reasons, 'different sign of effect estimate between univariate and multivariate regression')
-    look.for.magnitude.of.diference = look.for.magnitude.of.diference[-study.with.biggest.sign.difference]
-    if(length(look.for.magnitude.of.diference)==0){
-      if(save_files){ # add Status : Direction
-        Files_Info$status[Files_Info$File %in% studies_to_removeD] =
-          "Excluded during multivariate MR (unconsistent direction)"
-      }
-
-      tmp = "No study significant after checking for direction - Analysis failed"
-      Log = update_log(Log, tmp, verbose)
-
-      if(save_files)                write.table(Files_Info, file="PriorGWASs.tsv", sep="\t", quote=F, row.names=F )
-
-
-      res=list()
-      res$log_info = Log
-      res$stop = T
-      return(res)
-      }
+  (mycoefs$Estimate / corresponding.uvar.coefs$estimate) -> look.for.magnitude.of.diference
+  studies_to_removeD = mycoefs$nm[which(look.for.magnitude.of.diference < 0)]
+  studies_to_remove <- c(studies_to_remove, studies_to_removeD)
+  reasons          <- c(reasons, rep('different sign of effect estimate between univariate and multivariate regression', length(studies_to_removeD)))
+  
+  if(length(studies_to_remove)==nrow(coefs)){
+    if(save_files){ # add Status : Direction
+      Files_Info$status[Files_Info$File %in% studies_to_removeD] =
+        "Excluded during multivariate MR (unconsistent direction)"
+    }
+    
+    tmp = "No study significant after checking for direction - Analysis failed"
+    Log = update_log(Log, tmp, verbose)
+    
+    if(save_files)                write.table(Files_Info, file="PriorGWASs.tsv", sep="\t", quote=F, row.names=F )
+    
+    
+    res=list()
+    res$log_info = Log
+    res$stop = T
+    return(res)
   }
-})
+
 
   if(!is.null(studies_to_removeD)){
     if(save_files){ # add Status : Direction
