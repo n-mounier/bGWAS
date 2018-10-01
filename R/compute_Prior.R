@@ -92,6 +92,9 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkag
 
   R2=numeric(22)
   dynamic.study.names = unlist(selected_studies)
+  
+  OutOfSample = data.frame(Obs=numeric(), Pred=numeric(), 
+                           Res=numeric())
 
   for(chrm in 1:22) {
     tmp = paste0("   Chromosome ", chrm, "\n")
@@ -213,23 +216,21 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkag
 
     test.outcome    <- d_test[,outcome]
 
-    SS.total      <- sum((test.outcome - mean(test.outcome))^2)
-    SS.regression <- sum((preds$fit - mean(test.outcome))^2)
+    OutOfSample=rbind(OutOfSample,data.frame(Obs=test.outcome, Pred=preds$fit,
+                                             Res=(test.outcome - preds$fit)))
 
-
-    # fraction of variability explained by the model : SS.regression/SS.total
-    R2_chrm =  1-(1-SS.regression/SS.total)*(nrow(d_masked)-1)/(nrow(d_masked)-length(dynamic.study.names)-1)
-    tmp = paste0("Adjusted R-squared : ", round(R2_chrm, 4), "\n")
-    Log = update_log(Log, tmp, verbose)
-
-    R2[chrm] =R2_chrm
 
   }
   colnames(all.priors)[6:8] = c("observed_Z", "prior_estimate", "prior_std_error")
+  
+  SS.total     <- sum(OutOfSample$Obs^2)
+  SS.residuals <- sum((OutOfSample$Res)^2)
+  
+  R2 = 1 - SS.residuals/SS.total
 
-  tmp = paste0("## Mean out-of-sample adjusted R-squared across all chromosomes is ", round(mean(R2), 4), "\n")
+  tmp = paste0("## Out-of-sample R-squared across all chromosomes is ", round(R2, 4), "\n")
   Log = update_log(Log, tmp, verbose)
-  tmp = paste0("## Median out-of-sample adjusted R-squared across all chromosomes is ", round(median(R2), 4), "\n")
+  tmp = paste0("## Out-of-sample squared correlation across all chromosome is ", round(cor(OutOfSample$Obs, OutOfSample$Pred)^2, 4), "\n")
   Log = update_log(Log, tmp, verbose)
 
   ## we need to add one to the prior variance to account for the fact that we are
