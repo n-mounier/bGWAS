@@ -183,6 +183,9 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
   
   Convergence=F
   
+  tmp = paste0("Adding the first study :", significant.studies, " \n")
+  Log = update_log(Log, tmp, verbose)
+  
   it = 0
   while(!Convergence){
     if(nrow(steps)>7){ # are we in a loop?
