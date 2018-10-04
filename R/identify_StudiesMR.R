@@ -112,6 +112,10 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
   colnames(uni.coefs.collection) = c("study", "estimate", "std_error", "T", "P",
                                      "adj_Rsquared", "Rsquared")
   
+  
+  colnames(uni.coefs.collection) = c("study", "estimate", "std_error", "T", "P",
+                                     "adj_Rsquared", "Rsquared")
+  
   if(save_files){ # add univariate coeffs
     Files_Info$uni_estimate = numeric()
     Files_Info$uni_estimate[match(uni.coefs.collection$study, Files_Info$File)] = uni.coefs.collection$estimate
@@ -133,13 +137,17 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
   
   
   
-  tmp = paste0("# Stepwise selection (univariate selected traits)... \n")
+  tmp = paste0("# Stepwise selection (all traits)... \n")
   Log = update_log(Log, tmp, verbose)
+  
+  
+  backward_threshold = 0.05/length(Prior_study_names)
+  
   
   uni.coefs.collection=as.data.frame(uni.coefs.collection)
   uni.coefs.collection$study = as.character(uni.coefs.collection$study)
   
-  if(all(uni.coefs.collection$P>0.05)){
+  if(all(uni.coefs.collection$P>backward_threshold)){
     tmp = "No study significant - Analysis failed"
     Log = update_log(Log, tmp, verbose)
     
@@ -153,6 +161,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
   
   
   significant.studies = uni.coefs.collection$study[which.min(uni.coefs.collection$P)]
+  
   
   studies.to.test = unlist(subset(uni.coefs.collection, P<0.05, study))
   studies.to.test = studies.to.test[!studies.to.test %in% significant.studies]
@@ -221,7 +230,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
     
     no_change = T
     
-    tmp = paste0("#Test if any study can be added with p<", round(0.05, 4), " \n")
+    tmp = paste0("#Test if any study can be added with p<", round(backward_threshold, 4), " \n")
     Log = update_log(Log, tmp, verbose)
     PValues = numeric(length(studies.to.test))
     PValues = data.frame(study=studies.to.test, P=numeric(length(studies.to.test)), Estimate=numeric(length(studies.to.test)), stringsAsFactors = F)
@@ -251,7 +260,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
     
     
     
-    if(any(PValues$P<0.05)){
+    if(any(PValues$P<backward_threshold)){
       no_change = F
       study_to_add = PValues$study[which.min(PValues$P)]
       
@@ -322,14 +331,14 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
     coefs[, nm := gsub("`","",nm)]
     
     
-    tmp = paste0("#Test if any study has p>", round(0.05, 4), " now \n")
+    tmp = paste0("#Test if any study has p>", round(backward_threshold, 4), " now \n")
     Log = update_log(Log, tmp, verbose)
     
     
     # Remove traits with multivariate p-value larger that 0.05
     coefs[order(-`Pr(>|t|)`)] -> largest.MR.p.value
     study_to_remove <- character()
-    if(any(largest.MR.p.value$`Pr(>|t|)` > 0.05)){
+    if(any(largest.MR.p.value$`Pr(>|t|)` > backward_threshold)){
       no_change = F
       
       study_to_remove <-  largest.MR.p.value$nm[1]
@@ -367,6 +376,10 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
     
   }
   
+  
+  
+  
+  final_set_of_study_names  = significant.studies
   
 
   final_set_of_study_names  = significant.studies
