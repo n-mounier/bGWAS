@@ -667,8 +667,7 @@ bGWAS <- function(name,
   if(save_files){
     setwd(InitPath)
   }
-  rm(ZMatrix, envir = .GlobalEnv)
-  
+
   
   ### write log_info File ###
   Time = as.integer((proc.time()-StartTime)[3])

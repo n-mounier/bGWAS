@@ -414,8 +414,8 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
     Files_Info$multi_P = numeric()
     Files_Info$multi_P[match(coefs$study, Files_Info$File)] = coefs$P
   }
-  outcome = colnames(ZMatrix)[ncol(ZMatrix)]
-
+  outcome = colnames(ZMatrix_subset)[ncol(ZMatrix_subset)]
+  
   tmp = paste0("Estimating adjusted R-squared: \n")
   Log = update_log(Log, tmp, verbose)
   R2_Multi = summary(lm(data=ZMatrix_subset, formula = generate.formula(outcome, final_set_of_study_names)))$adj.r.squared
