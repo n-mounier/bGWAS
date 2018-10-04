@@ -431,7 +431,8 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
   res$log_info = Log
   res$studies = final_set_of_study_names
   res$coeffs = coefs
-
+  res$ZMat = ZMatrix_subset
+  
 
   return(res)
 }

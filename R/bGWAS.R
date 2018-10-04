@@ -587,7 +587,7 @@ bGWAS <- function(name,
   tmp = paste0("> Computing prior  \n")
   log_info = update_log(log_info, tmp, verbose)
   
-  Prior = compute_prior(res_MR$studies,matrix_MR$mat, matrix_all$mat, MR_shrinkage, prior_shrinkage, Z_matrices, save_files, verbose)
+  Prior = compute_prior(res_MR$studies,res_MR$ZMat, matrix_all$mat, MR_shrinkage, prior_shrinkage, Z_matrices, save_files, verbose)
   log_info = c(log_info, Prior$log_info)
   # if error/problem in compute_prior
   if(isTRUE(Prior$stop)){
