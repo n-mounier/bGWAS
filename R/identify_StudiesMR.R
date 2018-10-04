@@ -418,7 +418,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
 
   tmp = paste0("Estimating adjusted R-squared: \n")
   Log = update_log(Log, tmp, verbose)
-  R2_Multi = summary(lm(data=ZMatrix, formula = generate.formula(outcome, final_set_of_study_names)))$adj.r.squared
+  R2_Multi = summary(lm(data=ZMatrix_subset, formula = generate.formula(outcome, final_set_of_study_names)))$adj.r.squared
   tmp = paste0("- in-sample adjusted R-squared for the all-chromosomes multivariate regression is ", round(R2_Multi,4), " \n")
   Log = update_log(Log, tmp, verbose)
   tmp = paste0("- out-of-sample R-squared (masking one chromosome at a time), for the multivariate regression will be estimated when calculating the prior. \n")
