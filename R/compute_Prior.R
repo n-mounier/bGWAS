@@ -90,7 +90,6 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkag
   tmp = "# Calculating the prior chromosome by chromosome... \n"
   Log = update_log(Log, tmp, verbose)
 
-  R2=numeric(22)
   dynamic.study.names = unlist(selected_studies)
   
   OutOfSample = data.frame(Obs=numeric(), Pred=numeric(), 
@@ -207,8 +206,9 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkag
 
 
     # all SNPs we need to predict (the ones on this chromosome)
-    d_test             = MR_ZMatrix[chrm==chrm_          ,,drop=T]
-
+    out    =   (MR_ZMatrix$chrm == chrm)
+    d_test = MR_ZMatrix[out,]
+    
     suppressWarnings({ #In predict.lm(fit_masked, d_test, se.fit = T) : prediction from a rank-deficient fit may be misleading
       predict(fit_masked, d_test, se.fit=T) -> preds
     })
