@@ -396,7 +396,13 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
   #catn('regression on entire dataset:')
   tmp = paste0("# Final regression... \n")
   Log = update_log(Log, tmp, verbose)
-
+  
+  tmp = paste0("The studies used are: \n")
+  Log = update_log(Log, tmp, verbose)
+  
+  tmp = c(paste0(paste0("- ", final_set_of_study_names), collapse="\n"), "\n")
+  Log = update_log(Log, tmp, verbose)
+  
   coefs <- data.frame(coef(summary(lm(data=ZMatrix_subset, formula = generate.formula(All_study_names[length(All_study_names)], final_set_of_study_names)))))
   coefs=cbind(nm=rownames(coefs), coefs)
   rownames(coefs) <- NULL
