@@ -155,21 +155,6 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
     SNPsToKeep = apply(ZMatrix[,-c(1:5,as.numeric(ncol(ZMatrix)))], 1, function(x) any(abs(x)>Zlimit))
     ZMatrix=ZMatrix[SNPsToKeep,]
     
-    # check that each study have at least one SNP surviving thresholding
-    # not needed to check for the last column
-    StudiesToKeep = apply(ZMatrix[,-c(1:5,as.numeric(ncol(ZMatrix)))], 2, function(x) any(abs(x)>Zlimit))
-    if(!all(StudiesToKeep)){
-      tmp = paste0(paste0(colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after thresholding) \n")
-      if(save_files){
-        Files_Info$status[Files_Info$File %in% colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep]] =
-          "Excluded for MR: no strong instrument left after thresholding"
-      }
-      ZMatrix[,colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep]] <- NULL
-    }
-    Log = update_log(Log, tmp, verbose)
-    tmp = paste0(ncol(ZMatrix)-6, " studies left after thresholding \n") # -6 and not -5 because the last one is the conv. GWAS
-    Log = update_log(Log, tmp, verbose)
-    
     tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific = F), " SNPs left after thresholding \n")
     Log = update_log(Log, tmp, verbose)
   } else {
@@ -196,7 +181,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
       SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = MR_pruning_dist, clump_r2 = MR_pruning_LD)$SNP))
     }
   }
-  else {# distance pruning
+  else{# distance pruning
     tmp = paste0("   distance : ", MR_pruning_dist, "Kb \n")
     Log = update_log(Log, tmp, verbose)
     ToPrune$Z = maxZ
@@ -206,21 +191,34 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
   
   ZMatrixPruned = ZMatrix[ZMatrix$rs %in% SNPsToKeep,]
   
-  # check that each study have at least one SNP surviving pruning
-  StudiesToKeep = apply(ZMatrixPruned[,-c(1:5,as.numeric(ncol(ZMatrixPruned)))], 2, function(x) any(abs(x)>Zlimit))
+  tmp = paste0(format(nrow(ZMatrixPruned), big.mark = ",", scientific = F), " SNPs left after pruning \n")
+  Log = update_log(Log, tmp, verbose)
+  
+  NAllStudies = nrow(ZMatrixPruned)
+  
+  # check that each study have at least two SNPs surviving pruning+thresholding
+  StudiesToKeep = apply(ZMatrixPruned[,-c(1:5,as.numeric(ncol(ZMatrixPruned)))], 2, function(x) sum(abs(x)>Zlimit)>1)
   if(!all(StudiesToKeep)){
-    tmp = paste0(paste0(colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no strong instrument after pruning) \n")
+    tmp = paste0(paste0(colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no more than one strong instrument after pruning) \n")
     if(save_files){
       Files_Info$status[Files_Info$File %in% colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep]] =
-        "Excluded for MR: no strong instrument left after pruning"
+        "Excluded for MR: no more than one strong instrument left after thresholding+pruning"
     }
     ZMatrixPruned[,colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep]] <- NULL
   }
-  tmp = paste0(ncol(ZMatrixPruned)-6, " studies left after pruning \n")
+  tmp = paste0(ncol(ZMatrixPruned)-6, " studies left after thresholding+pruning \n")
   Log = update_log(Log, tmp, verbose)
   
-  tmp = paste0(format(nrow(ZMatrixPruned), big.mark = ",", scientific = F), " SNPs left after pruning \n")
-  Log = update_log(Log, tmp, verbose)
+  
+  # Further checking of the SNPs to remove SNPs associated with studies removed because only one SNP
+  SNPsToKeep = apply(ZMatrixPruned[,-c(1:5,as.numeric(ncol(ZMatrixPruned)))], 1, function(x) any(abs(x)>Zlimit))
+  if(sum(SNPsToKeep != NAllStudies)){
+    ZMatrixPruned=ZMatrixPruned[SNPsToKeep,]
+    tmp = paste0(format(nrow(ZMatrixPruned), big.mark = ",", scientific = F), " SNPs left after removing studies with only one strong instrument \n")
+    Log = update_log(Log, tmp, verbose)
+  }
+  
+  
   
   
   if(save_files) write.table(Files_Info, file="PriorGWASs.tsv", sep="\t", quote=F, row.names=F )
@@ -232,3 +230,5 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
   res$mat = ZMatrixPruned
   return(res)
 }
+
+
