@@ -555,7 +555,7 @@ bGWAS <- function(name,
   tmp = paste0("> Performing MR  \n")
   log_info = update_log(log_info, tmp, verbose)
   
-  res_MR = identify_studiesMR(matrix_MR$mat, MR_shrinkage, Z_Matrices, save_files, verbose)
+  res_MR = identify_studiesMR(matrix_MR$mat, MR_shrinkage, MR_threshold, Z_Matrices, save_files, verbose)
   log_info = c(log_info, res_MR$log_info)
   # if error/problem in identify_studiesMR
   if(isTRUE(res_MR$stop)){
@@ -605,8 +605,7 @@ bGWAS <- function(name,
     if(save_files){
       setwd(InitPath)
     }
-    rm(ZMatrix, envir = .GlobalEnv)
-    
+
     ### write log_info File ###
     Time = as.integer((proc.time()-StartTime)[3])
     minutes <- as.integer(trunc(Time/60))

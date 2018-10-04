@@ -1,3 +1,17 @@
+# bGWAS 0.3.1 (2018-10-04)
+
+## Changes
+- Modification of the selection of traits in the multivariate MR model
+
+The matrix of instruments use for each model should be specific to the traits used by the model, i.e. all the models we want to compare will have a different number of observations, and we can't use AIC to compare them anymore.    
+We implemented a stepwise approach, based on p-value to decide if a trait should be included or not. We start with a model including only the most significant study (univariate), and try to add, one by one, all the remaining studies (and update the instruments used for each model). If one of the studies has a p-value < 0.05 / number of studies tested, the most significant one is added to the model (if the univariate and multivariate effect estimate are in the same direction, otherwise the study is discarded). The model is updated to include these 2 studies, and we test if any of the studies in the updated model has a p-value > 0.05 / number of studies tested. We keep adding/removing studies until we obtain a definitive set of studies (convergence).    
+
+- Modification of the out-of-sample R2
+
+Out-of-sample R2 is not corrected for the number of traits/observation (no adjustement needed), and is calculated once all the regressions masking one chromosome are performed. We now obtain a global out-of-sample R2, and not one per chromosome (no need to use the mean/median, more robust if some chromosome have only a small number of SNPs to be predict).   
+
+
+
 # bGWAS 0.3.0 (2018-07-31)
 
 ## Changes
