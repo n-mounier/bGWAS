@@ -92,12 +92,23 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
   # Compute and save the univariate regressions (used to check directionnality in multivariate regression):
   tmp = paste0("# Univariate regressions for each trait... \n")
   Log = update_log(Log, tmp, verbose)
-
-
+  
+  
   uni.coefs.collection = data.table::data.table()
+  tmp= "  Number of trait-specific instruments per univariate regression: \n"
+  Log = update_log(Log, tmp, verbose)
+  
+  Zlimit = qnorm(MR_threshold/2, lower.tail = F)
+  
+  
   for(one.study in Prior_study_names) {
+    # create a ZMatrix_uni containing instruments only for one.study
+    ZMatrix_uni = ZMatrix[abs(ZMatrix[,one.study])>Zlimit,]
+    tmp= paste0("  . ",one.study, " : ", nrow(ZMatrix_uni), " \n")
+    Log = update_log(Log, tmp, verbose)
+    
     paste(All_study_names[length(All_study_names)], ' ~ -1 + `',one.study,'`', sep='', collapse="") -> uni.form
-    lm(data=ZMatrix, formula = uni.form) -> uni.fit
+    lm(data=ZMatrix_uni, formula = uni.form) -> uni.fit
     uni.coefs <- data.frame(coef(summary(uni.fit)))
     uni.coefs=cbind(nm=rownames(uni.coefs) %>% gsub("`","",.), uni.coefs)
     rownames(uni.coefs) <- NULL
@@ -107,10 +118,6 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
     uni.coefs.collection = rbind(uni.coefs.collection, uni.coefs)
   }
   data.table::setkey(uni.coefs.collection, nm)
-
-
-  colnames(uni.coefs.collection) = c("study", "estimate", "std_error", "T", "P",
-                                     "adj_Rsquared", "Rsquared")
   
   
   colnames(uni.coefs.collection) = c("study", "estimate", "std_error", "T", "P",
@@ -378,9 +385,6 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
   
   
   
-  
-  final_set_of_study_names  = significant.studies
-  
 
   final_set_of_study_names  = significant.studies
   
@@ -390,7 +394,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
   tmp = paste0("# Final regression... \n")
   Log = update_log(Log, tmp, verbose)
 
-  coefs <- data.frame(coef(summary(lm(data=ZMatrix, formula = generate.formula(All_study_names[length(All_study_names)], final_set_of_study_names)))))
+  coefs <- data.frame(coef(summary(lm(data=ZMatrix_subset, formula = generate.formula(All_study_names[length(All_study_names)], final_set_of_study_names)))))
   coefs=cbind(nm=rownames(coefs), coefs)
   rownames(coefs) <- NULL
   coefs = coefs[order(coefs$Pr...t..),,drop=F]
