@@ -152,8 +152,14 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
     tmp = paste0("# Thresholding... \n")
     Log = update_log(Log, tmp, verbose)
     # DO NOT USE THE LAST COLUMN!!
-    SNPsToKeep = apply(ZMatrix[,-c(1:5,as.numeric(ncol(ZMatrix)))], 1, function(x) any(abs(x)>Zlimit))
-    ZMatrix=ZMatrix[SNPsToKeep,]
+    if(ncol(ZMatrix)>7){
+      SNPsToKeep = apply(ZMatrix[,-c(1:5,as.numeric(ncol(ZMatrix)))], 1, function(x) any(abs(x)>Zlimit))
+      ZMatrix=ZMatrix[SNPsToKeep,]
+    } else {
+      SNPsToKeep = ZMatrix[,-c(1:5,as.numeric(ncol(ZMatrix)))]>Zlimit
+      ZMatrix=ZMatrix[SNPsToKeep,]
+    }
+    
     
     tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific = F), " SNPs left after thresholding \n")
     Log = update_log(Log, tmp, verbose)
@@ -165,9 +171,14 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
   # pruning
   tmp = paste0("Pruning MR instruments... \n")
   Log = update_log(Log, tmp, verbose)
-  apply(ZMatrix[,-c(1:5, ncol(ZMatrix))], 1, function(ZMatrix){
-    max(abs(ZMatrix))
-  }) -> maxZ
+  if(ncol(ZMatrix)>7){
+    apply(ZMatrix[,-c(1:5, ncol(ZMatrix))], 1, function(ZMatrix){
+      max(abs(ZMatrix))
+    }) -> maxZ
+  } else {
+    maxZ <- ZMatrix[,6]
+  }
+  
   ToPrune = ZMatrix[,1:3]
   colnames(ToPrune) = c("SNP", "chr_name", "chr_start")
   if(MR_pruning_LD>0){# LD-pruning
@@ -197,8 +208,13 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
   NAllStudies = nrow(ZMatrixPruned)
   
   # check that each study have at least two SNPs surviving pruning+thresholding
-  StudiesToKeep = apply(ZMatrixPruned[,-c(1:5,as.numeric(ncol(ZMatrixPruned)))], 2, function(x) sum(abs(x)>Zlimit)>1)
-  if(!all(StudiesToKeep)){
+  if(ncol(ZMatrixPruned)>7){
+    StudiesToKeep = apply(ZMatrixPruned[,-c(1:5,as.numeric(ncol(ZMatrixPruned)))], 2, function(x) sum(abs(x)>Zlimit)>1)
+  } else {
+    StudiesToKeep = sum(abs(ZMatrixPruned[,6])>Zlimit)>1
+  }
+  
+   if(!all(StudiesToKeep)){
     tmp = paste0(paste0(colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no more than one strong instrument after pruning) \n")
     if(save_files){
       Files_Info$status[Files_Info$File %in% colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep]] =
@@ -211,7 +227,12 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
   
   
   # Further checking of the SNPs to remove SNPs associated with studies removed because only one SNP
-  SNPsToKeep = apply(ZMatrixPruned[,-c(1:5,as.numeric(ncol(ZMatrixPruned)))], 1, function(x) any(abs(x)>Zlimit))
+  if(ncol(ZMatrixPruned)>7){
+    SNPsToKeep = apply(ZMatrixPruned[,-c(1:5,as.numeric(ncol(ZMatrixPruned)))], 1, function(x) any(abs(x)>Zlimit))
+  } else {
+    SNPsToKeep = abs(ZMatrixPruned[,6])>Zlimit
+  }
+  
   if(sum(SNPsToKeep != NAllStudies)){
     ZMatrixPruned=ZMatrixPruned[SNPsToKeep,]
     tmp = paste0(format(nrow(ZMatrixPruned), big.mark = ",", scientific = F), " SNPs left after removing studies with only one strong instrument \n")

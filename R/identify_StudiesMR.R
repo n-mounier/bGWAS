@@ -328,8 +328,14 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
     # remove instruments non specific to our studies
     Zlimit = qnorm(MR_threshold/2, lower.tail = F)
     # DO NOT USE THE LAST COLUMN!!
-    SNPsToKeep = apply(ZMatrix_subset[,-c(1:5,as.numeric(ncol(ZMatrix_subset)))], 1, function(x) any(abs(x)>Zlimit))
-    ZMatrix_subset=ZMatrix_subset[SNPsToKeep,]
+    
+    if(length(significant.studies)>1){
+      SNPsToKeep = apply(ZMatrix_subset[,-c(1:5,as.numeric(ncol(ZMatrix_subset)))], 1, function(x) any(abs(x)>Zlimit))
+      ZMatrix_subset=ZMatrix_subset[SNPsToKeep,]
+    } else {
+      SNPsToKeep = ZMatrix_subset[,-c(1:5,as.numeric(ncol(ZMatrix_subset)))]>Zlimit
+      ZMatrix_subset=ZMatrix_subset[SNPsToKeep,]
+    }
     
     ## RUN MODEL
     tmp="#Update model \n"
