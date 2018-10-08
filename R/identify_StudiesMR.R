@@ -169,13 +169,10 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
   
   significant.studies = uni.coefs.collection$study[which.min(uni.coefs.collection$P)]
   
+  non.significant.studies = Prior_study_names[!Prior_study_names %in% significant.studies]
+  studies.to.test = non.significant.studies # same now, but some studies (inconsistent direction / loop : might be remove from the test set, and not from the non.significant set)
   
-  studies.to.test = unlist(subset(uni.coefs.collection, P<0.05, study))
-  studies.to.test = studies.to.test[!studies.to.test %in% significant.studies]
-  
-  non.significant.studies = c(unlist(c(subset(uni.coefs.collection, !P<0.05, study), subset(uni.coefs.collection, is.na(P), study))),studies.to.test)
-  
-  if(save_files){ # add Status : AIC exclusion
+  if(save_files){ # add Status : stepwise exclusion, will be updated if the studies are added
     Files_Info$status[Files_Info$File %in% non.significant.studies] = "Excluded during stepwise selection"
   }
   
@@ -189,7 +186,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
   it = 0
   while(!Convergence){
     if(nrow(steps)>7){ # are we in a loop?
-      if(steps$Study[nrow(steps)-6]==steps$Study[nrow(steps)] & steps$Study[nrow(steps)-7]==steps$Study[nrow(steps)-1]){
+      if(steps$Study[nrow(steps)-6]==steps$Study[nrow(steps)] & steps$Study[nrow(steps)-7]==steps$Study[nrow(steps)-1] & steps$Study[nrow(steps)-1]!=""){
         tokeep = steps$Study[nrow(steps)]
         toexclude = steps$Study[nrow(steps)-1]
         # add the last ones to our list of study
