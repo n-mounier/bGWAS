@@ -581,6 +581,7 @@ bGWAS <- function(name,
   tmp = paste0("> Creating the full Z-Matrix  \n")
   log_info = update_log(log_info, tmp, verbose)
   Studies = select_priorGWASs(include_files=res_MR$studies, Z_matrices = Z_matrices)
+  print(Studies)
   matrix_all = makeFull_ZMatrix(Studies, GWAS, Z_matrices, save_files, verbose)
   log_info = c(log_info,matrix_all$log_info)
   
