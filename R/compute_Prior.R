@@ -223,15 +223,26 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkag
   }
   colnames(all.priors)[6:8] = c("observed_Z", "prior_estimate", "prior_std_error")
   
-  SS.total     <- sum(OutOfSample$Obs^2)
+ 
+  SS.total     <- sum((OutOfSample$Obs-mean(OutOfSample$Obs))^2)
   SS.residuals <- sum((OutOfSample$Res)^2)
   
   R2 = 1 - SS.residuals/SS.total
 
-  tmp = paste0("## Out-of-sample R-squared across all chromosomes is ", round(R2, 4), "\n")
+  tmp = paste0("## Out-of-sample R-squared for MR instruments across all chromosomes is ", round(R2, 4), "\n")
   Log = update_log(Log, tmp, verbose)
-  tmp = paste0("## Out-of-sample squared correlation across all chromosome is ", round(cor(OutOfSample$Obs, OutOfSample$Pred)^2, 4), "\n")
+  tmp = paste0("## Out-of-sample squared correlation for MR instruments across all chromosome is ", round(cor(OutOfSample$Obs, OutOfSample$Pred)^2, 4), "\n")
   Log = update_log(Log, tmp, verbose)
+
+  
+  tmp = paste0("## Correlation between prior and observed effects for all SNPs is ", round(cor(all.priors$observed_Z, all.priors$prior_estimate), 4), "\n")
+  Log = update_log(Log, tmp, verbose)
+  
+  Zlimit = qnorm(0.001/2, lower.tail = F)
+  SNPs_moderateeffect = subset(all.priors, abs(observed_Z)>Zlimit)
+  tmp = paste0("## Correlation between prior and observed effects for SNPs with GWAS p-value < 0.001 is ", round(cor(SNPs_moderateeffect$observed_Z, SNPs_moderateeffect$prior_estimate), 4), "\n")
+  Log = update_log(Log, tmp, verbose)
+  
 
   ## we need to add one to the prior variance to account for the fact that we are
   ## predicting a noisy variable : observedZ ~ N(trueZ, 1)
