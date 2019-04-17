@@ -1,3 +1,22 @@
+# bGWAS 0.3.2 (2019-04-17)
+
+## Bug fixes    
+- Correction of the instruments selection process        
+
+When only one prior GWAS is used, the previous version was using z-score > threshold instead of abs(z-score) > threshold to select instruments. This could lead to a smaller number of instruments used and a potentially incorrect estimation of the causal effects, and the R2 / squared correlation values reported.        
+    
+
+## Changes   
+- Clarification of the out-of-sample R2 and squared correlation estimation reported 
+
+These values are estimated using only the instruments initially selected for the multivariate MR model (not all SNPs). The predicted values of the instruments obtained when masking the chromosomes they are located on are used to calculate the out-of-sample R2 and the out-of-sample squared correlation. This is now more explicitly indicated in the log file.     
+Note that the R2 and the squared correlation can differ because the regression model does not include an intercept.       
+
+- Information about the correlation between prior and observed effects    
+
+In addition to the out-of-sample R2 and squared correlation, the correlation between prior and observed effects is now also reported (for all SNPs + for SNPs moderately associated with the trait, p<0.001).     
+
+
 # bGWAS 0.3.1 (2018-10-04)
 
 ## Changes

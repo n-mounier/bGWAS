@@ -121,6 +121,17 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkag
     ) -> fit_masked # fit, without one chromosome
     coefs <- data.frame(coef(summary(fit_masked)))
 
+    
+    # CHECK R2 / Squared correlation formulas
+    #SS.total =  sum(d_masked$SmallGWAS_Pilling2017.csv^2)
+    #SS.residuals = sum(fit_masked$residuals^2)
+    #SS.regression = sum((d_masked$SmallGWAS_Pilling2017.csv-fit_masked$residuals)^2)
+    #1 - SS.residuals/SS.total
+    #SS.regression/SS.total
+    #summary(fit_masked)$r.squared
+    #cor(fit_masked$fitted.values,d_masked$SmallGWAS_Pilling2017.csv)^2
+    ## squared correlation is not equal to R2 because of the "no intercept" model, but R2 formula is ok
+    
    # stopifnot(length(dynamic.study.names) ==  nrow(coefs))
      ## this can happen, if all non-0 Z-score of a study are one the same chromosome
      ## but this should not be a problem
@@ -207,6 +218,7 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkag
 
     # all SNPs we need to predict (the ones on this chromosome)
     out    =   (MR_ZMatrix$chrm == chrm)
+    if(!all(!out)){
     d_test = MR_ZMatrix[out,]
     
     suppressWarnings({ #In predict.lm(fit_masked, d_test, se.fit = T) : prediction from a rank-deficient fit may be misleading
@@ -215,20 +227,33 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkag
 
 
     test.outcome    <- d_test[,outcome]
-
+    
+   
     OutOfSample=rbind(OutOfSample,data.frame(Obs=test.outcome, Pred=preds$fit,
                                              Res=(test.outcome - preds$fit)))
+    }
 
 
   }
   colnames(all.priors)[6:8] = c("observed_Z", "prior_estimate", "prior_std_error")
   
- 
-  SS.total     <- sum((OutOfSample$Obs-mean(OutOfSample$Obs))^2)
+ # NORMALLY
+  #    SST = sum((obs-mean)^2)
+  #    SSE = sum((obs-fit)^2)
+  #    SSR = sum((fit-mean)^2)
+ # BUT...
+ # NO INTERCEPT MODEL
+  # so SST = sum(obs^2)
+  #    SSE = sum((obs-fit)^2)
+  #    SSR = sum(fit^2)
+  
+  SS.total     <- sum((OutOfSample$Obs)^2)
   SS.residuals <- sum((OutOfSample$Res)^2)
   
   R2 = 1 - SS.residuals/SS.total
 
+
+  
   tmp = paste0("## Out-of-sample R-squared for MR instruments across all chromosomes is ", round(R2, 4), "\n")
   Log = update_log(Log, tmp, verbose)
   tmp = paste0("## Out-of-sample squared correlation for MR instruments across all chromosome is ", round(cor(OutOfSample$Obs, OutOfSample$Pred)^2, 4), "\n")
