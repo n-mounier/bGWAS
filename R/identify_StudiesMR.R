@@ -222,7 +222,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
       SNPsToKeep = apply(ZMatrix_subset[,-c(1:5,as.numeric(ncol(ZMatrix_subset)))], 1, function(x) any(abs(x)>Zlimit))
       ZMatrix_subset=ZMatrix_subset[SNPsToKeep,]
     } else {
-      SNPsToKeep = ZMatrix_subset[,-c(1:5,as.numeric(ncol(ZMatrix_subset)))]>Zlimit
+      SNPsToKeep = abs(ZMatrix_subset[,-c(1:5,as.numeric(ncol(ZMatrix_subset)))])>Zlimit
       ZMatrix_subset=ZMatrix_subset[SNPsToKeep,]
     }
     
@@ -330,7 +330,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, Z_Matrices, 
       SNPsToKeep = apply(ZMatrix_subset[,-c(1:5,as.numeric(ncol(ZMatrix_subset)))], 1, function(x) any(abs(x)>Zlimit))
       ZMatrix_subset=ZMatrix_subset[SNPsToKeep,]
     } else {
-      SNPsToKeep = ZMatrix_subset[,-c(1:5,as.numeric(ncol(ZMatrix_subset)))]>Zlimit
+      SNPsToKeep = abs(ZMatrix_subset[,-c(1:5,as.numeric(ncol(ZMatrix_subset)))])>Zlimit
       ZMatrix_subset=ZMatrix_subset[SNPsToKeep,]
     }
     
