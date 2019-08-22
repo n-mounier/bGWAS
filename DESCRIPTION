@@ -26,7 +26,6 @@ Imports:
   magrittr (>= 1.5),
   qqman (>= 0.1.4),
   Rcpp (>= 0.12.15),
-  readr (>= 1.1.1),
-  TwoSampleMR (>= 0.3.0)
+  readr (>= 1.1.1)
 Remotes: MRCIEU/TwoSampleMR
 VignetteBuilder: knitr
