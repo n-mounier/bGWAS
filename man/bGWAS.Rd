@@ -115,19 +115,19 @@ data for the analysis (some alleles might be swapped when comparing with the ini
 }
 \examples{
 # Permorm bGWAS, using a conventional GWAS from the list of prior GWASs
+\dontrun{
 MyGWAS = 5
 list_priorGWASs(MyGWAS)
-\dontrun{
 A = bGWAS(name = "Test_UsingGWASfromPriorGWASs",
          GWAS = MyGWAS)
          }
 
 # Permorm bGWAS, using a small conventional GWAS included in data (file) and selecting a subset of
 # studies for the prior
+\dontrun{
 MyGWAS = system.file("Data/SmallGWAS_Pilling2017.csv", package="bGWAS")
 MyStudies = select_priorGWASs(include_traits=c("Type 2 diabetes", "Smoking"),
                          include_files=c("jointGwasMc_HDL.txt.gz","jointGwasMc_LDL.txt.gz"))
-\dontrun{
 B = bGWAS(name = "Test_UsingSmallGWAS",
           GWAS = MyGWAS,
           prior_studies=MyStudies,
