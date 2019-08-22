@@ -61,9 +61,6 @@ approach,  \code{default=FALSE}}
 
 \item{verbose}{A logical indicating if information on progress should be reported,
 \code{default=TRUE}}
-
-\item{sign_method}{The method used to identify significant SNPs, should be \code{"p"} for
-p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)}
 }
 \value{
 \code{bGWAS}() returns an object of class "bGWAS". \cr
