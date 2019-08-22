@@ -2,8 +2,8 @@
 language: r
 
 # Define multiple R-versions, one from bioconductor
-#r:
-#  - oldrel
+r:
+  - oldrel
 #  - release
 #  - devel
 #  - bioc-devel
