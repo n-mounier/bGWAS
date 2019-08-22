@@ -35,8 +35,9 @@ specified (if all including parameters are NULL, include all studies), and then 
 (if all excluding parameters are NULL, keep all studies included at the step before)
 }
 \examples{
+  \dontrun{
   AllStudies = list_priorGWASs()
   list_traits()
   MyStudies = select_priorGWASs(include_traits=c("Heart Rate", "Body mass index", "Smoking"))
-  #AllStudies[AllStudies$ID \%in\% MyStudies, ]
+  #AllStudies[AllStudies$ID \%in\% MyStudies, ]}
 }
