@@ -92,10 +92,11 @@ list_consortia <- function(Z_matrices = "~/ZMatrices/", verbose=F) {
 #' @param verbose boolean, default = FALSE
 #' @return IDs of studies that meet the criteria
 #' @examples
+#'   \dontrun{
 #'   AllStudies = list_priorGWASs()
 #'   list_traits()
 #'   MyStudies = select_priorGWASs(include_traits=c("Heart Rate", "Body mass index", "Smoking"))
-#'   #AllStudies[AllStudies$ID %in% MyStudies, ]
+#'   #AllStudies[AllStudies$ID %in% MyStudies, ]}
 #' @export
 
 
