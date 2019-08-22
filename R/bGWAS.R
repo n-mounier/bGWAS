@@ -35,8 +35,6 @@
 #'        (if set to NULL, no pruning is done), \code{default=500} (numeric)
 #' @param res_pruning_LD The LD threshold used for pruning results, should be between 0 and 1
 #'        (if 0, distance-based pruning is used), \code{default=0} (numeric)
-#' @param sign_method The method used to identify significant SNPs, should be \code{"p"} for
-#'        p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)
 #' @param save_files A logical indicating if the results should be saved as files,
 #'        \code{default=FALSE}
 #' @param verbose  A logical indicating if information on progress should be reported,
