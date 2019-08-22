@@ -28,4 +28,5 @@ Imports:
   Rcpp (>= 0.12.15),
   readr (>= 1.1.1),
   TwoSampleMR (>= 0.3.0)
+Remotes: MRCIEU/TwoSampleMR
 VignetteBuilder: knitr
