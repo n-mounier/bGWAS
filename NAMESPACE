@@ -3,7 +3,6 @@
 S3method(all,equal.bGWAS)
 S3method(print,bGWAS)
 export(bGWAS)
-export(bGWASfromPrior)
 export(coefficients_plot_bGWAS)
 export(extract_MRcoeffs_bGWAS)
 export(extract_results_bGWAS)
