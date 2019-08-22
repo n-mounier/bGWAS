@@ -6,7 +6,7 @@
 #'
 #' @return print
 #' @export
-print.bGWAS <- function(obj) {
+print.bGWAS <- function(obj, ...) {
   cat("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ \n \n ")
   cat (paste0(" Analysis : \"",strsplit(strsplit(obj$log_info[
     grep("The name of your analysis is: ", obj$log_info)],
