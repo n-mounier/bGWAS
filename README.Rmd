@@ -13,6 +13,9 @@ A = readRDS("inst/Data/A.RDS")
 
 
 ```{r badges, echo = FALSE, results='asis'}
+# https://shields.io/
+
+
 #TRAVIS CI buil
 cat(
 badger::badge_travis("n-mounier/bGWAS"),
@@ -38,7 +41,7 @@ badger::badge_custom("license", "GPL-2.0", "lightgrey", "https://www.gnu.org/lic
 
 
 # bGWAS 
-<!--- <img src="man/figures/logo.svg" align="right" height=140/> --->
+<!--- <img src="doc/Figures/logo.svg" align="right" height=140/> --->
 
 
 :information_source: `bGWAS` has been updated to version 1.0.0.     
@@ -97,7 +100,9 @@ You can install the current version of `bGWAS` with:
 remotes::install_github("n-mounier/bGWAS")
 library(bGWAS)
 ```
-
+<!--- Note: using remotes instead of devtools leads to re-build the package
+and apparently, it may be a problem with R 3.4 and macOS, 
+see https://stackoverflow.com/questions/43595457/alternate-compiler-for-installing-r-packages-clang-error-unsupported-option/43943631#43943631 --->
 
 ## Usage
 [//]:*******
@@ -239,7 +244,7 @@ MR_coefficients[1, 1:8]
 
 
 Functions for graphic representations:   
-```{r PlotsA}
+```{r PlotsA, dpi=300}
 manhattan_plot_bGWAS(A)
 
 coefficients_plot_bGWAS(A) 

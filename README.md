@@ -7,7 +7,7 @@
 
 # bGWAS
 
-<!--- <img src="man/figures/logo.svg" align="right" height=140/> --->
+<!--- <img src="doc/Figures/logo.svg" align="right" height=140/> --->
 
 :information\_source: `bGWAS` has been updated to version 1.0.0.  
 Check the [NEWS](News.md) to learn more about what has been modified\!
@@ -88,6 +88,10 @@ You can install the current version of `bGWAS` with:
 remotes::install_github("n-mounier/bGWAS")
 library(bGWAS)
 ```
+
+<!--- Note: using remotes instead of devtools leads to re-build the package
+and apparently, it may be a problem with R 3.4 and macOS, 
+see https://stackoverflow.com/questions/43595457/alternate-compiler-for-installing-r-packages-clang-error-unsupported-option/43943631#43943631 --->
 
 ## Usage
 
@@ -308,7 +312,7 @@ colnames(hits)
 nrow(hits)
 ```
 
-    ## [1] 0
+    ## [1] 5
 
 ``` r
 all_results = extract_results_bGWAS(A, "all")
@@ -356,7 +360,7 @@ MR_coefficients[1, 1:8]
     ##                                               study    estimate  std_error
     ## 1 All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq.gz -0.06433771 0.03200732
     ##       Tstat          P chrm1_estimate chrm1_std_error
-    ## 1 -2.010094 0.04900041             NA              NA
+    ## 1 -2.010094 0.04900041    -0.07819836      0.03233513
 
 Functions for graphic representations:
 
