@@ -20,7 +20,7 @@ Suggests:
   rmarkdown
 Imports:
   calibrate (>= 1.7.2),
-  data.table (>= 1.12),
+  data.table (>= 1.12.0),
   ggplot2 (>= 2.2.1),
   gplots (>= 3.0.1),
   qqman (>= 0.1.4),
