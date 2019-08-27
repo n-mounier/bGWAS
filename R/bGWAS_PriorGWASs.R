@@ -42,7 +42,8 @@ list_files <- function(IDs=NULL, Z_matrices = "~/ZMatrices/") {
     # check that the IDs exists
     Studies = list_priorGWASs(Z_matrices=Z_matrices)
     if(!all(IDs %in% Studies$ID)) print("Please check the IDs, some of them do not match")
-    Files = subset(Studies, .data$ID %in% IDs)
+    Studies %>%
+      filter(.data$ID %in% IDs) -> Files
   }
   return(Files$File)
 }

@@ -142,9 +142,11 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
 
   if(annotate){ # significant SNPs from the analysis
     # extract them
-    value = ifelse(method=="FDR", "fdr", "BF_p")
-    SNPs_to_plot = subset(obj$all_BFs, .data$rsid %in% obj$significant_SNPs,
-                               c("rsid", "chrm_UK10K", "pos_UK10K", value))
+    value = ifelse(method=="FDR", "BF_fdr", "BF_p")
+    obj$all_BFs %>%
+      filter( .data$rsid %in% obj$significant_SNPs) %>%
+      select(rsid, chrm_UK10K, pos_UK10K, {{value}}) -> SNPs_to_plot
+    
     all = obj$all_BFs[,c("rsid", "chrm_UK10K", "pos_UK10K")]
     all <- all[order(all$chrm_UK10K, all$pos_UK10K), ]
 
@@ -159,8 +161,8 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
       }
       else{
         posx=0
-        for(c in 1:(chr-1)){
-          posx = posx + utils::tail(subset(all, .data$chrm_UK10K==c)$pos,1)
+        for(ch in 1:(chr-1)){
+          posx = posx + utils::tail(all %>% filter(.data$chrm_UK10K==ch) %>% pull(.data$pos_UK10K),1)
         }
         posx = posx + pos
       }
@@ -290,7 +292,7 @@ extract_results_bGWAS <- function(obj, SNPs="significant"){
     if(length(obj$significant_SNPs)==0){
       stop("You can't extract \"significant\" results , because the analysis has been limited to prior estimation", call. = F)
     }
-    Res = subset(obj$all_BFs, .data$rsid %in% obj$significant_SNPs)
+    Res = obj$all_BFs %>% filter(.data$rsid %in% obj$significant_SNPs)
   }
 
   return(Res)
@@ -322,11 +324,12 @@ extract_MRcoeffs_bGWAS <- function(obj){
   Res %>%
     transmute(name = get_names(.data$study, Z_matrices)) -> WithNames
   bind_cols(WithNames, Res) -> Res
-  for(c in 1:22){
-    CHRM = subset(obj$all_MRcoeffs, .data$chrm==c)
-    Res[,paste0("chrm", c, "_estimate")] = CHRM$estimate[match(Res$study, CHRM$study)]
-    Res[,paste0("chrm", c, "_std_error")] = CHRM$std_error[match(Res$study, CHRM$study)]
-    Res[,paste0("chrm", c, "_P")] = CHRM$P[match(Res$study, CHRM$study)]
+  for(ch in 1:22){
+    obj$all_MRcoeffs %>%
+      filter(.data$chrm == ch) -> CHRM
+    Res[,paste0("chrm", ch, "_estimate")] = CHRM$estimate[match(Res$study, CHRM$study)]
+    Res[,paste0("chrm", ch, "_std_error")] = CHRM$std_error[match(Res$study, CHRM$study)]
+    Res[,paste0("chrm", ch, "_P")] = CHRM$P[match(Res$study, CHRM$study)]
     }
   return(Res)
 }
@@ -383,7 +386,7 @@ heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
     mutate(alt = case_when(.data$z_obs<0 ~ .data$ref,
                            TRUE ~ .data$alt),
            z_obs = abs(.data$z_obs),
-           z_prior_estimate = abs(.data$z_prior_estimate)) -> Res_signif_aligned
+           z_prior_estimate = abs(.data$mu_prior_estimate)) -> Res_signif_aligned
   
   
   
@@ -409,7 +412,7 @@ heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
   }
   
   Res_signif_aligned %>%
-    select(.data$RFs) %>%
+    select(RFs) %>%
     as.matrix -> RF_SNPs
   
   RF_contribution = RF_SNPs
@@ -417,8 +420,10 @@ heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
   Res_signif_aligned %>%
     pull(.data$rsid) -> SNPs
   for(snp in 1:length(SNPs)){
-    causalestimates = subset(all_causalestimates, .data$chrm==as.numeric(Res_signif_aligned[snp, "chrm_UK10K"])) # subset the chromosome
-    causalestimates = causalestimates[match(colnames(RF_SNPs), causalestimates$study),] # re-order the RFs before multiplying
+    all_causalestimates %>%
+      filter(.data$chrm==as.numeric(Res_signif_aligned[snp, "chrm_UK10K"])) -> causalestimates
+    # re-order the RFs before multiplying
+    causalestimates = causalestimates[match(colnames(RF_SNPs), causalestimates$study),] 
     RF_contribution[snp,] = RF_SNPs[snp,] * causalestimates$estimate
   }
   
