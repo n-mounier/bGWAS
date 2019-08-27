@@ -1,3 +1,60 @@
+# bGWAS 1.0.0 (2019-08-26)
+    
+
+## Changes
+- Posterior, corrected effects and rescaling    
+
+Now, the posterior effects (`mu_posterior_estimate` - `mu_posterior_std_error`) and the direct effects (`mu_direct_estimate` - `mu_direct_std_error`) are estimated simultaneously with the prior effects (`mu_prior_estimate` - `mu_prior_std_error`). The analysis is performed on the z-score scale, and these effects are automatically rescaled to the observed effect size beta scale when possible (`beta_posterior_estimate`, `beta_posterior_std_error`, `beta_direct_estimate`, `beta_direct_std_error`).   
+
+- Add stepwise_threshold    
+
+By default, the stepwise selection threshold was set to : 0.05 / (the number of prior GWASs used). Now, we allow the user to provide a custom threshold (that could be less stringent, since some of the prior GWASs might be correlated).    
+
+- Update of the Z-matrices files    
+
+We updated the Z-matrices files, to reduce the set of prior GWASs and exclude some files that were not meeting our inclusion criteria (see [here](docs/ZMatrices.md) for more details). We also added a column "Name" to the file `AvailableStudies.tsv` to use in the figures and increase readability.
+   
+
+- Minimum number of instruments for MR    
+
+Initially, all prior GWASs with at least two instruments were kept to be tested in the multivariate model. This number was arbitrary, and we now allow the user to specify the minimum number of instruments that should be used  (`MR_ninstruments`).    
+
+- Pruning of MR instruments    
+
+When the default threshold was used to select MR instruments, the step to "select strong instruments" before pruning them was skipped, assuming that all the SNPs in the matrix were already strong instruments. That was the case only when all the prior GWASs were used, and if a subset of prior GWASs was selected, pruning was done based on all prior GWASs, not only the ones included. This is now fixed.      
+
+## New functions
+- `heatmap_bGWAS()`   
+
+This function creates a heatmap to represent the contribution of each risk factor to the prior effect estimated (for all significant SNPs).   
+
+- `get_RSquared_bGWAS()`   
+
+This function returns the (out-of-sample) squared correlation between prior and observed effects (for all SNPs, the ones having a moderate effect on the trait, or MR instruments only).   
+
+- `print_log_bGWAS()`   
+
+This function prints the log (summary of the \code{bGWAS} analysis performed, everything that is printed using \code{verbose=TRUE}).   
+
+
+
+## Documentation
+- Description of Z-matrices files
+
+We added a file to provide a more in depth description of the Z-matrices files [here](docs/ZMatrices.md).    
+
+- Description of output files    
+
+We added a file to provide a more in depth description of the outpute files [here](docs/OutputFiles.md).    
+
+
+## Performance
+
+- Windows Compatibilty 
+
+Takes advantage of the ability to directly read `.gz` files using `data.table::fread` (no need to use `system("zcat < ...")` anymore.    
+
+
 # bGWAS 0.3.2 (2019-04-17)
 
 ## Bug fixes    
