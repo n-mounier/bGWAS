@@ -3,312 +3,256 @@
 
 
 # #' Compute Prior
-# #'
+# #' 
 # #' From a list of significant studies (from \code{identify_StudiesMR()}), the pruned Z-matrix
 # #' of MR instruments (from \code{makeMR_ZMatrix()}) and the full Z-matrix of all SNPs for these
 # #' significant studies (from \code{makeFull_ZMatrix()}), compute the prior
-# #'
+# #' 
 # #' @inheritParams bGWAS
-# #' @param selected_studies data table
-# #' @param MR_ZMatrix data table
-# #' @param All_ZMatrix data table
-# #'
-#  Function not exported, no need of extended documentation?
+# #' @param selected_studies list of significant prior GWASs file names (character)
+# #' @param MR_ZMatrix, used to get per-chromosome estimate (data.frame)
+# #' @param All_ZMatrix, used to get prior effects (data.frame)
+# #' @param GWASData, used to add prior/posterior/direct to results (data.frame)
+# #' @param rescaling, should we get the effects on beta scale? (logical)
+# NOT EXPORTED
 
 
-compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, MR_shrinkage, prior_shrinkage, Z_matrices, save_files=FALSE, verbose=FALSE){
-
+compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, GWASData, rescaling, MR_shrinkage, prior_shrinkage, Z_matrices, save_files=FALSE, verbose=FALSE){
+  
   Log = c()
-
-
-  tmp = paste0("# Preparation of the data... \n")
-  Log = update_log(Log, tmp, verbose)
-
-
-  push.extreme.zs.back.a.little.towards.zero <- function(d) { # Some z-scores are just too far from zero
-    max.allowed.z = abs(stats::qnorm(1e-300 / 2)) # p=1e-300 is the max allowed now, truncate z-scores accordingly
-    studies.here = names(d)
-    studies.here = studies.here[!studies.here %in% c("rs","chrm","pos","alt","ref")]
-    for(n in studies.here) {
-      d[[n]] [ d[[n]] < -max.allowed.z ] <- -max.allowed.z
-      d[[n]] [ d[[n]] >  max.allowed.z ] <-  max.allowed.z
-    }
-    d
+ 
+  
+  # Function to automatically generate the formula for linear model
+  generate_Formula <- function(outcome, study_names, with_intercept=F ) {
+    formula = ifelse(with_intercept,
+                     paste(outcome, ' ~  1 + ',paste(collapse=' + ', paste(sep='','`',study_names,'`'))),
+                     paste(outcome, ' ~ -1 + ',paste(collapse=' + ', paste(sep='','`',study_names,'`'))))
+    return(formula)
   }
-
-  MR_ZMatrix= push.extreme.zs.back.a.little.towards.zero(MR_ZMatrix)
-  All_ZMatrix = push.extreme.zs.back.a.little.towards.zero(All_ZMatrix)
-  # Set the z-scores to 0 for the regression if too low
-  if(MR_shrinkage < 1.0) {
-    for(column_of_zs in selected_studies) {
-      print(column_of_zs)
-      threshold = abs(stats::qnorm(MR_shrinkage/2))
-      MR_ZMatrix[c(abs(MR_ZMatrix[,column_of_zs]) < threshold) , column_of_zs] <- 0
-    }
-    # check how many chromosomes have non-zero zs
-    # is that really interesting??
-   # data.table::rbindlist(lapply(selected_studies, function(column_of_zs) {
-   #   MR_ZMatrix[ , .(study_name = column_of_zs, nz=sum(.SD[[column_of_zs]] != 0)) , by=chrm]
-    #})) -> counts.by.chrm
-   # counts.by.chrm[,.(chrms.with.nz=sum(nz!=0)), by=study_name] [order(-chrms.with.nz)] -> chrms.with.nz
-#    if(save_files){
-#      readr::write_csv(chrms.with.nz, 'chrms.with.nz.csv')
-#    }
-  }
-
-  if(prior_shrinkage < 1.0) {
-    for(column_of_zs in selected_studies) {
-      threshold = abs(stats::qnorm(prior_shrinkage/2))
-      All_ZMatrix[abs(All_ZMatrix[,column_of_zs]) < threshold , column_of_zs] <- 0
-    }
-    tmp = paste0("Applying shrinkage (threshold = ", prior_shrinkage, ") before calculating the prior. \n")
-    Log = update_log(Log, tmp, verbose)
-  }
-
-  if(prior_shrinkage<1){
-    NonZero_ZMatrix = All_ZMatrix[apply(All_ZMatrix[,6:(ncol(All_ZMatrix)-1)], 1, function(x) any(unlist(abs(x)>threshold))),1:(ncol(All_ZMatrix)-1)]
-  } else {
-    NonZero_ZMatrix = All_ZMatrix
-  }
-
-
-  generate.formula <- function(outcome, study_names ) {
-    paste(paste0(outcome,' ~ -1 + '),paste(collapse=' + ', paste(sep='','`',study_names,'`')))
-  }
-
-  outcome = colnames(MR_ZMatrix)[ncol(MR_ZMatrix)]
-  generate.formula(outcome, selected_studies) -> form
-
-  tmp = "Done! \n"
-  Log = update_log(Log, tmp, verbose)
-
-
-
-  all.priors =  data.table::data.table()
-  all.coefs = data.table::data.table()
-
+  
+  MR_ZMatrix %>%
+    names() %>%
+    as.data.frame(stringsAsFactors = FALSE) %>%
+    slice(ncol(MR_ZMatrix)) %>%
+    pull() -> my_outcome
+  
+  generate_Formula(my_outcome, selected_studies) -> myFormula
+  
+  all.priors =  data.frame()
+  all.coefs = data.frame()
+  
   tmp = "# Calculating the prior chromosome by chromosome... \n"
   Log = update_log(Log, tmp, verbose)
-
-  dynamic.study.names = unlist(selected_studies)
   
   OutOfSample = data.frame(Obs=numeric(), Pred=numeric(), 
                            Res=numeric())
-
-  for(chrm in 1:22) {
-    tmp = paste0("   Chromosome ", chrm, "\n")
+  
+  for(chr in 1:22) {
+    tmp = paste0("   Chromosome ", chr, "\n")
     Log = update_log(Log, tmp, verbose)
-
-
-    if(is.na(table(All_ZMatrix$chrm)[chrm])){
+    
+    if(is.na(table(All_ZMatrix$chrm)[chr])){
       tmp = "No SNP on this chromosome \n"
       Log = update_log(Log, tmp, verbose)
-
-      # ALSO TEST IF NSNP < NSTUDIES
-
+      
+      # ALSO TEST IF NSNP < NSTUDIES?
       next
     }
-
+    
     # create the dataset without this chromosome - for MR instruments
-    train    =   (MR_ZMatrix$chrm != chrm)
-    d_masked = MR_ZMatrix[train,]
-
+    MR_ZMatrix %>%
+      filter(.data$chrm != chr) -> MR_ZMatrix_masked
+    
     tmp = "Running regression, \n"
     Log = update_log(Log, tmp, verbose)
-
-
-    lm(data=d_masked, formula = generate.formula(outcome, dynamic.study.names)
+    
+    
+    stats::lm(data=MR_ZMatrix_masked, formula = myFormula
     ) -> fit_masked # fit, without one chromosome
-    coefs <- data.frame(coef(summary(fit_masked)))
-
+    fit_masked %>%  
+      summary %>%
+      stats::coef() %>%
+      as.data.frame() %>% 
+      tibble::rownames_to_column("nm") %>%
+      mutate(chrm=chr) -> coefs
     
-    # CHECK R2 / Squared correlation formulas
-    #SS.total =  sum(d_masked$SmallGWAS_Pilling2017.csv^2)
-    #SS.residuals = sum(fit_masked$residuals^2)
-    #SS.regression = sum((d_masked$SmallGWAS_Pilling2017.csv-fit_masked$residuals)^2)
-    #1 - SS.residuals/SS.total
-    #SS.regression/SS.total
-    #summary(fit_masked)$r.squared
-    #cor(fit_masked$fitted.values,d_masked$SmallGWAS_Pilling2017.csv)^2
-    ## squared correlation is not equal to R2 because of the "no intercept" model, but R2 formula is ok
-    
-   # stopifnot(length(dynamic.study.names) ==  nrow(coefs))
-     ## this can happen, if all non-0 Z-score of a study are one the same chromosome
-     ## but this should not be a problem
+    # stopifnot(length(selected_studies) ==  nrow(coefs))
+    ## this can happen, if all non-0 Z-score of a study are one the same chromosome
+    ## but this should not be a problem
     # just add some warning message here :
-    if(length(dynamic.study.names) !=  nrow(coefs)){
-      missingSt = dynamic.study.names[!dynamic.study.names %in% rownames(coefs)]
+    if(length(selected_studies) !=  nrow(coefs)){
+      missingSt = selected_studies[!selected_studies %in% rownames(coefs)]
       tmp = paste0("No effect estimate when masking this chromosome for : ",
-                  paste0(missingSt, collapse=" - "),
-                  " (all SNPs having non-0 Z-scores are on this chromosome) \n")
+                   paste0(missingSt, collapse=" - "),
+                   " (all SNPs having non-0 Z-scores are on this chromosome) \n")
       Log = update_log(Log, tmp, verbose)
-
+      
     }
-    coefs = coefs[order(-coefs$Pr...t..),,drop=F]
-  # stopifnot(length(dynamic.study.names) ==  nrow(coefs))
-
-    stopifnot(nrow(coefs) >= 1)
-
-    coefs.DT =  data.table::data.table(chrm, data.table::data.table(coefs, keep.rownames=T))
-    data.table::setnames(coefs.DT, 'rn', 'study_name')
-    coefs.DT[ , study_name := gsub('`','',study_name) ]
-
-    all.coefs = rbind(all.coefs, coefs.DT)
-
+    
+    # Do we need it?
+    coefs %>%
+      arrange(desc(.data$`Pr(>|t|)`)) -> coefs
+    
+    stopifnot(nrow(coefs) >= 1) # why would this happen?
+    # if only one study selected, and all instruments on the same chromosome?
+    # better handle this!
+    
+    all.coefs = rbind(all.coefs, coefs)
+    
     # check the predictions using data from the training set
     #in_train = data.frame( CRG=d_masked[,..outcome], prd=predict.lm(fit_masked) )
     #residual.variance.in.training=var(in_train[,1]-in_train$prd)
-
-
-    chrm_ = chrm
-
+    
     tmp = "Calculating prior estimates for SNPs on this chromosome, \n"
     Log = update_log(Log, tmp, verbose)
-
-
+    
     # all SNPs we need to predict (the ones on this chromosome)
-    d_test             = subset(All_ZMatrix, chrm==chrm_)
-
+    All_ZMatrix %>%
+      filter(.data$chrm==chr) -> d_test
+    
     suppressWarnings({ #In predict.lm(fit_masked, d_test, se.fit = T) : prediction from a rank-deficient fit may be misleading
-      predict(fit_masked, d_test, se.fit=T) -> preds
+      stats::predict(fit_masked, d_test, se.fit=T) -> preds_test
     })
-
+    
     tmp = "Calculating prior standard errors for SNPs on this chromosome, \n"
     Log = update_log(Log, tmp, verbose)
-
-
+    
+    
     #A few lines to compute the extra.variance if we allow that the z's are random too
-    {
-      cv = vcov(fit_masked)
-      sum(diag(cv))            -> extra.variance.1
-
-      Estimate = coef(summary(fit_masked))[,"Estimate"]
-      names(Estimate) %>% {. == rownames(cv)} %>% stopifnot
-      Estimate = t(t(Estimate))
-      t(Estimate) %*% Estimate -> extra.variance.2
-
-      extra.variance = c(extra.variance.1 + extra.variance.2)
-
-      rownames(cv) %>% {gsub('`','',.)} -> rns
-
-    }
-
-
-    nice.table = d_test[,c(
-      "rs"
-      ,"chrm"
-      ,"pos"
-      ,"alt"
-      ,"ref"
-      ,outcome)]
-    colnames(nice.table)[6] = "obs"
-    nice.table$fit = preds$fit
-    nice.table$se = preds$se.fit
-    # add extra variance
-    nice.table$se = sqrt( (nice.table$se^2) + extra.variance )
-
-
-    all.priors = rbind(all.priors, nice.table)
-
+    cv <- stats::vcov(fit_masked)
+    extra.variance.1 <- sum(diag(cv)) 
+    
+    summary(fit_masked) %>%
+      stats::coef() %>%
+      as.data.frame() %>%
+      pull(.data$Estimate) -> Estimates
+    
+    t(Estimates) %*% Estimates -> extra.variance.2
+    
+    extra.variance <- extra.variance.1 + extra.variance.2
+    
+    d_test %>%
+      select(c(1:5, ncol(d_test))) %>%
+      mutate(fit=preds_test$fit,
+             se = sqrt(preds_test$se.fit^2 + c(extra.variance +1))) -> d_test
+    ## we also need to add one to the prior variance to account for the fact that we are
+    ## predicting a noisy variable : observedZ ~ N(trueZ, 1)
+    
+    d_test %>%
+      bind_rows(all.priors, .data$.) -> all.priors
+    
     tmp = "Calculating out of sample prediction for SNPs on this chromosome, \n"
     Log = update_log(Log, tmp, verbose)
-
-    outcome = colnames(MR_ZMatrix)[ncol(MR_ZMatrix)]
-
-
-    # all SNPs we need to predict (the ones on this chromosome)
-    out    =   (MR_ZMatrix$chrm == chrm)
-    if(!all(!out)){
-    d_test = MR_ZMatrix[out,]
     
-    suppressWarnings({ #In predict.lm(fit_masked, d_test, se.fit = T) : prediction from a rank-deficient fit may be misleading
-      predict(fit_masked, d_test, se.fit=T) -> preds
-    })
-
-
-    test.outcome    <- d_test[,outcome]
     
-   
-    OutOfSample=rbind(OutOfSample,data.frame(Obs=test.outcome, Pred=preds$fit,
-                                             Res=(test.outcome - preds$fit)))
-    }
-
-
+    d_test %>%
+      filter(.data$rs %in% MR_ZMatrix$rs) %>%
+      select(Obs=6,
+             Pred=7) %>%
+      mutate(Res=.data$Obs-.data$Pred) %>%
+      bind_rows(OutOfSample, .data$.) -> OutOfSample
+    
   }
-  colnames(all.priors)[6:8] = c("observed_Z", "prior_estimate", "prior_std_error")
   
- # NORMALLY
-  #    SST = sum((obs-mean)^2)
-  #    SSE = sum((obs-fit)^2)
-  #    SSR = sum((fit-mean)^2)
- # BUT...
- # NO INTERCEPT MODEL
-  # so SST = sum(obs^2)
-  #    SSE = sum((obs-fit)^2)
-  #    SSR = sum(fit^2)
-  
-  SS.total     <- sum((OutOfSample$Obs)^2)
+  # Out of sample R2
+  SS.total     <- sum((OutOfSample$Obs-mean(OutOfSample$Obs))^2)
   SS.residuals <- sum((OutOfSample$Res)^2)
   
-  R2 = 1 - SS.residuals/SS.total
-
-
+  R2 <- 1 - SS.residuals/SS.total
   
   tmp = paste0("## Out-of-sample R-squared for MR instruments across all chromosomes is ", round(R2, 4), "\n")
   Log = update_log(Log, tmp, verbose)
-  tmp = paste0("## Out-of-sample squared correlation for MR instruments across all chromosome is ", round(cor(OutOfSample$Obs, OutOfSample$Pred)^2, 4), "\n")
-  Log = update_log(Log, tmp, verbose)
-
-  
-  tmp = paste0("## Correlation between prior and observed effects for all SNPs is ", round(cor(all.priors$observed_Z, all.priors$prior_estimate), 4), "\n")
+  tmp = paste0("## Out-of-sample squared correlation for MR instruments across all chromosome is ", round(stats::cor(OutOfSample$Obs, OutOfSample$Pred)^2, 4), "\n")
   Log = update_log(Log, tmp, verbose)
   
-  Zlimit = qnorm(0.001/2, lower.tail = F)
-  SNPs_moderateeffect = subset(all.priors, abs(observed_Z)>Zlimit)
-  tmp = paste0("## Correlation between prior and observed effects for SNPs with GWAS p-value < 0.001 is ", round(cor(SNPs_moderateeffect$observed_Z, SNPs_moderateeffect$prior_estimate), 4), "\n")
+  
+  tmp = paste0("## Correlation between prior and observed effects for all SNPs is ", round(stats::cor(all.priors[,6:7])[1,2], 4), "\n")
   Log = update_log(Log, tmp, verbose)
   
+  Zlimit <- stats::qnorm(0.001/2, lower.tail = F)
+  all.priors %>%
+    filter_at(vars(6), any_vars(abs(.data$.)>Zlimit)) -> SNPs_moderateeffect
+  tmp = paste0("## Correlation between prior and observed effects for SNPs with GWAS p-value < 0.001 is ", round(stats::cor(SNPs_moderateeffect[,6:7])[1,2], 4), "\n")
+  Log = update_log(Log, tmp, verbose)
+  
+  
+  # Merge with GWASData, to keep all columns, nicely aligned
+  # keep the SNPs in our Z matrix and order them correctly
+  GWASData %>%
+    slice(match(all.priors$rs, .data$rsid)) -> GWASData
+  
+  GWASData %>%
+    mutate(mu_prior_estimate=case_when(
+      .data$z_obs == all.priors[,my_outcome] ~ all.priors$fit, # aligned
+      TRUE ~ - all.priors$fit),  #swapped
+      mu_prior_std_error= all.priors$se) -> Results
+  
 
-  ## we need to add one to the prior variance to account for the fact that we are
-  ## predicting a noisy variable : observedZ ~ N(trueZ, 1)
-  all.priors$prior_std_error = sqrt(all.priors$prior_std_error**2 + 1)
+  
+  ## also add the posterior / direct
+  Results %>%
+    mutate(mu_posterior_estimate = (.data$mu_prior_std_error**2/
+                                      (.data$mu_prior_std_error**2+1)) *
+             ((.data$mu_prior_estimate/.data$mu_prior_std_error**2) + .data$z_obs),
+           mu_posterior_std_error = sqrt(.data$mu_prior_std_error**2/
+                                           (.data$mu_prior_std_error**2+1)),
+           mu_direct_estimate = (.data$z_obs - .data$mu_prior_estimate),
+           mu_direct_std_error = sqrt(1 + .data$mu_prior_std_error**2)) -> Results
 
-
-  ## also add the posterior
-  all.priors$posterior_estimate = (all.priors$prior_std_error**2/(all.priors$prior_std_error**2+1)) *
-                           ((all.priors$prior_estimate/all.priors$prior_std_error**2)+all.priors$observed_Z)
-  all.priors$posterior_std_error = sqrt(all.priors$prior_std_error**2/(all.priors$prior_std_error**2+1))
-
-
-
-  data.table::setkey(all.coefs, study_name, chrm)
-
-  colnames(all.coefs) = c("chrm", "study", "estimate", "std_error", "T", "P")
-
+  
+  # if rescaling
+  if(rescaling){
+    # prior
+    Results %>%
+      mutate(beta_prior_estimate = .data$se * .data$mu_prior_estimate,
+             beta_prior_std_error = .data$se * .data$mu_prior_std_error) -> Results
+    
+    # posterior
+      Results %>%
+        mutate(beta_posterior_estimate = .data$se * .data$mu_posterior_estimate,
+               beta_posterior_std_error = .data$se * .data$mu_posterior_std_error) -> Results
+    # direct
+    Results %>%
+      mutate(beta_direct_estimate = .data$se * .data$mu_direct_estimate,
+             beta_direct_std_error = .data$se * .data$mu_direct_std_error) -> Results
+    
+  }
+  
+  # add UK10K chr/pos data.frame for SNPs that are kept
+  All_ZMatrix %>%
+    transmute(chrm_UK10K=.data$chrm, 
+           pos_UK10K=.data$pos) -> ChrPos
+  bind_cols(ChrPos, Results) -> Results
+  
+  
+  
+  all.coefs %>%
+    arrange(.data$nm) %>%
+    set_names(c("study", "estimate", "std_error", "T", "P", "chrm")) -> all.coefs
+  
   if(save_files){
     readr::write_csv(path="CoefficientsByChromosome.csv", x=all.coefs)
     tmp = paste0("The file ", "CoefficientsByChromosome.csv has been successfully written. \n")
     Log = update_log(Log, tmp, verbose)
-
+    
   }
-
+  
   tmp = "Done! \n"
   Log = update_log(Log, tmp, verbose)
-
-
-
-
+  
+  
+  
+  
   if(save_files){
-    readr::write_csv(path="Prior.csv", x=all.priors)
+    readr::write_csv(path="Prior.csv", x=Results)
     tmp = paste0("The file ", "Prior.csv has been successfully written. \n")
     Log = update_log(Log, tmp, verbose)
-
+    
   }
-
-  res=list()
-  res$log_info = Log
-  res$prior = as.data.frame(all.priors)
-  res$all_coeffs = as.data.frame(all.coefs)
-  res$non_zero = NonZero_ZMatrix
+  
+  res=list(log_info = Log,
+           prior = Results,
+           all_coeffs = all.coefs) 
   return(res)
 }
+ 

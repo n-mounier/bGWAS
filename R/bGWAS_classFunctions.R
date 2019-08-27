@@ -2,52 +2,58 @@
 
 
 
-#' @param obj an object of class bGWAS
-#'
+#' Print a bGWAS object
+#' @param x an object of class bGWAS
+#' @param ... further arguments
+#' 
 #' @return print
 #' @export
-print.bGWAS <- function(obj, ...) {
+print.bGWAS <- function(x,...) {
   cat("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ \n \n ")
-  cat (paste0(" Analysis : \"",strsplit(strsplit(obj$log_info[
-    grep("The name of your analysis is: ", obj$log_info)],
+  cat (paste0(" Analysis : \"",strsplit(strsplit(x$log_info[
+    grep("The name of your analysis is: ", x$log_info)],
     "The name of your analysis is: \"", fixed=T)[[1]][2], "\"", fixed=T)[[1]][1],"\" \n"))
-  cat( "bGWAS performed on", format( nrow(obj$all_BFs) , big.mark = "," , scientific = F) ,
+  cat( "bGWAS performed on", format( nrow(x$all_BFs) , big.mark = "," , scientific = F) ,
                                     "SNPs \n \n" )
 
   cat("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ \n \n")
 
-  cat(nrow(obj$significant_studies), "studies used to build the prior : \n")
-  print(obj$significant_studies[,1:3], row.names=F)
+  if(nrow(x$significant_studies)>1){
+    cat(nrow(x$significant_studies), "studies used to build the prior : \n")
+    print(x$significant_studies[,1:3], row.names=F)
+  } else {
+    cat(nrow(x$significant_studies), "study used to build the prior : \n")
+    print(x$significant_studies[,1:3], row.names=F)
+  }
 
   cat("\n-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ \n \n")
 
-  if(length(obj$significant_SNPs)==0){
+  if(length(x$significant_SNPs)==0){
     cat("No significant SNP identified, because the analysis has been limited to prior estimation")
   } else
-    if(length(obj$significant_SNPs)==1){
-      cat(length(obj$significant_SNPs), "significant SNP identified : \n ")
-      cat(obj$significant_SNPs, sep=", ")
+    if(length(x$significant_SNPs)==1){
+      cat(length(x$significant_SNPs), "significant SNP identified : \n ")
+      cat(x$significant_SNPs, sep=", ")
     } else {
-      cat(length(obj$significant_SNPs), "significant SNPs identified : \n ")
-      cat(obj$significant_SNPs, sep=", ")
+      cat(length(x$significant_SNPs), "significant SNPs identified : \n ")
+      cat(x$significant_SNPs, sep=", ")
     }
-  # independant ? which threshold ? get info in log
   cat("\n\n-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ ")
 
   }
 
-# print(MyObj)
 
 
 
+#' Equality test for bGWAS objects
 #' @param obj1 an object of class bGWAS
-#' @param obj2 an object of class bGWA
+#' @param obj2 an object of class bGWAS
 #'
 #' @return all.equal
 #' @export
 all.equal.bGWAS <- function(obj1, obj2) {
   if(length(obj1)!= length(obj2)) return(FALSE)
-  # log - we don't care
+  # log - we don't care.
   # significant SNPs
   if(!all.equal(obj1$significant_SNPs,obj2$significant_SNPs)) return(FALSE)
   # all BFs
@@ -65,28 +71,25 @@ all.equal.bGWAS <- function(obj1, obj2) {
 
 #' Manhattan Plot from bGWAS results
 #'
-#' Create a Manhattan Plot from bGWAS results (object of class bGWAS obtained
-#' when using bGWAS() or bGWASfromPrior()),
+#' Creates a Manhattan Plot from bGWAS results 
 #'
 #'
-#' @param obj an object of class bGWAS
+#' @param obj an object of class bGWAS created using \code{\link{bGWAS}()}
 #' @param save_file A logical indicating if the graphic should be saved,
 #'        \code{default=FALSE}, graphic will be displayed on the on-screen device
 #' @param file_name The name of the file saved (is \code{save_file} is \code{TRUE})
 #'        \code{default=NULL}, will used NameOfYourAnalysis_ManhattanPlot.png
-#' @param threshold The threshold used to draw the significance line,
-#'        \code{default=NULL}, will used the threshold used in the analysis
 #' @param annotate A logical indicating if the significant SNPs identified in the
 #'        analysis should be annotated on the plot, \code{default=TRUE}
 #'        If your results are not pruned or if you have a high number of significant SNPs,
-#'        \code{annotate=TRUE} might decrease readability of the figure.
+#'        be aware that \code{annotate=TRUE} might decrease readability of the figure.
 #'
 #' @return a Manhattan Plot
 #'
 #' @export
 
 manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
-                                 threshold=NULL, annotate=T) {
+                                  annotate=T) {
 
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
@@ -103,30 +106,25 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
   }
   if(save_file && !is.character(file_name)) stop("file_name : should be a character")
   if(!is.logical(annotate)) stop("annotate : shoud be logical")
-  if(!is.null(threshold) && !is.numeric(threshold)) stop("threshold : shoud be numeric")
-  # if no threshold, use the one from analysis (in log file)
-  if(is.null(threshold)){
-    method = strsplit(strsplit(obj$log_info[
+  method = strsplit(strsplit(obj$log_info[
     grep("Significant SNPs will be identified according to ", obj$log_info)],
     "Significant SNPs will be identified according to ")[[1]][2], ".", fixed=T)[[1]][1]
-    threshold = as.numeric(strsplit(strsplit(obj$log_info[
-      grep("Significant SNPs will be identified according to ", obj$log_info)],
-      "The threshold used is :")[[1]][2], ".", fixed=T)[[1]][1])
-  } else {
-      method="p-value"
-  }
+  threshold = as.numeric(strsplit(strsplit(obj$log_info[
+    grep("Significant SNPs will be identified according to ", obj$log_info)],
+    "The threshold used is :")[[1]][2], ".", fixed=T)[[1]][1])
+
 
 
 
   if(save_file) grDevices::png(file_name, width = 20, height = 12, units = "cm", res = 500)
 
   qqman::manhattan(obj$all_BFs ,
-                   chr = "chrm" ,
-                   bp = "pos" ,
+                   chr = "chrm_UK10K" ,
+                   bp = "pos_UK10K" ,
                    p = ifelse( method == "FDR" ,
-                               "fdr" ,
-                               "BF_P" ) ,
-                   snp = "rs",
+                               "BF_fdr" ,
+                               "BF_p" ) ,
+                   snp = "rsid",
                    col = c("gray10", "gray60"),
                    cex = 0.6,
                    suggestiveline = FALSE,
@@ -144,11 +142,11 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
 
   if(annotate){ # significant SNPs from the analysis
     # extract them
-    value = ifelse(method=="FDR", "fdr", "BF_P")
-    SNPs_to_plot = subset(obj$all_BFs, rs %in% obj$significant_SNPs,
-                               c("rs", "chrm", "pos", value))
-    all = obj$all_BFs[,c("rs", "chrm", "pos")]
-    all <- all[order(all$chrm, all$pos), ]
+    value = ifelse(method=="FDR", "fdr", "BF_p")
+    SNPs_to_plot = subset(obj$all_BFs, .data$rsid %in% obj$significant_SNPs,
+                               c("rsid", "chrm_UK10K", "pos_UK10K", value))
+    all = obj$all_BFs[,c("rsid", "chrm_UK10K", "pos_UK10K")]
+    all <- all[order(all$chrm_UK10K, all$pos_UK10K), ]
 
     # y = -log10(p) ou -log10(fdr)
     SNPs_to_plot$y = -log10(SNPs_to_plot[,value]) - 0.3 # to make sure all SNPs names are in plotting windows
@@ -162,7 +160,7 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
       else{
         posx=0
         for(c in 1:(chr-1)){
-          posx = posx + tail(subset(all, chrm==c)$pos,1)
+          posx = posx + utils::tail(subset(all, .data$chrm_UK10K==c)$pos,1)
         }
         posx = posx + pos
       }
@@ -185,11 +183,10 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
 
 #' Coefficients Plot from bGWAS results
 #'
-#' Create a Coefficients Plot (causal effect of Prior GWASs) from bGWAS results (object of class bGWAS obtained
-#' when using bGWAS())
+#' Creates a Coefficients Plot (causal effect of each Prior GWASs) 
 #'
 #'
-#' @param obj an object of class bGWAS
+#' @param obj an object of class bGWAS created using \code{\link{bGWAS}()}
 #' @param save_file A logical indicating if the graphic should be saved,
 #'        \code{default=FALSE}, graphic will be displayed on the on-screen device
 #' @param file_name The name of the file saved (is \code{save_file} is \code{TRUE})
@@ -217,13 +214,9 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
   # add the trait name (if multiple studies for a same trait, add " - X" )
   Z_matrices = strsplit(obj$log_info[stringr::str_detect(obj$log_info, "The Z-Matrix files are stored in \"")], "\"")[[1]][2]
   all_studies =  list_priorGWASs(Z_matrices = Z_matrices)
-  coeffs$Trait = unlist(all_studies[match(coeffs$study, all_studies$File), "Trait"])
-  if(length(unique(coeffs$Trait))!=nrow(coeffs)){
-    for(t in unique(coeffs$Trait)){
-      if(nrow(coeffs[coeffs$Trait==t,]) >1 )
-      coeffs$Trait[coeffs$Trait==t] = paste0(t, " (", c(1:nrow(coeffs[coeffs$Trait==t,])), ")")
-    }
-  }
+  coeffs %>%
+    mutate(Trait=get_names(.data$study, Z_matrices)) -> coeffs
+  
 
 
   # add CI
@@ -272,16 +265,15 @@ print(P)
 if(save_file) grDevices::dev.off()
 }
 
-# coefficients_plot_bGWAS(MyObj, save_file = T)
 
 
 #' Extract SNPs results from bGWAS results
 #'
-#' Extract SNPs results from an object of class bGWAS obtained
-#' when using bGWAS() or bGWAS_fromPrior()
+#' Extracts SNPs results from bGWAS results (BFs, p-value, prior, posterior and 
+#' direct effects)
 #'
 #'
-#' @param obj an object of class bGWAS
+#' @param obj an object of class bGWAS created using \code{\link{bGWAS}()}
 #' @param SNPs, "all" / "significant"
 #'
 #' @return a data.frame containing the results for all / significant SNPs
@@ -298,7 +290,7 @@ extract_results_bGWAS <- function(obj, SNPs="significant"){
     if(length(obj$significant_SNPs)==0){
       stop("You can't extract \"significant\" results , because the analysis has been limited to prior estimation", call. = F)
     }
-    Res = subset(obj$all_BFs, rs %in% obj$significant_SNPs)
+    Res = subset(obj$all_BFs, .data$rsid %in% obj$significant_SNPs)
   }
 
   return(Res)
@@ -309,11 +301,9 @@ extract_results_bGWAS <- function(obj, SNPs="significant"){
 
 #' Extract MR coefficients from bGWAS results
 #'
-#' Extract MR coefficients from an object of class bGWAS obtained
-#' when using bGWAS()
+#' Extracts MR coefficients (multivariate genome-wide and per-chromosome estimates)
 #'
-#'
-#' @param obj an object of class bGWAS created using `bGWAS()`
+#' @param obj an object of class bGWAS created using \code{\link{bGWAS}()}
 #'
 #' @return a data.frame containing the MR coefficients (1 estimate using
 #' all chromosomes + 22 estimates with 1 chromosome masked)
@@ -327,8 +317,13 @@ extract_MRcoeffs_bGWAS <- function(obj){
   # For each study :
   # global coeff / chromosomes coeff
   Res=data.frame(obj$significant_studies)
+  Z_matrices = strsplit(obj$log_info[stringr::str_detect(obj$log_info, "The Z-Matrix files are stored in \"")], "\"")[[1]][2]
+  
+  Res %>%
+    transmute(name = get_names(.data$study, Z_matrices)) -> WithNames
+  bind_cols(WithNames, Res) -> Res
   for(c in 1:22){
-    CHRM = subset(obj$all_MRcoeffs, chrm==c)
+    CHRM = subset(obj$all_MRcoeffs, .data$chrm==c)
     Res[,paste0("chrm", c, "_estimate")] = CHRM$estimate[match(Res$study, CHRM$study)]
     Res[,paste0("chrm", c, "_std_error")] = CHRM$std_error[match(Res$study, CHRM$study)]
     Res[,paste0("chrm", c, "_P")] = CHRM$P[match(Res$study, CHRM$study)]
@@ -340,28 +335,24 @@ extract_MRcoeffs_bGWAS <- function(obj){
 
 #' Heatmap of SNP effects on prior traits from bGWAS results
 #'
-#' Create a heatmap of SNP effects on prior traits from bGWAS results
-#' (object of class bGWAS obtained when using bGWAS() or bGWASfromPrior()),
+#' Creates a heatmap of SNP effects on prior traits
 #'
 #'
-#' @param obj an object of class bGWAS
+#' @param obj an object of class bGWAS created using \code{\link{bGWAS}()}
 #' @param save_file A logical indicating if the graphic should be saved,
 #'        \code{default=FALSE}, graphic will be displayed on the on-screen device
 #' @param file_name The name of the file saved (is \code{save_file} is \code{TRUE})
 #'        \code{default=NULL}, will used NameOfYourAnalysis_Heatmap.png
 #' @return a Heatmap
 #'
+#' @importFrom rlang :=
 #' @export
 
 
-
-
-
 heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
+  # can only be run on significant SNPs?
+  
 
-
-  col=grDevices::colorRampPalette(c("blue", "white", "red"))(16*13)
-  ## ALIGNEMENT !!!
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
   if(!is.logical(save_file)) stop("save_file : should be logical")
@@ -374,61 +365,152 @@ heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
   }
   if(save_file && !is.character(file_name)) stop("file_name : should be a character")
 
+  
+  if(nrow(obj$significant_studies)<2) stop("heatmap can only be created if at least 2 prior GWASs have been used to create the prior")
 
+  if(length(obj$significant_SNPs)<2)  stop("heatmap can only be created if at least 2 significant hits have been identified")
+    
   if(save_file) grDevices::png(file_name, width = 20, height = 12, units = "cm", res = 500)
 
-  Effects = obj$nonZero_effects
-  SNPs = obj$significant_SNPs
-  # + keep only top hits !
-  Effects = Effects[match(obj$significant_SNPs, Effects$rs),]
-  # what if a SNP is a hit but has no significant effect from any risk factor ? Add a line with all 0 ?
+  Matrix = obj$matrix_heatmap
+  Res_signif = extract_results_bGWAS(obj)
+  all_causalestimates = obj$all_MRcoeffs
 
-
+  # 1) align to have obs_effect >0
   # sign = POS if the risk factor has a positive effect on our trait
   #        NEG if the risk factor has a negative effect on our trait
-  Effects_Aligned = Effects[,6:(ncol(obj$nonZero_effects)-1)]
+  Res_signif %>%
+    mutate(alt = case_when(.data$z_obs<0 ~ .data$ref,
+                           TRUE ~ .data$alt),
+           z_obs = abs(.data$z_obs),
+           z_prior_estimate = abs(.data$z_prior_estimate)) -> Res_signif_aligned
+  
+  
+  
+  # 2) re-align ZMat with GWAS results (using ALT)
+  Matrix %>%
+    slice(match(Res_signif_aligned$rsid, .data$rs)) -> Matrix
+  
+  Matrix %>%
+    select(-c(1:5))  %>%
+    colnames -> RFs
+  
+  Res_signif_aligned %>%
+    mutate( ZMat_alt = Matrix$alt,
+            Zmat_ref = Matrix$ref) ->  Res_signif_aligned
+  
 
-  Sign = ifelse(obj$significant_studies$estimate[match(colnames(Effects_Aligned), obj$significant_studies$study)]>0, "POS", "NEG")
-  for(t in 1:ncol(Effects_Aligned)){
-    if(Sign[t]=="NEG"){
-      tName = colnames(Effects_Aligned)[t]
-      Effects_Aligned[, (tName) := -(obj$nonZero_effects[obj$nonZero_effects$rs %in% obj$significant_SNPs,..tName, with=F])]
-    }
+  for(RF in RFs){
+    Res_signif_aligned %>%
+      mutate({{RF}} := case_when(
+                (alt == .data$ZMat_alt) ~ Matrix[,RF],
+                (alt == .data$Zmat_ref) ~ -Matrix[,RF],
+                TRUE ~ NA_real_))-> Res_signif_aligned
   }
-  # keep 0 = 0 or set to NA ?
-  # row distance + clustering
-  rd<-dist(Effects_Aligned)
-  rc<-hclust(rd)
-  # column distance + clustering
-  cd<-dist(t(Effects_Aligned))
-  cc<-hclust(cd)
-
-
-  # Add Order ???
-
-  # Heatmap : beta, aligned risk scores
-  col=grDevices::colorRampPalette(c("blue", "white", "red"))(16*13)
-  SNPsAlleles = paste(Effects$rs, Effects$alt, sep=" - ")
-
-  gplots::heatmap.2(as.matrix(Effects_Aligned), Rowv=as.dendrogram(rc), Colv=as.dendrogram(cc),
-            dendrogram="both", col=col, trace="none",
-            margins=c(9.5, 7.7),labCol=colnames(Effects_Aligned), labRow=SNPsAlleles , cexCol=0.7, cexRow=0.6,
-            #lhei=c(,6),
-            lwid=c(1.5, 3.5), keysize=0.75, key.ylab="Count", key.par = list(cex=0.5, cex.main=1, cex.axis=1, cex.lab=1, cex.sub=1), srtCol=45,
-            key.xlab="Z-Score")
-
-
- # gplots::heatmap.2(as.matrix(Effects_Aligned), Rowv=as.dendrogram(rc), Colv=as.dendrogram(cc),#, reorder(dendo, Order),
- #           dendrogram="col", col=col, trace="none",
- #           margins=c(12, 0),labCol=colnames(Effects_Aligned), labRow=rep("", nrow(Effects_Aligned)) , cexCol=0.7, cex=0.5,
-            #lhei=c(2,4),
- #           lwid=c(1.5,3.5), keysize=0.75, key.par = list(cex=0.5)) #keysize=0.9)
- # heatmap(as.matrix(Effects_Aligned), Rowv=as.dendrogram(rc), Colv=as.dendrogram(cc),
- #         col = col, margins=c(14,0),labCol=colnames(Effects_Aligned), labRow=rep("", nrow(Effects_Aligned)))
-
-
-
+  
+  Res_signif_aligned %>%
+    select(.data$RFs) %>%
+    as.matrix -> RF_SNPs
+  
+  RF_contribution = RF_SNPs
+  
+  Res_signif_aligned %>%
+    pull(.data$rsid) -> SNPs
+  for(snp in 1:length(SNPs)){
+    causalestimates = subset(all_causalestimates, .data$chrm==as.numeric(Res_signif_aligned[snp, "chrm_UK10K"])) # subset the chromosome
+    causalestimates = causalestimates[match(colnames(RF_SNPs), causalestimates$study),] # re-order the RFs before multiplying
+    RF_contribution[snp,] = RF_SNPs[snp,] * causalestimates$estimate
+  }
+  
+  # check that our sum(RF_contributions) match the prior reported
+  # cbind(apply(RF_contribution, 1, function(x) sum(x)) , Res_signif_aligned$z_prior_estimate)
+  
+  # plot
+  significance = RF_SNPs
+  limit = stats::qnorm(5e-8*0.5, lower.tail = F)
+  significance[abs(significance)>=limit] = "*"
+  significance[significance!="*"] = ""
+  
+  Res_signif_aligned %>%
+    tidyr::unite(SNPs_Name, .data$rsid, .data$alt, sep = " - ") %>%
+    pull(.data$SNPs_Name) -> SNPs_Name
+  
+  Z_matrices = strsplit(obj$log_info[stringr::str_detect(obj$log_info, "The Z-Matrix files are stored in \"")], "\"")[[1]][2]
+  
+  RFs_Names = get_names(RFs, Z_matrices)
+  
+  my_colors=grDevices::colorRampPalette(c("blue", "white", "red"))(20*20)
+  
+  
+  gplots::heatmap.2(RF_contribution, 
+            cellnote = significance,
+            notecol="black", 
+            notecex = 2,
+            Rowv=F, Colv=F,
+            dendrogram="none", col=my_colors, trace="none",
+            margins=c(10, 10),labCol=RFs_Names, labRow=SNPs_Name , cexCol=0.8, cexRow=0.8,
+            lwid=c(0.5, 3.5), keysize=0.75, key.ylab="", 
+            key.par = list(cex=0.5, cex.main=0.0001,  cex.axis=1, cex.lab=1, cex.sub=1), srtCol=45,
+            density.info='none',
+            key.xlab="Contribution to prior effects")
+  
+  
   if(save_file) grDevices::dev.off()
+}
+
+
+
+#' Get squared correlation between observed and prior effects from bGWAS results
+#'
+#' Returns squared correlation between observed and prior effects,
+#' for different subsets of SNPs (all, the ones having at least a moderate effects,
+#' MR instruments) 
+#'
+#'
+#' @param obj an object of class bGWAS created using \code{\link{bGWAS}()}
+#' @param SNPs, "all" / "moderate" / "instruments"
+#' @return a squared correlation
+#'
+#' @export
+
+get_RSquared_bGWAS <- function(obj, SNPs="all"){ # obj should be a bGWAS object
+  # SNPs can be "all", "moderate", "instruments"
+  if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
+  if(!SNPs %in% c("all", "moderate", "instruments")) stop("SNPs : should be \"all\", \"moderate\" or \"instruments\".")
+  
+  R2=NA
+  if(SNPs=="all"){
+    Line =  obj$log_info[stringr::str_detect(obj$log_info, "Correlation between prior and observed effects for all SNPs is ")]
+    R2 = as.numeric(stringr::str_split(Line, "is ")[[1]][2])^2
+  } else if(SNPs=="moderate"){
+    Line =  obj$log_info[stringr::str_detect(obj$log_info, "Correlation between prior and observed effects for SNPs with GWAS p-value < 0.001 is ")]
+    R2 = as.numeric(stringr::str_split(Line, "is ")[[1]][2])^2
+  } else if(SNPs=="instruments"){
+    Line =  obj$log_info[stringr::str_detect(obj$log_info, "Out-of-sample squared correlation for MR instruments across all chromosome is ")]
+    R2 = as.numeric(stringr::str_split(Line, "is ")[[1]][2])
+  }
+  
+  return(R2)
+}
+
+
+
+#' Print log from bGWAS results
+#'
+#' Prints the log (everything that is printed during a \code{bGWAS} analysis)
+#' with \code{verbose=TRUE})
+#'
+#'
+#' @param obj an object of class bGWAS created using \code{\link{bGWAS}()}
+#'
+#' @export
+
+print_log_bGWAS <- function(obj){ # obj should be a bGWAS object
+  # SNPs can be "all", "moderate", "instruments"
+  if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
+
+  
+  cat(obj$log_info, sep = "\n")
 }
 
 
@@ -444,150 +526,5 @@ update_log <- function(log_obj, text, verbose=F){
 
 
 
-
-# miami_plot_bGWAS() <- function (obj, P1, P2, threshold_min){
-#   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
-#   if(is.null(obj$all_MRcoeffs)) stop("The prior has not been created using Prior GWASs, there are no coefficients to extract")
-#
-#   # add corrected ? "Difference"
-#   if(!P1 %in% c("Obs", "Prior", "Posterior", "Difference")) stop("P1: should be \"Obs\", \"Prior\", \"Posterior\" or \"Difference\".")
-#   if(!P2 %in% c("Obs", "Prior", "Posterior", "Difference")) stop("P2: should be \"Obs\", \"Prior\", \"Posterior\" or \"Difference\".")
-#   if(P1==P2) stop("P1 and P2 should be different!.")
-#
-#   if(!is.numeric(threshold)) stop("threshold: should be numeric.")
-#
-#   # 1) Identify columns and get P-values
-#   myData = obj$all_BFs[,1:3]
-#   if(P1=="Obs"){
-#     myData$P1 = 2*pnorm(-abs(obj$all_BFs$observed_Z))
-#   } else if(P1=="Prior"){
-#     ZPrior = obj$all_BFs$prior_estimate/ obj$all_BFs$prior_std_error
-#     myData$P1 = 2*pnorm(-abs(ZPrior))
-#   } else if(P1=="Posterior"){
-#     ZPosterior = obj$all_BFs$posterior_estimate/ obj$all_BFs$posterior_std_error
-#     myData$P1 = 2*pnorm(-abs(ZPosterior))
-#   } else if(P1=="Difference"){
-#     ZDiff = (obj$all_BFs$observed_Z-obj$all_BFs$prior_estimate)/sqrt(1^2+obj$all_BFs$prior_std_error^2)
-#     myData$P1 = 2*pnorm(-abs(ZDiff))
-#   }
-#   if(P2=="Obs"){
-#     myData$P2 = 2*pnorm(-abs(obj$all_BFs$observed_Z))
-#   } else if(P2=="Prior"){
-#     ZPrior = obj$all_BFs$prior_estimate/ obj$all_BFs$prior_std_error
-#     myData$P2 = 2*pnorm(-abs(ZPrior))
-#   } else if(P2=="Posterior"){
-#     ZPosterior = obj$all_BFs$posterior_estimate/ obj$all_BFs$posterior_std_error
-#     myData$P2 = 2*pnorm(-abs(ZPosterior))
-#   } else if(P2=="Difference"){
-#     ZDiff = (obj$all_BFs$observed_Z-obj$all_BFs$prior_estimate)/sqrt(1^2+obj$all_BFs$prior_std_error^2)
-#     myData$P2 = 2*pnorm(-abs(ZDiff))
-#   }
-#
-#   # 2) threshold
-#   myData = myData[myData$P1 < threshold | myData$P2 < threshold,]
-#   myData$P1 = -log10(myData$P1)
-#   myData$P2 =  log10(myData$P2)
-#   d = data.frame(rs=rep(myData$rs,2),CHR=rep(myData$chrm,2), BP=rep(myData$pos,2),
-#                       P=c(myData$P1, myData$P2))
-#
-#
-#   #if (!is.null(x[[snp]]))
-#   #  d = transform(d, SNP = x[[snp]])
-#   #d <- subset(d, (is.numeric(CHR) & is.numeric(BP) & is.numeric(P)))
-#   d <- d[order(d$CHR, d$BP), ]
-#
-#   d$pos = NA
-#   d$index = NA
-#   ind = 0
-#   for (i in unique(d$CHR)) {
-#     ind = ind + 1
-#     d[d$CHR == i, ]$index = ind
-#   }
-#   nchr = length(unique(d$CHR))
-#   if (nchr == 1) {
-#     d$pos = d$BP
-#     ticks = floor(length(d$pos))/2 + 1
-#     xlabel = paste("Chromosome", unique(d$CHR), "position")
-#     labs = ticks
-#   }  else {
-#     lastbase = 0
-#     ticks = NULL
-#     for (i in unique(d$index)) {
-#       if (i == 1) {
-#         d[d$index == i, ]$pos = d[d$index == i, ]$BP
-#       }      else {
-#         lastbase = lastbase + tail(subset(d, index ==
-#                                             i - 1)$BP, 1)
-#         d[d$index == i, ]$pos = d[d$index == i, ]$BP +
-#           lastbase
-#       }
-#       ticks = c(ticks, (min(d[d$index == i, ]$pos) + max(d[d$index ==
-#                                                              i, ]$pos))/2 + 1)
-#     }
-#     xlabel = "Chromosome"
-#     labs <- unique(d$CHR)
-#   }
-#   xmax = ceiling(max(d$pos) * 1.03)
-#   xmin = floor(max(d$pos) * -0.03)
-#   def_args <- list(xaxt = "n", bty = "n", xaxs = "i", yaxs = "i",
-#                    las = 1, pch = 20, xlim = c(xmin, xmax), ylim = c(ceiling(-max(d$P)),
-#                                                                      ceiling(max(d$P))), xlab = xlabel, ylab = expression(-log[10](italic(p))))
-#   dotargs <- NULL
-#   do.call("plot", c(NA, dotargs, def_args[!names(def_args) %in%
-#                                             names(dotargs)]))
-#
-#     axis(1, at = ticks, labels = labs)
-#
-#   col = rep(c("grey", "black"), max(d$CHR))
-#   if (nchr == 1) {
-#     with(d, points(pos, P, pch = 20, col = col[1], ...))
-#   } else {
-#     icol = 1
-#     for (i in unique(d$index)) {
-#       with(d[d$index == unique(d$index)[i], ], points(pos,
-#                                                       P, col = col[icol], pch = 20))
-#       icol = icol + 1
-#     }
-#   }
-#
-#
-#   if (suggestiveline)
-#     abline(h = suggestiveline, col = "blue")
-#   if (genomewideline)
-#     abline(h = genomewideline, col = "red")
-#   if (!is.null(highlight)) {
-#     if (any(!(highlight %in% d$SNP)))
-#       warning("You're trying to highlight SNPs that don't exist in your results.")
-#     d.highlight = d[which(d$SNP %in% highlight), ]
-#     with(d.highlight, points(pos, logp, col = "green3", pch = 20,
-#                              ...))
-#   }
-#   if (!is.null(annotatePval)) {
-#     topHits = subset(d, P <= annotatePval)
-#     par(xpd = TRUE)
-#     if (annotateTop == FALSE) {
-#       with(subset(d, P <= annotatePval), textxy(pos, -log10(P),
-#                                                 offset = 0.625, labs = topHits$SNP, cex = 0.45),
-#            ...)
-#     }
-#     else {
-#       topHits <- topHits[order(topHits$P), ]
-#       topSNPs <- NULL
-#       for (i in unique(topHits$CHR)) {
-#         chrSNPs <- topHits[topHits$CHR == i, ]
-#         topSNPs <- rbind(topSNPs, chrSNPs[1, ])
-#       }
-#       textxy(topSNPs$pos, -log10(topSNPs$P), offset = 0.625,
-#              labs = topSNPs$SNP, cex = 0.5, ...)
-#     }
-#   }
-#   par(xpd = FALSE)
-# }
-
-get_RSquared <- function(obj){ # obj should be a bGWAS object
-  Line =  obj$log_info[stringr::str_detect(obj$log_info, "Median out-of-sample adjusted R-squared across all chromosomes is ")]
-  R2 = as.numeric(stringr::str_split(Line, "is ")[[1]][2])
-  return(R2)
-}
 
 

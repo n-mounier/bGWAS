@@ -7,7 +7,7 @@
 extract_results_bGWAS(obj, SNPs = "significant")
 }
 \arguments{
-\item{obj}{an object of class bGWAS}
+\item{obj}{an object of class bGWAS created using \code{\link{bGWAS}()}}
 
 \item{SNPs, }{"all" / "significant"}
 }
@@ -15,6 +15,6 @@ extract_results_bGWAS(obj, SNPs = "significant")
 a data.frame containing the results for all / significant SNPs
 }
 \description{
-Extract SNPs results from an object of class bGWAS obtained
-when using bGWAS() or bGWAS_fromPrior()
+Extracts SNPs results from bGWAS results (BFs, p-value, prior, posterior and 
+direct effects)
 }

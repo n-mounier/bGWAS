@@ -5,10 +5,10 @@
 \title{Manhattan Plot from bGWAS results}
 \usage{
 manhattan_plot_bGWAS(obj, save_file = F, file_name = NULL,
-  threshold = NULL, annotate = T)
+  annotate = T)
 }
 \arguments{
-\item{obj}{an object of class bGWAS}
+\item{obj}{an object of class bGWAS created using \code{\link{bGWAS}()}}
 
 \item{save_file}{A logical indicating if the graphic should be saved,
 \code{default=FALSE}, graphic will be displayed on the on-screen device}
@@ -16,18 +16,14 @@ manhattan_plot_bGWAS(obj, save_file = F, file_name = NULL,
 \item{file_name}{The name of the file saved (is \code{save_file} is \code{TRUE})
 \code{default=NULL}, will used NameOfYourAnalysis_ManhattanPlot.png}
 
-\item{threshold}{The threshold used to draw the significance line,
-\code{default=NULL}, will used the threshold used in the analysis}
-
 \item{annotate}{A logical indicating if the significant SNPs identified in the
 analysis should be annotated on the plot, \code{default=TRUE}
 If your results are not pruned or if you have a high number of significant SNPs,
-\code{annotate=TRUE} might decrease readability of the figure.}
+be aware that \code{annotate=TRUE} might decrease readability of the figure.}
 }
 \value{
 a Manhattan Plot
 }
 \description{
-Create a Manhattan Plot from bGWAS results (object of class bGWAS obtained
-when using bGWAS() or bGWASfromPrior()),
+Creates a Manhattan Plot from bGWAS results
 }

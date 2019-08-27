@@ -8,15 +8,12 @@
 # #' a specified threshold)
 # #'
 # #' @inheritParams bGWAS
-# #'
-# #' @return Log file and pruned Z-Matrix of MR instrument + create a file if saveFiles=T
-# #'
+# NOT EXPORTED
 
-makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
-                           MR_threshold, MR_pruning_dist, MR_pruning_LD, path="~/ZMatrices", save_files=F, verbose=F) {
-  platform = .Platform$OS.type
-  if(platform=="windows") stop("Windows is not supported yet", call. = FALSE)
-  
+
+makeMR_ZMatrix <- function(prior_studies=NULL, GWASData, GName,
+                           MR_threshold, MR_ninstruments, MR_pruning_dist, MR_pruning_LD, Z_matrices="~/ZMatrices", 
+                           MR_shrinkage, save_files=F, verbose=F) {
   Log = c()
   tmp = paste0("# Loading the ZMatrix... \n")
   Log = update_log(Log, tmp, verbose)
@@ -27,14 +24,9 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
   if(!is.null(prior_studies)){
     tmp = paste0("Selecting studies :\n")
     Log = update_log(Log, tmp, verbose)
-    if(platform == "unix"){
-      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), select=c(1:5, prior_studies+5), showProgress = FALSE, data.table=F)
-    }
-    
+    ZMatrix=data.table::fread(file.path(Z_matrices, "ZMatrix_MR.csv.gz"), select=c(1:5, prior_studies+5), showProgress = FALSE, data.table=F)
   } else {
-    if(platform == "unix") {
-      ZMatrix=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_NotImputed.csv.gz")), showProgress = FALSE, data.table=F)
-    }
+    ZMatrix=data.table::fread(file.path(Z_matrices, "ZMatrix_MR.csv.gz"), showProgress = FALSE, data.table=F)
   }
   
   tmp = paste0(ncol(ZMatrix)-5, " studies \n")
@@ -46,209 +38,211 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWAS,
   ## 1st step should be taking the SNPs in common, otherwise we might exclude all the SNPs
   # from the conventionnal GWAS when pruning
   # Add conventional GWAS column, at the end (make sure alleles are aligned)
-  if(is.numeric(GWAS)){  # if GWAS from our data
-    tmp = paste0("# Adding data from the conventional GWAS (ID=", GWAS, "): \n \"", list_files(IDs = GWAS, Z_matrices = path) , "\" \n")
-    Log = update_log(Log, tmp, verbose)
-    
-    if(platform == "unix"){
-      GWASData=data.table::fread(paste0("zcat < ",paste0(path, "/ZMatrix_Imputed.csv.gz")), select=c(1:5, GWAS+5), showProgress = FALSE, data.table=F)
-    }
-    
-    # no need to check for alignment of alleles, just subset and rename the column
-    # keep the SNPs in our pruned matrix and order them correctly
-    GWASData = GWASData[match(ZMatrix$rs,GWASData$rs),]
-    ZMatrix$outcome =  GWASData[,6]
-    colnames(ZMatrix)[ncol(ZMatrix)]= list_files(IDs = GWAS, Z_matrices = path)
-    
-    tmp = "Done! \n"
-    Log = update_log(Log, tmp, verbose)
-    
-  } else if(is.character(GWAS)){  # if GWAS is a file
-    tmp = paste0("# Adding data from the conventional GWAS : \n \"", GWAS, "\" \n")
-    Log = update_log(Log, tmp, verbose)
-    
-    if(!grepl(".gz", GWAS)){
-      GWASData = data.table::fread(GWAS, showProgress = FALSE, data.table=F)
-    } else if(grepl(".gz", GWAS)) {
-      # if tar.gz
-      GWASData = data.table::fread(paste0("zcat < ", GWAS), showProgress = FALSE, data.table = F)
-    }
-    
-    SNPID = match(colnames(GWASData),c("snpid", "snp", "rnpid", "rs", "rsid"))
-    SNPID = which(!is.na(SNPID))[1]
-    ALT = match(colnames(GWASData),c("a1", "alts", "alt"))
-    ALT = which(!is.na(ALT))[1]
-    REF = match(colnames(GWASData),c("a2", "ref", "a0"))
-    REF = which(!is.na(REF))[1]
-    ZSTAT = match(colnames(GWASData),c("z", "Z", "zscore"))
-    ZSTAT = which(!is.na(ZSTAT))[1]
-    
-    # keep the SNPs in our Z matrix and order them correctly
-    GWASData = GWASData[match(ZMatrix$rs, GWASData[,SNPID]),]
-    # check alignment
-    aligned = which(GWASData[,ALT] == ZMatrix$alt &
-                      GWASData[,REF] == ZMatrix$ref)
-    swapped = which(GWASData[,REF] == ZMatrix$alt &
-                      GWASData[,ALT] == ZMatrix$ref)
-    #  weird = c(1:nrow(GWAS))[!c(1:nrow(GWAS)) %in% c(aligned, swapped)]
-    
-    GWASData$myZ = NA
-    GWASData[aligned, "myZ"] =  GWASData[aligned, ZSTAT]
-    GWASData[swapped, "myZ"] = -GWASData[swapped, ZSTAT]
-    
-    ZMatrix[, strsplit(GWAS, "/")[[1]][ length(strsplit(GWAS, "/")[[1]])]] = GWASData$myZ
-    
-    tmp = "Done! \n"
-    Log = update_log(Log, tmp, verbose)
-    
-  } else if(is.data.frame(GWAS)){  # if GWAS is data.frame
-    GName = attributes(GWAS)$GName
-    tmp = paste0("# Adding data from the conventional GWAS : \n \"", GName,
-                 "\" \n")
-    Log = update_log(Log, tmp, verbose)
-    
-    SNPID = match(colnames(GWAS),c("snpid", "snp", "rnpid", "rs", "rsid"))
-    SNPID = which(!is.na(SNPID))[1]
-    ALT = match(colnames(GWAS),c("a1", "alts", "alt"))
-    ALT = which(!is.na(ALT))[1]
-    REF = match(colnames(GWAS),c("a2", "ref", "a0"))
-    REF = which(!is.na(REF))[1]
-    ZSTAT = match(colnames(GWAS),c("z", "Z", "zscore"))
-    ZSTAT = which(!is.na(ZSTAT))[1]
-    
-    # keep the SNPs in our Z matrix and order them correctly
-    GWAS = GWAS[match(ZMatrix$rs, GWAS[,SNPID]),]
-    # check alignment
-    aligned = which(GWAS[,ALT] == ZMatrix$alt &
-                      GWAS[,REF] == ZMatrix$ref)
-    swapped = which(GWAS[,REF] == ZMatrix$alt &
-                      GWAS[,ALT] == ZMatrix$ref)
-    #  weird = c(1:nrow(GWAS))[!c(1:nrow(GWAS)) %in% c(aligned, swapped)]
-    
-    GWAS$myZ = NA
-    GWAS[aligned, "myZ"] =  GWAS[aligned, ZSTAT]
-    GWAS[swapped, "myZ"] = -GWAS[swapped, ZSTAT]
-    
-    
-    
-    ZMatrix[, GName] = GWAS$myZ
-    
-    tmp = "Done! \n"
-    Log = update_log(Log, tmp, verbose)
-    
-  }
+  tmp = paste0("# Adding data from the conventional GWAS : \n \"", GName,
+               "\" \n")
+  Log = update_log(Log, tmp, verbose)
+  
+  # keep the SNPs in our Z matrix and order them correctly + check allele alignement
+  ZMatrix %>%
+    filter(.data$rs %in% GWASData$rsid) -> ZMatrix
+  
+  GWASData %>%
+    slice(match(ZMatrix$rs, .data$rsid)) %>%
+    mutate(ZMat_alt = ZMatrix$alt,
+           Zmat_ref = ZMatrix$ref,
+            aligned_Z = case_when(
+              (.data$alt == .data$ZMat_alt &
+                 .data$ref == .data$Zmat_ref) ~ .data$z_obs,
+              (.data$ref == .data$ZMat_alt &
+                 .data$alt == .data$Zmat_ref) ~ -.data$z_obs,
+              TRUE ~ NA_real_))-> GWASData
+  
+  ZMatrix %>%
+    mutate({{GName}} := GWASData$aligned_Z) -> ZMatrix
+  
+  tmp = "Done! \n"
+  Log = update_log(Log, tmp, verbose)
   
   
-  ZMatrix = ZMatrix[complete.cases(ZMatrix),]
+  ZMatrix %>%
+    tidyr::drop_na() -> ZMatrix
+  
   tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific=F), " SNPs in common between prior studies and the conventional GWAS \n")
   Log = update_log(Log, tmp, verbose)
   
-  # select based on threshold if different from 1e-5 and removed rows without any Z-Score ok
+  # select based on threshold and remove rows without any Z-Score ok
   
   # ZLimit should be define even if threshold == 1e-5 to remove studies without strong instruments after pruning
-  Zlimit = qnorm(MR_threshold/2, lower.tail = F)
+  Zlimit = stats::qnorm(MR_threshold/2, lower.tail = F)
   
-  if(MR_threshold != 1e-5 ){
-    tmp = paste0("# Thresholding... \n")
+  tmp = paste0("# Thresholding... \n")
+  Log = update_log(Log, tmp, verbose)
+  # DO NOT USE THE LAST COLUMN!!
+  ZMatrix %>%
+    filter_at(vars(-c(1:5,as.numeric(ncol(ZMatrix)))), 
+              any_vars(abs(.) > Zlimit)) -> ZMatrix
+  
+  
+  tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific = F), " SNPs left after thresholding \n")
+  Log = update_log(Log, tmp, verbose)
+  
+  # before pruning, remove studies with less than MR_ninstruments instruments
+  # check that each study have at least two SNPs surviving pruning+thresholding
+  ZMatrix %>%
+    select(-c(1:5,as.numeric(ncol(ZMatrix)))) %>%
+    apply(., 2, function(col){
+      sum(abs(col)>Zlimit)>=MR_ninstruments}) -> StudiesToKeep
+  
+  
+  if(!all(StudiesToKeep)){
+    ZMatrix  %>%
+      select(-c(1:5,as.numeric(ncol(ZMatrix)))) %>%
+      select(names(StudiesToKeep[!StudiesToKeep])) %>%
+      colnames -> StudiesToRemove
+    tmp = paste0(paste0(get_names(StudiesToRemove, Z_matrices), collapse=" - "), " : removed (less than ", MR_ninstruments, " instrument after thresholding) \n")
     Log = update_log(Log, tmp, verbose)
-    # DO NOT USE THE LAST COLUMN!!
-    if(ncol(ZMatrix)>7){
-      SNPsToKeep = apply(ZMatrix[,-c(1:5,as.numeric(ncol(ZMatrix)))], 1, function(x) any(abs(x)>Zlimit))
-      ZMatrix=ZMatrix[SNPsToKeep,]
-    } else {
-      SNPsToKeep = ZMatrix[,-c(1:5,as.numeric(ncol(ZMatrix)))]>Zlimit
-      ZMatrix=ZMatrix[SNPsToKeep,]
+    
+    if(save_files){
+      Files_Info$status[Files_Info$File %in% colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep]] =
+        paste0("Excluded for MR: less than ",  MR_ninstruments, " strong instrument left after thresholding/pruning")
     }
     
+    ZMatrix %>%
+      select(-StudiesToRemove) -> ZMatrix
     
-    tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific = F), " SNPs left after thresholding \n")
-    Log = update_log(Log, tmp, verbose)
-  } else {
-    tmp = paste0("No thresholding needed... \n")
-    Log = update_log(Log, tmp, verbose)
   }
+  tmp = paste0(ncol(ZMatrix)-6, " studies left after thresholding \n")
+  Log = update_log(Log, tmp, verbose)
+  
+  
   
   # pruning
   tmp = paste0("Pruning MR instruments... \n")
   Log = update_log(Log, tmp, verbose)
-  if(ncol(ZMatrix)>7){
-    apply(ZMatrix[,-c(1:5, ncol(ZMatrix))], 1, function(ZMatrix){
-      max(abs(ZMatrix))
-    }) -> maxZ
-  } else {
-    maxZ <- ZMatrix[,6]
-  }
   
-  ToPrune = ZMatrix[,1:3]
-  colnames(ToPrune) = c("SNP", "chr_name", "chr_start")
+  ZMatrix %>%
+    select(-c(1:5,as.numeric(ncol(ZMatrix)))) %>%
+    apply(., 1, function(row){
+      max(abs(row))}) -> maxZ
+ 
+  
+  ZMatrix %>%
+    transmute(SNP=.data$rs,
+              chr_name=.data$chrm,
+              chr_start=.data$pos,
+              Z=maxZ) -> ToPrune
+
   if(MR_pruning_LD>0){# LD-pruning
     tmp = paste0("   distance : ", MR_pruning_dist, "Kb", " - LD threshold : ", MR_pruning_LD, "\n")
     Log = update_log(Log, tmp, verbose)
-    # get max Z-score and convert to p-value
-    ToPrune$pval.exposure = 2*pnorm(-abs(maxZ))
+    # convert max Z-score to p-value
+    ToPrune %>%
+      mutate(pval.exposure = 2 * stats::pnorm(-abs(.data$Z)),
+             Z=NULL) -> ToPrune
     # Do pruning, chr by chr
     SNPsToKeep = c()
     for(chr in unique(ToPrune$chr_name)){
       SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = MR_pruning_dist, clump_r2 = MR_pruning_LD)$SNP))
     }
-  }
-  else{# distance pruning
+  } else{# distance pruning
     tmp = paste0("   distance : ", MR_pruning_dist, "Kb \n")
     Log = update_log(Log, tmp, verbose)
-    ToPrune$Z = maxZ
     SNPsToKeep = prune_byDistance(ToPrune, prune.dist=MR_pruning_dist, byP=F)
   }
   
-  
-  ZMatrixPruned = ZMatrix[ZMatrix$rs %in% SNPsToKeep,]
-  
+  ZMatrix %>%
+    filter(.data$rs %in% SNPsToKeep) -> ZMatrixPruned
+
   tmp = paste0(format(nrow(ZMatrixPruned), big.mark = ",", scientific = F), " SNPs left after pruning \n")
   Log = update_log(Log, tmp, verbose)
   
   NAllStudies = nrow(ZMatrixPruned)
   
-  # check that each study have at least two SNPs surviving pruning+thresholding
-  if(ncol(ZMatrixPruned)>7){
-    StudiesToKeep = apply(ZMatrixPruned[,-c(1:5,as.numeric(ncol(ZMatrixPruned)))], 2, function(x) sum(abs(x)>Zlimit)>1)
-  } else {
-    StudiesToKeep = sum(abs(ZMatrixPruned[,6])>Zlimit)>1
-  }
+  # check that each study have at least MR_ninstruments SNPs surviving pruning+thresholding
+  ZMatrixPruned %>%
+    select(-c(1:5,as.numeric(ncol(ZMatrixPruned)))) %>%
+    apply(., 2, function(col){
+      sum(abs(col)>Zlimit)>=MR_ninstruments}) -> StudiesToKeep
+    
   
-   if(!all(StudiesToKeep)){
-    tmp = paste0(paste0(colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep], collapse=" - "), " : removed (no more than one strong instrument after pruning) \n")
+  if(!all(StudiesToKeep)){
+    ZMatrixPruned  %>%
+      select(-c(1:5,as.numeric(ncol(ZMatrixPruned)))) %>%
+      select(names(StudiesToKeep[!StudiesToKeep])) %>%
+      colnames -> StudiesToRemove
+    tmp = paste0(paste0(get_names(StudiesToRemove, Z_matrices), collapse=" - "), " : removed (less than ", MR_ninstruments, " strong instrument after pruning) \n")
+    Log = update_log(Log, tmp, verbose)
+    
     if(save_files){
       Files_Info$status[Files_Info$File %in% colnames(ZMatrix[,-c(1:5)])[!StudiesToKeep]] =
-        "Excluded for MR: no more than one strong instrument left after thresholding+pruning"
-    }
-    ZMatrixPruned[,colnames(ZMatrixPruned[,-c(1:5)])[!StudiesToKeep]] <- NULL
+        paste0("Excluded for MR: less than", MR_ninstruments,  " strong instrument left after thresholding/pruning")
+      }
+
+    ZMatrixPruned %>%
+      select(-StudiesToRemove) -> ZMatrixPruned
+    
   }
   tmp = paste0(ncol(ZMatrixPruned)-6, " studies left after thresholding+pruning \n")
   Log = update_log(Log, tmp, verbose)
   
   
   # Further checking of the SNPs to remove SNPs associated with studies removed because only one SNP
-  if(ncol(ZMatrixPruned)>7){
-    SNPsToKeep = apply(ZMatrixPruned[,-c(1:5,as.numeric(ncol(ZMatrixPruned)))], 1, function(x) any(abs(x)>Zlimit))
-  } else {
-    SNPsToKeep = abs(ZMatrixPruned[,6])>Zlimit
-  }
+  ZMatrixPruned %>%
+    select(-c(1:5,as.numeric(ncol(ZMatrixPruned)))) %>%
+    apply(., 1, function(row){
+      any(abs(row)>Zlimit)}) -> SNPsToKeep  
   
-  if(sum(SNPsToKeep != NAllStudies)){
-    ZMatrixPruned=ZMatrixPruned[SNPsToKeep,]
+    
+  if(sum(SNPsToKeep) != NAllStudies){
+    ZMatrixPruned %>%
+      filter(SNPsToKeep) -> ZMatrixPruned
     tmp = paste0(format(nrow(ZMatrixPruned), big.mark = ",", scientific = F), " SNPs left after removing studies with only one strong instrument \n")
     Log = update_log(Log, tmp, verbose)
   }
   
   
+
+  push_extreme_zs_back_a_little_towards_zero <- function(d) { # Some z-scores are just too far from zero
+    maxAllowed_z = abs(stats::qnorm(1e-300 / 2)) # p=1e-300 is the max allowed now, truncate z-scores accordingly
+    names(d) %>% 
+      .[!. %in% c("rs","chrm","pos","alt","ref")] -> studies_here
+    for(n in studies_here) {
+      d %>%
+        mutate(!!n := case_when(
+          abs(eval(parse(text=n))) > maxAllowed_z  ~  maxAllowed_z,
+          abs(eval(parse(text=n))) < -maxAllowed_z ~ -maxAllowed_z,
+          TRUE ~ eval(parse(text=n)))) -> d
+    }
+    return(d)
+  }
+  # Truncate Z-scores
+  ZMatrixPruned %>%
+    push_extreme_zs_back_a_little_towards_zero() -> ZMatrixPruned
   
   
-  if(save_files) write.table(Files_Info, file="PriorGWASs.tsv", sep="\t", quote=F, row.names=F )
+  
+  # Set the z-scores to 0 for the regression if shrinkage
+  if(MR_shrinkage < 1.0) {
+    names(ZMatrixPruned) %>% 
+      .[!. %in% c('rs','chrm','pos','alt','ref', GName)] -> Prior_study_names
+    threshold = abs(stats::qnorm(MR_shrinkage/2))
+    for(column_of_zs in Prior_study_names) { 
+      ZMatrixPruned %>%
+        mutate(!!column_of_zs := case_when(
+          abs(eval(parse(text=column_of_zs))) < threshold ~ 0,
+          TRUE ~ eval(parse(text=column_of_zs)))) -> ZMatrixPruned
+    }
+    tmp = paste0("Applying shrinkage (threshold = ", MR_shrinkage, ") before performing MR. \n")
+    Log = update_log(Log, tmp, verbose)
+  }
+  
+  
+  if(save_files) utils::write.table(Files_Info, file="PriorGWASs.tsv", sep="\t", quote=F, row.names=F )
   
   
   
-  res=list()
-  res$log_info = Log
-  res$mat = ZMatrixPruned
+  res=list(log_info = Log,
+           mat = ZMatrixPruned)
   return(res)
 }
 

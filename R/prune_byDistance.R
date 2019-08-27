@@ -2,20 +2,9 @@
 
 
 
-# #' Prune a Z-Matrix
-# #'
-# #'
-# #' @param ZMatrix A subset of the prior GWASs Z-Matrix
-# #' @param prune.dist The distance for pruning
-# #' @param r2.limit The r2 threshold if LD-pruning, \code{default=1.1}, only distance pruning
-# #'        is performed
-# #'
-# #' @details
-# #'
-# #'
-#' @importFrom magrittr "%>%"
-#' @importFrom data.table ":="
-# #  Function not exported, no need of extended documentation?
+# #' Prune set of SNPs
+# NOT EXPORTED
+
 
 
 prune_byDistance <- function(data, prune.dist=100, byP=T) {

@@ -7,13 +7,12 @@
 extract_MRcoeffs_bGWAS(obj)
 }
 \arguments{
-\item{obj}{an object of class bGWAS created using `bGWAS()`}
+\item{obj}{an object of class bGWAS created using \code{\link{bGWAS}()}}
 }
 \value{
 a data.frame containing the MR coefficients (1 estimate using
 all chromosomes + 22 estimates with 1 chromosome masked)
 }
 \description{
-Extract MR coefficients from an object of class bGWAS obtained
-when using bGWAS()
+Extracts MR coefficients (multivariate genome-wide and per-chromosome estimates)
 }
