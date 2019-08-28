@@ -16,7 +16,7 @@ Check the [NEWS](NEWS.md) to learn more about what has been modified\!
 are now obsolete and you will not be able to use them with the newest
 version of the package.  
 Note: some Prior GWASs have been removed, you can find more details
-[here](docs/ZMatrices.md).
+[here](doc/ZMatrices.md).
 
 ## Overview
 
