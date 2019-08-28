@@ -12,7 +12,7 @@ By default, the stepwise selection threshold was set to : 0.05 / (the number of 
 
 - Update of the Z-matrices files    
 
-We updated the Z-matrices files, to reduce the set of prior GWASs and exclude some files that were not meeting our inclusion criteria (see [here](docs/ZMatrices.md) for more details). We also added a column "Name" to the file `AvailableStudies.tsv` to use in the figures and increase readability.
+We updated the Z-matrices files, to reduce the set of prior GWASs and exclude some files that were not meeting our inclusion criteria (see [here](doc/ZMatrices.md) for more details). We also added a column "Name" to the file `AvailableStudies.tsv` to use in the figures and increase readability.
    
 
 - Minimum number of instruments for MR    
