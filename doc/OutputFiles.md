@@ -10,7 +10,7 @@ The output files created are:
 -   **name.log** - report containing everything that has been printed during the bGWAS analysis (is `verbose=T`)     
     
     
--   **PriorGWASs.tsv** - contains information about all prior GWASs (general info + status (used/removed) + MR coefficients):
+-   **PriorGWASs.tsv** : contains information about all prior GWASs (general info + status (used/removed) + MR coefficients):
 <ul>    File : prior GWAS file name <br/>      
         Name : prior GWAS name  <br/>   
         Trait : phenotypical category (both Systolic and Diastiolic Blood Pressure are part of "Blood Pressure" for example)   <br/> 
@@ -25,14 +25,16 @@ The output files created are:
         multi_std_error	: causal effect standard error from multivariate MR   <br/>  
         multi_T	: T-statistic from multivariate MR     <br/>
         multi_P: p-value estimate from multivariate MR   <br/>  </ul>
--   **CoefficientsByChromosome.csv** - contains the MR estimates when masking the focal chromosome (22 coefficients / prior GWASs used for prior estimation)   
+
+-   **CoefficientsByChromosome.csv** : contains the MR estimates when masking the focal chromosome (22 coefficients / prior GWASs used for prior estimation)   
 <ul>    study : everything that is printed during a bGWAS analysis (if `verbose=TRUE`) <br/>     
         estimate : causal effect estimate from multivariate MR (masking one chromosome)    <br/>
         std_error : causal effect standard error from multivariate MR (masking one chromosome)  <br/>  
         T : T-statistics from multivariate MR (masking one chromosome)   <br/> 
         P : p-value from multivariate MR (masking one chromosome)  <br/>   
         chrm : chromosome masked     <br/> </ul>
-        -   **PriorBFp.csv** - contains BF and p-values, prior, posterior and direct effects estimates for all SNPs      
+
+-   **PriorBFp.csv** : contains BF and p-values, prior, posterior and direct effects estimates for all SNPs      
 <ul>    chrm_UK10K : chromosome (obtained from UK10K data)     <br/>
         pos_UK10K : position (obtained from UK10K data)   <br/> 
         rsid : rs number     <br/>
@@ -55,5 +57,6 @@ The output files created are:
         beta_direct_std_error : direct effect standard error (beta scale)   <br/>
         BF : Bayes Factor        <br/>
         BF_p/BF_fdr : Bayes Factor p-value / fdr  <br/>  </ul>
-        -   **SignificantSNPs.csv** - contains BF and p-values, prior, posterior and direct effects estimates for a subset of significant SNPs (subset of **PriorBFp.csv**)  
+
+-   **SignificantSNPs.csv** : contains BF and p-values, prior, posterior and direct effects estimates for a subset of significant SNPs (subset of **PriorBFp.csv**)  
 
