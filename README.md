@@ -308,20 +308,23 @@ print(A)
     ## -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
     ##  
     ##   Analysis : "Test_UsingSmallDataFrame" 
-    ## bGWAS performed on 291,583 SNPs 
+    ## bGWAS performed on 286,807 SNPs 
     ##  
     ## -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
     ##  
-    ## 1 study used to build the prior : 
-    ## # A tibble: 1 x 3
+    ## 4 studies used to build the prior : 
+    ## # A tibble: 4 x 3
     ##   study                                             estimate std_error
     ##   <chr>                                                <dbl>     <dbl>
-    ## 1 All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq.gz  -0.0643    0.0320
+    ## 1 EDUyears_2016_sumstat.txt                            0.187    0.0255
+    ## 2 All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq.gz   -0.122    0.0248
+    ## 3 cardiogram_gwas_results.txt                         -0.439    0.0623
+    ## 4 DBP                                                 -0.248    0.0623
     ## 
     ## -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
     ##  
-    ## 5 significant SNPs identified : 
-    ##  rs17486195, rs1160985, rs1333049, rs12993295, rs78801493
+    ## 11 significant SNPs identified : 
+    ##  rs429358, rs11633958, rs7857118, rs9457925, rs12828640, rs56179563, rs9379844, rs3794695, rs1573644, rs4762753, rs59613878
     ## 
     ## -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 
@@ -338,7 +341,7 @@ print_log_bGWAS(A)
     ## The conventional GWAS used as input the object: "GWAS".  
     ##    SNPID column, ok - ALT column, ok - REF column, ok - BETA column, ok - SE column, ok
     ## Posterior effects will be rescaled using BETA and SE.
-    ## The analysis will be run in the folder: "/Users/nmounier/ZMatrices".  
+    ## The analysis will be run in the folder: "/Users/nmounier/Documents/SGG/Temp/Test_UsingSmallDataFrame".  
     ## The p-value threshold used for selecting MR instruments is: 1e-06.  
     ## The minimum number instruments required for each trait is: 3.  
     ## The distance used for pruning MR instruments is: 500Kb.  
@@ -361,13 +364,13 @@ print_log_bGWAS(A)
     ## 209,840 SNPs 
     ## # Adding data from the conventional GWAS :  "GWAS" 
     ## Done! 
-    ## 9,125 SNPs in common between prior studies and the conventional GWAS 
+    ## 8,813 SNPs in common between prior studies and the conventional GWAS 
     ## # Thresholding... 
-    ## 786 SNPs left after thresholding 
+    ## 767 SNPs left after thresholding 
     ## 6 studies left after thresholding 
     ## Pruning MR instruments... 
     ##    distance : 500Kb 
-    ## 162 SNPs left after pruning 
+    ## 159 SNPs left after pruning 
     ## 6 studies left after thresholding+pruning 
     ## 
     ## > Performing MR  
@@ -376,24 +379,42 @@ print_log_bGWAS(A)
     ## Conventionnal GWAS of interest : GWAS
     ## # Univariate regressions for each trait... 
     ##   Number of trait-specific instruments per univariate regression: 
-    ##   . Body Mass Index (GIANT) : 60 
+    ##   . Body Mass Index (GIANT) : 59 
     ##   . Coronary Artery Disease (CARDIoGRAM) : 6 
-    ##   . Years of Schooling (SSGAC) : 84 
-    ##   . Systolic Blood Pressure (ICBP) : 5 
+    ##   . Years of Schooling (SSGAC) : 83 
+    ##   . Systolic Blood Pressure (ICBP) : 8 
     ##   . Diastolic Blood Pressure (ICBP) : 8 
-    ##   . College Completion (SSGAC) : 5 
+    ##   . College Completion (SSGAC) : 4 
     ## Done! 
     ## # Stepwise selection (all traits)... 
-    ## Adding the first study :Body Mass Index (GIANT) 
+    ## Adding the first study :Years of Schooling (SSGAC) 
+    ## #Test if any study can be added with p<0.05 
+    ## Adding one study :Systolic Blood Pressure (ICBP) 
+    ## Done! 
+    ## #Test if any study has p>0.05 now 
+    ## #Test if any study can be added with p<0.05 
+    ## Adding one study :Body Mass Index (GIANT) 
+    ## Done! 
+    ## #Test if any study has p>0.05 now 
+    ## #Test if any study can be added with p<0.05 
+    ## Adding one study :Coronary Artery Disease (CARDIoGRAM) 
+    ## Done! 
+    ## #Test if any study has p>0.05 now 
+    ## #Test if any study can be added with p<0.05 
+    ## Adding one study :Diastolic Blood Pressure (ICBP) 
+    ## Done! 
+    ## #Test if any study has p>0.05 now 
+    ## Excluding one study :Systolic Blood Pressure (ICBP) 
+    ## Done! 
     ## #Test if any study can be added with p<0.05 
     ## #Test if any study has p>0.05 now 
     ## It converged! 
     ## # Final regression... 
     ## The studies used are: 
-    ## - Body Mass Index (GIANT)
+    ## - Years of Schooling (SSGAC)- Body Mass Index (GIANT)- Coronary Artery Disease (CARDIoGRAM)- Diastolic Blood Pressure (ICBP)
     ## 
     ## Estimating adjusted R-squared: 
-    ## - in-sample adjusted R-squared for the all-chromosomes multivariate regression is 0.0482 
+    ## - in-sample adjusted R-squared for the all-chromosomes multivariate regression is 0.5534 
     ## - out-of-sample R-squared (masking one chromosome at a time), for the multivariate regression will be estimated when calculating the prior. 
     ## 
     ## 
@@ -403,11 +424,11 @@ print_log_bGWAS(A)
     ## > Creating the full Z-Matrix  
     ## # Loading the ZMatrix... 
     ## Selecting studies :
-    ## 1 studies 
+    ## 4 studies 
     ## 6,811,310 SNPs 
     ## # Adding data from the conventional GWAS :  "GWAS" 
     ## Done! 
-    ## 291,583 SNPs in common between prior studies and the conventional GWAS 
+    ## 286,807 SNPs in common between prior studies and the conventional GWAS 
     ## 
     ## > Computing prior  
     ## # Calculating the prior chromosome by chromosome... 
@@ -499,10 +520,10 @@ print_log_bGWAS(A)
     ## Running regression, 
     ## Calculating prior estimates for SNPs on this chromosome, 
     ## Calculating prior standard errors for SNPs on this chromosome, 
-    ## ## Out-of-sample R-squared for MR instruments across all chromosomes is 0.0161
-    ## ## Out-of-sample squared correlation for MR instruments across all chromosome is 0.0489
-    ## ## Correlation between prior and observed effects for all SNPs is 0.001
-    ## ## Correlation between prior and observed effects for SNPs with GWAS p-value < 0.001 is 0.0319
+    ## ## Out-of-sample R-squared for MR instruments across all chromosomes is 0.5206
+    ## ## Out-of-sample squared correlation for MR instruments across all chromosome is 0.5271
+    ## ## Correlation between prior and observed effects for all SNPs is 0.1855
+    ## ## Correlation between prior and observed effects for SNPs with GWAS p-value < 0.001 is 0.5944
     ## Done! 
     ## 
     ## 
@@ -519,18 +540,18 @@ print_log_bGWAS(A)
     ##     everything is ok!  
     ## Done! 
     ## > Pruning and identifying significant SNPs 
-    ##    Starting with 291,583 SNPs 
+    ##    Starting with 286,807 SNPs 
     ## # Selecting significant SNPs according to p-values... 
-    ## 22 SNPs left 
+    ## 31 SNPs left 
     ## Done! 
     ## # Pruning significant SNPs... 
     ##    distance : 500Kb 
-    ## 5 SNPs left 
+    ## 11 SNPs left 
     ## Done! 
     ## 
     ## 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 2 minute(s) and 2 second(s).
+    ## Time of the analysis: 1 minute(s) and 57 second(s).
 
 Functions to extract results from an object of class *bGWAS*:
 
@@ -539,21 +560,33 @@ hits = extract_results_bGWAS(A, "significant")
 hits
 ```
 
-    ## # A tibble: 5 x 22
-    ##   chrm_UK10K pos_UK10K rsid  alt   ref      beta      se z_obs
-    ##        <dbl>     <dbl> <chr> <chr> <chr>   <dbl>   <dbl> <dbl>
-    ## 1          3  29790763 rs17… A     G     2.65e-4 2.40e-5 11.1 
-    ## 2          1 220209813 rs11… T     C     7.79e-5 1.11e-5  7.04
-    ## 3          6 132242660 rs13… C     G     1.04e-4 1.53e-5  6.77
-    ## 4         15  89497100 rs12… T     G     4.34e-5 8.81e-6  4.92
-    ## 5         10  85631344 rs78… T     C     6.16e-5 1.13e-5  5.46
-    ##   mu_prior_estima… mu_prior_std_er… mu_posterior_es… mu_posterior_st…
-    ##              <dbl>            <dbl>            <dbl>            <dbl>
-    ## 1           0.182              1.01             5.66            0.710
-    ## 2           0.247              1.01             3.68            0.711
-    ## 3          -0.0291             1.00             3.38            0.708
-    ## 4           0.538              1.09             2.93            0.738
-    ## 5           0.0335             1.00             2.75            0.708
+    ## # A tibble: 11 x 22
+    ##    chrm_UK10K pos_UK10K rsid  alt   ref      beta      se  z_obs
+    ##         <dbl>     <dbl> <chr> <chr> <chr>   <dbl>   <dbl>  <dbl>
+    ##  1          1 225492545 rs42… T     C      0.106  0.00546  19.3 
+    ##  2          3  10540516 rs11… T     C     -0.0418 0.00410 -10.2 
+    ##  3          6  83562639 rs78… A     T      0.0240 0.00387   6.20
+    ##  4         10  30900081 rs94… A     G     -0.0875 0.0145   -6.03
+    ##  5          4 133885985 rs12… A     G     -0.0229 0.00399  -5.74
+    ##  6          8 120703781 rs56… A     G      0.0211 0.00406   5.19
+    ##  7          9  22362841 rs93… A     G      0.0219 0.00399   5.50
+    ##  8          2 174530122 rs37… T     C     -0.0260 0.00491  -5.30
+    ##  9          3  21881162 rs15… T     C      0.0201 0.00412   4.88
+    ## 10          4  55593481 rs47… T     G      0.0259 0.00487   5.31
+    ## 11         11 101608267 rs59… T     C      0.0206 0.00420   4.90
+    ##    mu_prior_estima… mu_prior_std_er… mu_posterior_es… mu_posterior_st…
+    ##               <dbl>            <dbl>            <dbl>            <dbl>
+    ##  1           -0.351             1.16            10.9             0.757
+    ##  2           -0.190             1.16            -5.94            0.758
+    ##  3            2.61              1.32             4.89            0.797
+    ##  4           -1.72              1.17            -4.21            0.760
+    ##  5           -2.34              1.20            -4.34            0.767
+    ##  6            3.37              1.23             4.47            0.776
+    ##  7            1.43              1.14             3.72            0.751
+    ##  8           -1.69              1.16            -3.76            0.757
+    ##  9            2.43              1.21             3.88            0.770
+    ## 10            1.16              1.16             3.54            0.757
+    ## 11            1.78              1.16             3.57            0.757
     ## # … with 10 more variables: mu_direct_estimate <dbl>,
     ## #   mu_direct_std_error <dbl>, beta_prior_estimate <dbl>,
     ## #   beta_prior_std_error <dbl>, beta_posterior_estimate <dbl>,
@@ -565,19 +598,25 @@ all_results = extract_results_bGWAS(A, "all")
 nrow(all_results)
 ```
 
-    ## [1] 291583
+    ## [1] 286807
 
 ``` r
 extract_MRcoeffs_bGWAS(A)[,1:12]
 ```
 
-    ## # A tibble: 1 x 12
-    ##   name       study           estimate std_error Tstat      P chrm1_estimate
-    ##   <chr>      <chr>              <dbl>     <dbl> <dbl>  <dbl>          <dbl>
-    ## 1 Body Mass… All_ancestries…  -0.0643    0.0320 -2.01 0.0490        -0.0782
-    ##   chrm1_std_error chrm1_P chrm2_estimate chrm2_std_error chrm2_P
-    ##             <dbl>   <dbl>          <dbl>           <dbl>   <dbl>
-    ## 1          0.0323  0.0192        -0.0380          0.0312   0.229
+    ## # A tibble: 4 x 12
+    ##   name        study        estimate std_error Tstat        P chrm1_estimate
+    ##   <chr>       <chr>           <dbl>     <dbl> <dbl>    <dbl>          <dbl>
+    ## 1 Years of S… EDUyears_20…    0.187    0.0255  7.33 1.32e-11          0.187
+    ## 2 Body Mass … All_ancestr…   -0.122    0.0248 -4.93 2.12e- 6         -0.108
+    ## 3 Coronary A… cardiogram_…   -0.439    0.0623 -7.05 6.18e-11         -0.469
+    ## 4 Diastolic … DBP            -0.248    0.0623 -3.98 1.07e- 4         -0.264
+    ##   chrm1_std_error  chrm1_P chrm2_estimate chrm2_std_error  chrm2_P
+    ##             <dbl>    <dbl>          <dbl>           <dbl>    <dbl>
+    ## 1          0.0258 2.93e-11          0.186          0.0273 3.01e-10
+    ## 2          0.0259 5.55e- 5         -0.124          0.0268 8.72e- 6
+    ## 3          0.0616 4.27e-12         -0.439          0.0685 2.24e- 9
+    ## 4          0.0619 3.78e- 5         -0.250          0.0653 1.93e- 4
 
 Functions for graphic representations:
 
@@ -615,7 +654,7 @@ A detailed description of these files can be found
 
 Analysis using all the 38 prior GWASs available, for a conventional GWAS
 containing \~7M SNPs in common with the prior studies \~ 25 minutes (see
-complete Lifespan Analysis [here]()).
+complete Lifespan Analysis [here](doc/Lifespan_Analysis.md)).
 
 Analysis using 6 prior GWASs, for a conventional GWAS containing \~
 300,000 SNPs in common with prior studies (see example A) \~ 2 minutes.
