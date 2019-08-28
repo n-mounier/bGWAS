@@ -473,7 +473,7 @@ heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
 #' Get squared correlation between observed and prior effects from bGWAS results
 #'
 #' Returns squared correlation between observed and prior effects,
-#' for different subsets of SNPs (all, the ones having at least a moderate effects,
+#' for different subsets of SNPs (all, the ones having at least a moderate effects - p-value < 0.001 -,
 #' MR instruments) 
 #'
 #'

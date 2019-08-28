@@ -16,6 +16,6 @@ a squared correlation
 }
 \description{
 Returns squared correlation between observed and prior effects,
-for different subsets of SNPs (all, the ones having at least a moderate effects,
+for different subsets of SNPs (all, the ones having at least a moderate effects - p-value < 0.001 -,
 MR instruments)
 }
