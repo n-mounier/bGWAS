@@ -31,7 +31,8 @@ UK10K <- fread("/data/sgg2/aaron/homedir/Experiments/genome-data/positions.in.TW
 # start with rsid ...
 # for all UK10K SNPs
 UK10K %>%
-  transmute(rs, chrm=chr, pos=pos.b19, alt=alts, ref=ref, MAF=aaf) -> Full_Z
+  # all imputed files are swapped, so use alt=ref and ref=alts
+  transmute(rs, chrm=chr, pos=pos.b19, alt=ref, ref=alts, MAF=aaf) -> Full_Z
 nrow(Full_Z)
 # 17,769,027 SNPs
 
@@ -147,3 +148,42 @@ R.utils::gzip('ZMatrices/ZMatrix_MR.csv',
 
 system("tar -cvzf ZMatrices.tar.gz ZMatrices")
 
+
+
+
+##### Fix swapped alleles ####
+# 
+# MR_Z = data.table::fread("ZMatrices/ZMatrix_MR.csv.gz")
+# myalt = pull(MR_Z, ref)
+# myref = pull(MR_Z, alt)
+# 
+# MR_Z %>%
+#   mutate(alt=myalt,
+#          ref=myref) -> MR_Z
+# 
+# 
+# Full_Z = data.table::fread("ZMatrices/ZMatrix_Full.csv.gz")
+# myalt_full = pull(Full_Z, ref)
+# myref_full = pull(Full_Z, alt)
+# 
+# Full_Z %>%
+#   mutate(alt=myalt_full,
+#          ref=myref_full) -> Full_Z
+# 
+# 
+# 
+# data.table::fwrite(Full_Z,
+#                    file="ZMatrices/ZMatrix_Full.csv")
+# R.utils::gzip('ZMatrices/ZMatrix_Full.csv',
+#               destname='ZMatrices/ZMatrix_Full.csv.gz',
+#               remove=T)
+# 
+# 
+# data.table::fwrite(MR_Z,
+#                    file="ZMatrices/ZMatrix_MR.csv")
+# R.utils::gzip('ZMatrices/ZMatrix_MR.csv',
+#               destname='ZMatrices/ZMatrix_MR.csv.gz',
+#               remove=T)
+# 
+# 
+# system("tar -cvzf ZMatrices.tar.gz ZMatrices")
