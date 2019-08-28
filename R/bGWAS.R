@@ -425,8 +425,9 @@ bGWAS <- function(name,
   
   # 2 : Z-Matrix for MR
   log_info = c(log_info, "", "")
-  tmp = paste0("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n",
-               "<<< Identification of significant prior GWASs for MR >>>  \n")
+  tmp = "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n"
+  log_info = update_log(log_info, tmp, verbose)
+  tmp =  "<<< Identification of significant prior GWASs for MR >>>  \n"
   log_info = update_log(log_info, tmp, verbose)
   
   # We should keep the Z-Matrix creation outside of the study identification function
@@ -466,8 +467,11 @@ bGWAS <- function(name,
   # 3 : make MR ZMat
   # 4 : Compute Prior
   log_info = c(log_info, "", "")
-  tmp = paste0("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n",
-               "<<< Estimation of the prior >>>  \n")
+  tmp = "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n"
+  log_info = update_log(log_info, tmp, verbose)
+  tmp = "<<< Estimation of the prior >>>  \n"
+  log_info = update_log(log_info, tmp, verbose)
+  
   
   log_info = update_log(log_info, tmp, verbose)
   
@@ -487,8 +491,9 @@ bGWAS <- function(name,
   
   ##### COMPUTE THE BAYES FACTOR AND THE P-VALUE #####
   log_info = c(log_info, "", "")
-  tmp = paste0("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n",
-               "<<< Calculation of Bayes Factors and p-values >>>  \n")
+  tmp = "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n"
+  log_info = update_log(log_info, tmp, verbose)
+  tmp = "<<< Calculation of Bayes Factors and p-values >>>  \n"
   log_info = update_log(log_info, tmp, verbose)
   
   
