@@ -323,7 +323,7 @@ extract_MRcoeffs_bGWAS <- function(obj){
 
   # For each study :
   # global coeff / chromosomes coeff
-  Res=data.frame(obj$significant_studies)
+  Res = obj$significant_studies
   Z_matrices = strsplit(obj$log_info[stringr::str_detect(obj$log_info, "The Z-Matrix files are stored in \"")], "\"")[[1]][2]
   
   Res %>%
