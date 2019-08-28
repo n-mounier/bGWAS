@@ -4,8 +4,10 @@ set.seed(333)
 
 library(tidyverse)
 
-Lifespan_Data <- data.table::fread("~/Documents/SGG/Projects/LifeGen2/Data/lifegen_phase2_bothor_alldr_2017_09_18.tsv")
+Lifespan_Data <- data.table::fread("~/Documents/SGG/Projects/LifeGen2/Data/lifegen_phase2_bothpl_alldr_2017_09_18.tsv")
 head(Lifespan_Data)
+Lifespan_Data$V17 <- NULL
+
 Lifespan_Data %>%
   tidyr::drop_na() -> Lifespan_Data
 
@@ -76,7 +78,7 @@ R.utils::gzip('~/Documents/SGG/Projects/Packaging/bGWAS/inst/Data/Z_Matrices/ZMa
 ## Rdata for tests
 library(bGWAS)
 
-data("SmallGWAS_Timmers2019")
+#data("SmallGWAS_Timmers2019")
 MyStudies = select_priorGWASs(include_traits=c("Blood Pressure", "Education"),  
                               include_files=c("cardiogram_gwas_results.txt", 
                                               "All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq.gz"))
