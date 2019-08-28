@@ -330,13 +330,7 @@ bGWAS <- function(name,
   } else{
     stop("stepwise_threshold : should not numeric or NULL", call. = FALSE)
   }
-  if(MR_shrinkage==1){
-    tmp = "No shrinkage applied before performing MR."
-    log_info = update_log(log_info, tmp, verbose)
-  } else {
-    tmp = paste0("All p-values lower than ",format(MR_shrinkage, scientific = T), " will be shrunk to 0 before performing MR.  \n")
-    log_info = update_log(log_info, tmp, verbose)
-  }
+  
   
   ## prior_shrinkage, should be between MR_threshold and 1
   if(!is.numeric(prior_shrinkage)) stop("prior_shrinkage : non-numeric argument", call. = FALSE)
@@ -495,7 +489,7 @@ bGWAS <- function(name,
   log_info = update_log(log_info, tmp, verbose)
   
   PriorWithBF = request_BFandP(Prior$prior, sign_thresh, use_permutations, sign_method, save_files, verbose)
-  log_info = c(log_info, PriorWithBF$log_info)
+  log_info = update_log(log_info, PriorWithBF$log_info, F)
   
   
   
@@ -506,12 +500,12 @@ bGWAS <- function(name,
   
   Results = get_significantSNPs(PriorWithBF$SNPs, sign_method, sign_thresh, res_pruning_dist, res_pruning_LD, 
                                 res_MR$studies, matrix_all$mat, save_files, verbose)
-  log_info = c(log_info, Results$log_info)
+  log_info = update_log(log_info, Results$log_info, F)
   
   
   
   ### go back to inital folder ###
-  log_info = c(log_info, "", "")
+  log_info = update_log(log_info, c("", ""), F)
   tmp = "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n"
   log_info = update_log(log_info, tmp, verbose)
   
