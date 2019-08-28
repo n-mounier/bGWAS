@@ -96,7 +96,7 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
   
   
   if(save_files){
-    utils::write.table(PriorThr, file= "SignificantSNPs.csv", sep=",", row.names=F, quote=F)
+    readr::write_csv(path="SignificantSNPs.csv",  x=PriorThr)
     tmp = "The file \"SignificantSNPs.csv\" has been successfully created \n"
     Log = update_log(Log, tmp, verbose)
     

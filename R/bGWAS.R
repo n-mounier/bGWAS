@@ -8,7 +8,7 @@
 #'
 #' @param name The name of the analysis (character)
 #' @param GWAS The path to the conventional GWAS of interest, the ID of the GWAS from the
-#'        list of studies available (prior GWASs), or a data.frame (character, numeric or data.frame)
+#'        list of studies available (prior GWASs), or a \code{data.frame} (character, numeric or \code{data.frame})
 #' @param Z_matrices The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
 #'        (character)
 #' @param prior_studies The IDs of prior GWASs to use for the analysis, \code{default=NULL},
@@ -47,7 +47,7 @@
 #'
 #' @details
 #' \code{Name} and \code{GWAS} are required arguments.
-#' If \code{GWAS} is a path to a file (regular or .gz) or a data.frame, it should contain the following
+#' If \code{GWAS} is a path to a file (regular or .gz) or a \code{data.frame}, it should contain the following
 #' columns : \cr
 #' SNPID (rs numbers) should be : \code{rs}, \code{rsid}, \code{snp}, \code{snpid}, \code{rnpid} \cr
 #' A1 should be : \code{a1}, \code{alt}, \code{alts} \cr
@@ -86,7 +86,7 @@
 #' @examples
 #' # Permorm bGWAS, using a small conventional GWAS included in the package (data.frame) 
 #' # and selecting a subset of studies for the prior
-#'\dontrun{
+#'\dontrun{top
 #' data("SmallGWAS_Timmers2019")
 #' MyStudies = select_priorGWASs(include_traits=c("Blood Pressure", "Education"),  
 #'                               include_files=c("cardiogram_gwas_results.txt", 

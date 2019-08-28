@@ -9,12 +9,12 @@
 #'        all of them (numeric),
 #' @param Z_matrices The path to the folder containing Z-Matrices, \code{default="~/ZMatrices/"}
 #'        (character)
-#' @return data.frame containing prior GWASs information
+#' @return a \code{tibble} containing prior GWASs information
 #' @export
 
 list_priorGWASs <- function(IDs=NULL, Z_matrices = "~/ZMatrices/") {
   if(!is.null(IDs) && !is.numeric(IDs)) stop("ID : should be numeric")
-  Studies = data.table::fread(file.path(Z_matrices, "AvailableStudies.tsv"), showProgress = FALSE, data.table = F)
+  Studies = readr::read_tsv(file.path(Z_matrices, "AvailableStudies.tsv"), progress = FALSE, col_types = readr::cols())
   if(!"Name" %in% colnames(Studies)) stop("Z_matrices : please use the most recent version")
   
   if(!is.null(IDs)){
@@ -37,7 +37,7 @@ list_priorGWASs <- function(IDs=NULL, Z_matrices = "~/ZMatrices/") {
 
 list_files <- function(IDs=NULL, Z_matrices = "~/ZMatrices/") {
   if(is.null(IDs)) {
-    Files = data.table::fread(file.path(Z_matrices, "AvailableStudies.tsv"), select = "File", showProgress = FALSE, data.table=F)
+    Files = readr::read_tsv(file.path(Z_matrices, "AvailableStudies.tsv"), progress = FALSE, col_types = readr::cols())
   } else {
     # check that the IDs exists
     Studies = list_priorGWASs(Z_matrices=Z_matrices)
@@ -58,8 +58,8 @@ list_files <- function(IDs=NULL, Z_matrices = "~/ZMatrices/") {
 #' @export
 
 list_traits <- function(Z_matrices = "~/ZMatrices/") {
-  Traits = data.table::fread(file.path(Z_matrices, "AvailableStudies.tsv"), select = "Trait", showProgress = FALSE, data.table = F)$Trait
-  return(unique(Traits))
+  Traits = readr::read_tsv(file.path(Z_matrices, "AvailableStudies.tsv"), progress = FALSE, col_types = readr::cols())
+  return(unique(Traits$Trait))
 }
 
 
@@ -76,7 +76,7 @@ list_traits <- function(Z_matrices = "~/ZMatrices/") {
 
 
 get_names <- function(Files, Z_matrices = "~/ZMatrices/") {
-  Studies = data.table::fread(file.path(Z_matrices, "AvailableStudies.tsv"), showProgress = FALSE, data.table = F)
+  Studies = readr::read_tsv(file.path(Z_matrices, "AvailableStudies.tsv"), progress = FALSE, col_types = readr::cols())
   if(any(!Files %in% Studies$File)) stop("Some files are not part of Prior GWASs")
   Studies %>%
     slice(match(Files, .data$File)) %>%
@@ -115,10 +115,10 @@ select_priorGWASs <- function(include_files=NULL, include_traits=NULL,
   if(is.null(c(include_files,include_traits, exclude_files,exclude_traits))) stop("You did not specify any criteria for the selection.")
   Studies = list_priorGWASs(Z_matrices = Z_matrices)
 
-  if(!all(include_files %in% list_files(Z_matrices = Z_matrices))) stop("Some files specified in Files are not correct")
-  if(!all(exclude_files %in% list_files(Z_matrices = Z_matrices))) stop("Some files specified in Files are not correct")
-  if(!all(include_traits %in% list_traits(Z_matrices))) stop("Some traits in Traits specified are not correct")
-  if(!all(exclude_traits %in% list_traits(Z_matrices))) stop("Some traits in Traits specified are not correct")
+  if(!all(include_files %in% list_files(Z_matrices = Z_matrices))) stop("Some files specified in include_files are not correct")
+  if(!all(exclude_files %in% list_files(Z_matrices = Z_matrices))) stop("Some files specified in exclude_files are not correct")
+  if(!all(include_traits %in% list_traits(Z_matrices))) stop("Some traits specified in include_traits are not correct")
+  if(!all(exclude_traits %in% list_traits(Z_matrices))) stop("Some traits specified in exclude_traits specified are not correct")
  
   # Should not be possible to include / exclude the same file given different criteria
   # or it could...

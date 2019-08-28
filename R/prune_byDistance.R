@@ -13,9 +13,9 @@ prune_byDistance <- function(data, prune.dist=100, byP=T) {
   # if byP = F : stat = Zstat, beta.. -> max is better
 
      if(byP){
-       SNP_order = order(data[,4])
+       SNP_order = order(data %>% pull(4))
      } else {
-       SNP_order =  order(-data[,4])
+       SNP_order = order(data %>% pull(4), decreasing = T)
      }
      data = data[SNP_order,]
      snp=0

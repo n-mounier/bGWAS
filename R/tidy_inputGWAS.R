@@ -129,12 +129,12 @@ tidy_inputGWAS <- function(GWAS, Z_matrices = "~/ZMatrices/", verbose=FALSE){
     # if headers ok, and file or data.frame get GWASData
     if(is.character(GWAS)) {
       # Get the full data
-      GWASData = data.table::fread(GWAS, showProgress = FALSE, data.table=F)
+      GWASData = as_tibble(data.table::fread(GWAS, showProgress = FALSE, data.table=F))
       attributes(GWASData)$GName = basename(GWAS)
       
     } else if(is.data.frame(GWAS)){ # if data.frame
       # add attribute GName to the data.frame, to be re-used in other subfunctions
-      GWASData=GWAS
+      GWASData=as_tibble(GWAS)
       rm(GWAS)
     }
     

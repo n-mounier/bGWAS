@@ -38,13 +38,13 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, GWASData, r
   
   generate_Formula(my_outcome, selected_studies) -> myFormula
   
-  all.priors =  data.frame()
-  all.coefs = data.frame()
+  all.priors =  tibble()
+  all.coefs = tibble()
   
   tmp = "# Calculating the prior chromosome by chromosome... \n"
   Log = update_log(Log, tmp, verbose)
   
-  OutOfSample = data.frame(Obs=numeric(), Pred=numeric(), 
+  OutOfSample = tibble(Obs=numeric(), Pred=numeric(), 
                            Res=numeric())
   
   for(chr in 1:22) {
@@ -97,7 +97,8 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, GWASData, r
     # if only one study selected, and all instruments on the same chromosome?
     # better handle this!
     
-    all.coefs = rbind(all.coefs, coefs)
+    all.coefs %>% 
+      bind_rows(coefs) -> all.coefs
     
     # check the predictions using data from the training set
     #in_train = data.frame( CRG=d_masked[,..outcome], prd=predict.lm(fit_masked) )
@@ -141,9 +142,8 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, GWASData, r
     d_test %>%
       bind_rows(all.priors, .data$.) -> all.priors
     
-    tmp = "Calculating out of sample prediction for SNPs on this chromosome, \n"
-    Log = update_log(Log, tmp, verbose)
-    
+  
+    # subset - MR instruments only
     
     d_test %>%
       filter(.data$rs %in% MR_ZMatrix$rs) %>%

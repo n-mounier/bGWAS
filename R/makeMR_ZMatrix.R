@@ -19,14 +19,14 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWASData, GName,
   Log = update_log(Log, tmp, verbose)
   
   
-  if(save_files) Files_Info = data.table::fread("PriorGWASs.tsv")
+  if(save_files) Files_Info = readr::read_tsv("PriorGWASs.tsv", progress = FALSE, col_types = readr::cols())
   
   if(!is.null(prior_studies)){
     tmp = paste0("Selecting studies :\n")
     Log = update_log(Log, tmp, verbose)
-    ZMatrix=data.table::fread(file.path(Z_matrices, "ZMatrix_MR.csv.gz"), select=c(1:5, prior_studies+5), showProgress = FALSE, data.table=F)
+    ZMatrix = as_tibble(data.table::fread(file.path(Z_matrices, "ZMatrix_MR.csv.gz"), select=c(1:5, prior_studies+5), showProgress = FALSE, data.table=F))
   } else {
-    ZMatrix=data.table::fread(file.path(Z_matrices, "ZMatrix_MR.csv.gz"), showProgress = FALSE, data.table=F)
+    ZMatrix = as_tibble(data.table::fread(file.path(Z_matrices, "ZMatrix_MR.csv.gz"), showProgress = FALSE, data.table=F))
   }
   
   tmp = paste0(ncol(ZMatrix)-5, " studies \n")

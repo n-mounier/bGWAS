@@ -71,7 +71,8 @@ all.equal.bGWAS <- function(obj1, obj2) {
 
 #' Manhattan Plot from bGWAS results
 #'
-#' Creates a Manhattan Plot from bGWAS results 
+#' Creates a Manhattan Plot from bGWAS results (for performance, only SNPs with 
+#' p-value or FDR < 0.05 are plotted)
 #'
 #'
 #' @param obj an object of class bGWAS created using \code{\link{bGWAS}()}
@@ -114,16 +115,20 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
     "The threshold used is :")[[1]][2], ".", fixed=T)[[1]][1])
 
 
+  value = ifelse(method=="FDR", "BF_fdr", "BF_p")
+  
+  obj$all_BFs %>%
+    select(rsid, chrm_UK10K, pos_UK10K, {{value}}) %>%
+    set_names(c("rsid", "chrm_UK10K", "pos_UK10K", "p")) %>%
+    filter(p<0.05) -> ToPlot
 
 
   if(save_file) grDevices::png(file_name, width = 20, height = 12, units = "cm", res = 500)
 
-  qqman::manhattan(obj$all_BFs ,
+  qqman::manhattan(ToPlot ,
                    chr = "chrm_UK10K" ,
                    bp = "pos_UK10K" ,
-                   p = ifelse( method == "FDR" ,
-                               "BF_fdr" ,
-                               "BF_p" ) ,
+                   p = "p" ,
                    snp = "rsid",
                    col = c("gray10", "gray60"),
                    cex = 0.6,
@@ -142,16 +147,16 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
 
   if(annotate){ # significant SNPs from the analysis
     # extract them
-    value = ifelse(method=="FDR", "BF_fdr", "BF_p")
-    obj$all_BFs %>%
-      filter( .data$rsid %in% obj$significant_SNPs) %>%
-      select(rsid, chrm_UK10K, pos_UK10K, {{value}}) -> SNPs_to_plot
-    
-    all = obj$all_BFs[,c("rsid", "chrm_UK10K", "pos_UK10K")]
-    all <- all[order(all$chrm_UK10K, all$pos_UK10K), ]
+    ToPlot %>%
+      filter( .data$rsid %in% obj$significant_SNPs) -> SNPs_to_plot
+
+    ToPlot %>%
+      mutate(p=NULL) %>%
+      arrange(.data$chrm_UK10K,.data$pos_UK10K) -> all
 
     # y = -log10(p) ou -log10(fdr)
-    SNPs_to_plot$y = -log10(SNPs_to_plot[,value]) - 0.3 # to make sure all SNPs names are in plotting windows
+    SNPs_to_plot %>%
+      mutate(y = -log10(p) - 0.3) -> SNPs_to_plot # to make sure all SNPs names are in plotting windows
      # x = have to look at all SNPs chr/pos
     get_posx <- function(snp, all){
       chr = as.numeric(snp[2])
@@ -172,7 +177,7 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
     SNPs_to_plot$x = apply(SNPs_to_plot, 1, function(x) get_posx(x, all))
 
     calibrate::textxy(SNPs_to_plot$x, SNPs_to_plot$y,
-                      labs=SNPs_to_plot$rs,
+                      labs=SNPs_to_plot$rsid,
                       offset = 0.625, cex=0.45)
   }
 
@@ -278,7 +283,7 @@ if(save_file) grDevices::dev.off()
 #' @param obj an object of class bGWAS created using \code{\link{bGWAS}()}
 #' @param SNPs, "all" / "significant"
 #'
-#' @return a data.frame containing the results for all / significant SNPs
+#' @return a \code{tibble} containing the results for all / significant SNPs
 #' @export
 
 extract_results_bGWAS <- function(obj, SNPs="significant"){
@@ -307,7 +312,7 @@ extract_results_bGWAS <- function(obj, SNPs="significant"){
 #'
 #' @param obj an object of class bGWAS created using \code{\link{bGWAS}()}
 #'
-#' @return a data.frame containing the MR coefficients (1 estimate using
+#' @return a \code{tibble} containing the MR coefficients (1 estimate using
 #' all chromosomes + 22 estimates with 1 chromosome masked)
 #' @export
 

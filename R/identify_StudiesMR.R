@@ -16,7 +16,8 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
   
   Log = c()
   
-  if(save_files) Files_Info = data.table::fread("PriorGWASs.tsv")
+  if(save_files) Files_Info = readr::read_tsv("PriorGWASs.tsv", progress = FALSE, col_types = readr::cols())
+  
   
   tmp = paste0("#Preparation of the MR analyses to identify significant studies... \n")
   Log = update_log(Log, tmp, verbose)
@@ -205,8 +206,10 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
     stats::lm(data=ZMatrix_subset, formula = myFormula) %>%
       summary %>%
       stats::coef() %>%
-      as.data.frame() %>% 
-      tibble::rownames_to_column("nm") -> coefs
+      as.data.frame() %>% # 1st create a data.frame (to get rownames)
+      tibble::rownames_to_column("nm") %>% # then convert to tibble
+      as_tibble()  -> coefs
+
     
     
     ## TRY TO ADD
@@ -303,8 +306,9 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
     stats::lm(data=ZMatrix_subset, formula = myFormula) %>%
       summary %>%
       stats::coef() %>%
-      as.data.frame() %>% 
-      tibble::rownames_to_column("nm") -> coefs
+      as.data.frame() %>% # 1st create a data.frame (to get rownames)
+      tibble::rownames_to_column("nm") %>% # then convert to tibble
+      as_tibble()  -> coefs
     
     tmp = paste0("#Test if any study has p>", format(round(stepwise_threshold, 4), scientific = F), " now \n")
     Log = update_log(Log, tmp, verbose)
@@ -377,8 +381,9 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
   stats::lm(data=ZMatrix_final, formula = myFormula_final)  %>%
     summary %>%
     stats::coef() %>%
-    as.data.frame() %>% 
-    tibble::rownames_to_column("nm") -> coefs
+    as.data.frame() %>% # 1st create a data.frame (to get rownames)
+    tibble::rownames_to_column("nm") %>% # then convert to tibble
+    as_tibble()  -> coefs
   
   coefs %>%
     set_names(c("study", "estimate", "std_error", "Tstat", "P")) -> coefs

@@ -25,7 +25,7 @@ makeFull_ZMatrix <- function(studies=NULL, GWASData, GName,  Z_matrices="~/Z_mat
   tmp = paste0("Selecting studies :\n")
   Log = update_log(Log, tmp, verbose)
   
-  ZMatrix=data.table::fread(file.path(Z_matrices, "ZMatrix_Full.csv.gz"), select=c(1:5, studies+5 ), showProgress = FALSE, data.table = F)
+  ZMatrix = as_tibble(data.table::fread(file.path(Z_matrices, "ZMatrix_Full.csv.gz"), select=c(1:5, studies+5 ), showProgress = FALSE, data.table = F))
 
   tmp = paste0(ncol(ZMatrix)-5, " studies \n")
   Log = update_log(Log, tmp, verbose)
