@@ -528,7 +528,7 @@ print_log_bGWAS <- function(obj){ # obj should be a bGWAS object
 
 update_log <- function(log_obj, text, verbose=F){
   log_obj = c(log_obj, text)
-  if(verbose) cat(text)
+  if(verbose) cat(text, sep = "")
   return(log_obj)
 }
 

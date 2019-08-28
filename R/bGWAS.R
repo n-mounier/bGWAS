@@ -157,11 +157,11 @@ bGWAS <- function(name,
   # initialization of log_info file
   log_info = c()
   
-  tmp = paste0("<<< Preparation of analysis >>> \n")
+  tmp = "<<< Preparation of analysis >>> \n"
   log_info = update_log(log_info, tmp, verbose)
   
   ### check the parameters ###
-  tmp = paste0("> Checking parameters \n")
+  tmp = c("", "> Checking parameters \n")
   log_info = update_log(log_info, tmp, verbose)
   
   ## Name of analysis
@@ -209,7 +209,7 @@ bGWAS <- function(name,
   
   # Tidy input GWAS
   Data = tidy_inputGWAS(GWAS, Z_matrices, verbose)
-  log_info = c(log_info, Data$log_info)
+  log_info = update_log(log_info, Data$log_info, F)
   
   
   
@@ -424,26 +424,24 @@ bGWAS <- function(name,
   }
   
   # 2 : Z-Matrix for MR
-  log_info = c(log_info, "", "")
-  tmp = "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n"
-  log_info = update_log(log_info, tmp, verbose)
-  tmp =  "<<< Identification of significant prior GWASs for MR >>>  \n"
+  log_info = update_log(log_info, c("", ""), F)
+  tmp = c("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n",
+          "<<< Identification of significant prior GWASs for MR >>>  \n")
   log_info = update_log(log_info, tmp, verbose)
   
   # We should keep the Z-Matrix creation outside of the study identification function
   # so that we can quickly re-run the second part using a file containing the Z-Matrix
-  tmp = "> Creating the Z-Matrix of strong instruments \n"
+  tmp = c("", "> Creating the Z-Matrix of strong instruments \n")
   log_info = update_log(log_info, tmp, verbose)
   
   # the "global z_matrix of strong instruments" for all GWASs already exists, just select the studies kept for the prior + prune + add the GWAS of interest
   # makeMR_ZMatrix() create a ZMatrix file and returns the log_info
   matrix_MR = makeMR_ZMatrix(prior_studies, Data$GWAS, Data$GWAS_Name, MR_threshold, MR_ninstruments, MR_pruning_dist, MR_pruning_LD, Z_matrices, MR_shrinkage, save_files, verbose)
-  log_info = c(log_info,matrix_MR$log_info)
+  log_info = update_log(log_info, matrix_MR$log_info, F)
   # here, add potential stop() in function(s) and check for it?
   
   
-  log_info=c(log_info,"")
-  tmp = paste0("> Performing MR  \n")
+  tmp = c("", "> Performing MR  \n")
   log_info = update_log(log_info, tmp, verbose)
   
   res_MR = identify_studiesMR(matrix_MR$mat, MR_shrinkage, MR_threshold, stepwise_threshold, Z_matrices, save_files, verbose)
@@ -466,22 +464,18 @@ bGWAS <- function(name,
   
   # 3 : make MR ZMat
   # 4 : Compute Prior
-  log_info = c(log_info, "", "")
-  tmp = "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n"
-  log_info = update_log(log_info, tmp, verbose)
-  tmp = "<<< Estimation of the prior >>>  \n"
-  log_info = update_log(log_info, tmp, verbose)
-  
-  
+  log_info = update_log(log_info, c("", ""), F)
+  tmp = c("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n", 
+          "<<< Estimation of the prior >>>  \n")
   log_info = update_log(log_info, tmp, verbose)
   
-  tmp = paste0("> Creating the full Z-Matrix  \n")
+  tmp = c("", "> Creating the full Z-Matrix  \n")
   log_info = update_log(log_info, tmp, verbose)
   Studies = select_priorGWASs(include_files=res_MR$studies, Z_matrices = Z_matrices)
   matrix_all = makeFull_ZMatrix(Studies, Data$GWAS,  Data$GWAS_Name, Z_matrices, prior_shrinkage, save_files, verbose)
-  log_info = c(log_info,matrix_all$log_info)
+  log_info = update_log(log_info, matrix_all$log_info, F)
   
-  tmp = paste0("> Computing prior  \n")
+  tmp = c("", "> Computing prior  \n")
   log_info = update_log(log_info, tmp, verbose)
   
   Prior = compute_prior(res_MR$studies, res_MR$ZMat, matrix_all$mat, Data$GWAS, Data$rescaling, MR_shrinkage, prior_shrinkage, Z_matrices, save_files, verbose)
@@ -490,15 +484,14 @@ bGWAS <- function(name,
   
   
   ##### COMPUTE THE BAYES FACTOR AND THE P-VALUE #####
-  log_info = c(log_info, "", "")
-  tmp = "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n"
-  log_info = update_log(log_info, tmp, verbose)
-  tmp = "<<< Calculation of Bayes Factors and p-values >>>  \n"
+  log_info = update_log(log_info, c("", ""), F)
+  tmp = c("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n",
+          "<<< Calculation of Bayes Factors and p-values >>>  \n")
   log_info = update_log(log_info, tmp, verbose)
   
   
   # This script create a file containing all SNPs in common between prior file / imputed files
-  tmp = paste0("> Calculating them for all SNPs  \n")
+  tmp = c("", "> Calculating them for all SNPs  \n")
   log_info = update_log(log_info, tmp, verbose)
   
   PriorWithBF = request_BFandP(Prior$prior, sign_thresh, use_permutations, sign_method, save_files, verbose)
@@ -507,7 +500,7 @@ bGWAS <- function(name,
   
   
   ##### IDENTIFY SIGNIFICANT SNPS + PRUNING #####
-  tmp = paste0("> Pruning and identifying significant SNPs \n")
+  tmp = paste0("", "> Pruning and identifying significant SNPs \n")
   log_info = update_log(log_info, tmp, verbose)
   
   
