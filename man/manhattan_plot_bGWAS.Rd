@@ -25,5 +25,6 @@ be aware that \code{annotate=TRUE} might decrease readability of the figure.}
 a Manhattan Plot
 }
 \description{
-Creates a Manhattan Plot from bGWAS results
+Creates a Manhattan Plot from bGWAS results (for performance, only SNPs with 
+p-value or FDR < 0.05 are plotted)
 }

@@ -12,7 +12,7 @@ extract_results_bGWAS(obj, SNPs = "significant")
 \item{SNPs, }{"all" / "significant"}
 }
 \value{
-a data.frame containing the results for all / significant SNPs
+a \code{tibble} containing the results for all / significant SNPs
 }
 \description{
 Extracts SNPs results from bGWAS results (BFs, p-value, prior, posterior and 

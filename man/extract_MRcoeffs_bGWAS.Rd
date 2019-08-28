@@ -10,7 +10,7 @@ extract_MRcoeffs_bGWAS(obj)
 \item{obj}{an object of class bGWAS created using \code{\link{bGWAS}()}}
 }
 \value{
-a data.frame containing the MR coefficients (1 estimate using
+a \code{tibble} containing the MR coefficients (1 estimate using
 all chromosomes + 22 estimates with 1 chromosome masked)
 }
 \description{

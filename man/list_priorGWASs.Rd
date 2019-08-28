@@ -14,7 +14,7 @@ all of them (numeric),}
 (character)}
 }
 \value{
-data.frame containing prior GWASs information
+a \code{tibble} containing prior GWASs information
 }
 \description{
 Lists the studies that can be used as prior GWASs
