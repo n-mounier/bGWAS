@@ -35,7 +35,7 @@ We do not provide scripts to modify these files, but the package can accept cust
   
 ## Information about the files
 [//]:*******
-Details about the prior GWASs used can be found in the **AvailableStudies.tsv** file or obtained directly in R using list_priorGWASs().   
+Details about the prior GWASs used can be found in the **AvailableStudies.tsv** file or obtained directly in `R` using `**list_priorGWASs()**`.   
 Please note that now, we do use 38 studies now, instead of the 58 described in McDaid et al. Removal reasons are listed below.
 
 |            Prior GWAS            | Removal Reason(s) |    
@@ -54,9 +54,9 @@ Please note that now, we do use 38 studies now, instead of the 58 described in M
 | pgc.cross.scoring.5files..mdd_scz.zip | cross-disorder analysis  |
 | pgc.cross.scoring.5files..scz_bip.zip | cross-disorder analysis  |
 |           pgc.cross.scz         | cross-disorder analysis  |
-|         pgc.scz.2012_04         | SCZ1 file, part of the meta-analysis SCZ1 + SWE  |
+|         pgc.scz.2012_04         | SCZ1 file, part of the meta-analysis SCZ1 + SW that is already included  |
 |   phs000124.pha002845.txt.ugz   | newest version of the study already included  |
-| TransEthnic_T2D_GWAS.MegaMeta.2014OCT16.zip | not EUR ancestry |
+| TransEthnic_T2D_GWAS.MegaMeta.2014OCT16.zip | non european ancestry |
 
 
 
