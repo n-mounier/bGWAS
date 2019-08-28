@@ -4,11 +4,20 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE}
+setwd("/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS")
 knitr::opts_chunk$set(echo = TRUE,
                       fig.path = "doc/Figures/README-",
                       out.width = "100%")
-options(row.names = FALSE)
+# for tibbles...
+options(pillar.neg=F, # do no print neg number in red
+        pillar.subtle=F, # turn off highliting of significant digits
+        tibble.width = 130) # default=95, increase it to make it readable
 A = readRDS("inst/Data/A.RDS")
+# automatically updates manual
+devtools::check(pkg = ".", manual = TRUE, check_dir = "../bGWAS.check")
+system("mv ../bGWAS.check/bGWAS.Rcheck/bGWAS-manual.pdf doc/")
+# 
+remove.packages("bGWAS")
 ```
 
 
@@ -25,10 +34,10 @@ badger::badge_travis("n-mounier/bGWAS"),
 badger::badge_custom("version", suppressMessages(badger::ver_devel("n-mounier/bGWAS")), "informational", "https://github.com/n-mounier/bGWAS"),
 
 #lifecycle
-badger::badge_lifecycle("maturing", "9cf"), "\n",
+badger::badge_lifecycle("maturing", "9cf"), 
 
 #last commit:
-badger::badge_last_commit("n-mounier/bGWAS"), "\t",
+badger::badge_last_commit("n-mounier/bGWAS"),
 
 #license
 badger::badge_custom("license", "GPL-2.0", "lightgrey", "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html")
@@ -45,7 +54,7 @@ badger::badge_custom("license", "GPL-2.0", "lightgrey", "https://www.gnu.org/lic
 
 
 :information_source: `bGWAS` has been updated to version 1.0.0.     
-Check the [NEWS](News.md) to learn more about what has been modified!
+Check the [NEWS](NEWS.md) to learn more about what has been modified!
     
     
 :warning: If you downloaded the Z-Matrix files before 20/08/2019, they are now obsolete and you will not be able to use them with the newest version of the package.      
@@ -54,21 +63,21 @@ Note: some Prior GWASs have been removed, you can find more details [here](docs/
 ## Overview
 [//]:*******
 
-bGWAS is an R-package to perform a Bayesian GWAS, using summary statistics as input. Briefly, it compares the observed Z-scores from a conventional GWAS to prior effects. These prior Z-scores are directly calculated from publicly available GWASs (currently, a set of 38 studies, last update 20-08-2019 - hereinafter referred to as "prior GWASs"). Only prior GWASs having a significant influence on the conventional GWAS (identified using a multivariate Mendelian Randomization (MR) approach) are used to calculate the prior effects. Causal effects are estimated masking the focal chromosome to ensure independence.          
-Observed and prior effects are compared using Bayes Factors. Significance is assessed by calculating the probability of observing a value larger than the observed BF (P-value) given the prior distribution by decomposing the analytical form of the BFs and using an approximation for most BFs to make the computation faster. Prior, posterior and direct effects, alongside BFs and p-values are returned. Note that prior, posterior and direct effects are estimated on the Z-score scale, but are automatically rescaled to beta scale if possible.  
+bGWAS is an R-package to perform a Bayesian GWAS, using summary statistics from a conventional GWAS as input. Briefly, it compares the observed Z-scores for a focal phenotype to prior effects. These prior effects are directly estimated from publicly available GWASs (currently, a set of 38 studies, last update 20-08-2019 - hereinafter referred to as "prior GWASs"). Only prior GWASs having a significant causal effect on the focal phenotype, identified using a multivariate Mendelian Randomization (MR) approach, are used to calculate the prior effects. Causal effects are estimated masking the focal chromosome to ensure independence.          
+Observed and prior effects are compared using Bayes Factors. Significance is assessed by calculating the probability of observing a value larger than the observed BF (P-value) given the prior distribution. This is done by decomposing the analytical form of the BFs and using an approximation for most BFs to make the computation faster. Prior, posterior and direct effects, alongside BFs and p-values are returned. Note that prior, posterior and direct effects are estimated on the Z-score scale, but are automatically rescaled to beta scale if possible.  
 
 
 
-The functions available are:  
+The principal functions available are:  
 
 -   **`bGWAS()`**  
 main function that calculates prior effects from prior GWASs, compares them to observed Z-scores and returns an object of class *bGWAS*   
 
--   **`list_priorGWASs()`**
-directly returns information about the prior GWASs that can be used to calculate prior Z-scores   
+-   **`list_priorGWASs()`**    
+directly returns information about the prior GWASs that can be used to calculate prior effects  
 
 -   **`select_priorGWASs()`**   
-allows a quick selection of prior GWASs (to include/exclude specific studies when calculating prior Z-scores)  
+allows a quick selection of prior GWASs (to include/exclude specific studies when calculating prior effects)  
 
 -   **`extract_results_bGWAS()`**    
 returns results (prior, posterior and direct estimate / standard-error + p-value from BF for SNPs) from an object of class *bGWAS*   
@@ -80,12 +89,12 @@ creates a Manhattan Plot from an object of class *bGWAS*
 returns multivariate MR coefficients (1 estimate using all chromosomes + 22 estimates with 1 chromosome masked) from an object of class *bGWAS*   
 
 -   **`coefficients_plot_bGWAS()`**   
-creates a Coefficients Plot (causal effect of prior GWASs) from an object of class *bGWAS*  
+creates a Coefficients Plot (causal effect of each prior GWASs on the focal phenotype) from an object of class *bGWAS*  
 
 -   **`heatmap_bGWAS()`**    
-creates a heatmap to represent, for each significant SNP, the contribution of each prior GWAS used to create the prior effect from an object of class *bGWAS*  
+creates a heatmap to represent, for each significant SNP, the contribution of each prior GWAS to the estimated prior effect from an object of class *bGWAS*  
 
-All the functions available and more details about their use can be found in the [manual]().   
+All the functions available and more details about their usage can be found in the [manual](doc/bGWAS-manual.pdf).   
 
 
 
@@ -94,7 +103,7 @@ All the functions available and more details about their use can be found in the
 [//]:*******
 
 You can install the current version of `bGWAS` with:    
-```{r install-package, message=FALSE}
+```{r install-package, echo=TRUE, message=FALSE, results='hide'}
 # Directly install the package from github
 # install.packages("remotes")
 remotes::install_github("n-mounier/bGWAS")
@@ -110,24 +119,23 @@ see https://stackoverflow.com/questions/43595457/alternate-compiler-for-installi
 To run the analysis with `bGWAS` two inputs are needed:
 
 #### 1. The *GWAS* results to be tested   
-Can be a regular (space/tab/comma-separated) file or a gzipped file (.gz) or a `data.frame`. Must contain the following columns, which can have alternative names.  
-SNP-identifier:  `rs` or `rsid`, `snp`, `snpid`, `rnpid`    
-Alternate allele:  `a1` or `alt`, `alts`    
-Reference allele: `a2` or `a0`, `ref`    
-Z-statistics: `z` or `Z`, `zscore`      
-If the Z-statistics is not present, it will be automatically calculated from effect size and standard error, in which case the following columns should be provided:
-Effect-size: `b` or `beta`, `beta1`    
-Standard error:  `se` or `std`     
-If you want the prior/posterior/corrected effects to be rescaled, please provide effect sizes and standard errors instead of (or in addition to) Z-statistics.    
+Can be a regular (space/tab/comma-separated) file or a gzipped file (.gz) or a `data.frame`. Must contain the following columns, which can have alternative names:  
+<ul>   SNP-identifier:  `rs` or `rsid`, `snp`, `snpid`, `rnpid`                       Alternate allele:  `a1` or `alt`, `alts`    
+       Reference allele: `a2` or `a0`, `ref`    
+       Z-statistics: `z` or `Z`, `zscore`  </ul>     
+If the Z-statistics is not present, it will be automatically calculated from effect size and standard error, in which case the following columns should be provided:     
+<ul>   Effect-size: `b` or `beta`, `beta1`    
+       Standard error:  `se` or `std`     </ul>     
+If you want the prior/posterior/corrected effects to be rescaled, please make sure to provide effect sizes and standard errors instead of (or in addition to) Z-statistics.    
 
-#### 2. Prior *GWASs*   
+#### 2. Prior *GWASs* - Z-Matrix files   
    
-Matrix files, containing Z-scores for all prior GWASs should be downloaded separately and stored in `~/ZMatrices` or in the folder specified when launching the analysis. These files contains the Z-scores for all prior GWASs (before and after imputation) :   
-*ZMatrix_MR.csv.gz*: Z-scores (strong instruments only) used for multivariate MR,   
-*ZMatrix_Full.csv.gz*: Z-scores (all SNPs) used to calculate the prior Z-scores,     
-*AvailableStudies.tsv*: A file containing information about the prior GWASs available.   
+These files should be downloaded separately and stored in `~/ZMatrices` or in the folder specified when launching the analysis. These files contains the Z-scores for all prior GWASs :    
+<ul><ul>   *ZMatrix_MR.csv.gz*: Z-scores (strong instruments only) used for multivariate MR,   
+       *ZMatrix_Full.csv.gz*: Z-scores (all SNPs) used to calculate the prior Z-scores,     
+       *AvailableStudies.tsv*: A file containing information about the prior GWASs available.  </ul></ul>  
 
-**Problem with switch drive, download link will be added soon!**
+<font color="red">**Problem with switch drive, download link will be added soon!**</font>
 
 <!---
 On UNIX/MACOSX, from a terminal:    
@@ -138,15 +146,15 @@ tar xzvf ZMatrices.tar.gz
 On WINDOWS:   --->
 
 
-*If you want to use your own set of prior GWASs, please have a look [here](docs/ZMatrices.md) to see how you can modify the files.   *
-*We focused on including prior GWASs that do not come from UKBB, assuming that the focal phenotype is more likely to be obtained from UKBB. Sample overlap between the focal phenotype and the Prior GWASs is not accounted for by our method, so we did not include any UKBB results in the prior GWASs.    *
+<font color="grey"><small> If you want to use your own set of prior GWASs, please have a look [here](doc/ZMatrices.md) to see how you can modify the files.        
+We focused on including prior GWASs that do not come from UKBB, assuming that the focal phenotype results are more likely to be obtained from UKBB. Sample overlap between the focal phenotype and the prior GWASs is not accounted for by our method, so we did not include any UKBB results in the prior GWASs.</font> </small>  
 
 ### Study Selection
 [//]:-------------------------------
 
 Before running your analysis, you can select the prior GWASs you want to include. You can use the function **`list_prioGWASs()`** to get some information about the prior GWASs available.   
-You should remove traits that by definition are not independent from your trait of interest. For example, before analysing BMI results, make sure to exclude "Height" from the prior GWASs used. You can use the function **`select_priorGWASs()`** to automatically exclude/include some traits or some files.   
-You should also check for sample overlap, and remove prior GWASs that come from the same consortium as your data. If there are individuals in common between your conventional GWAS and prior GWASs, it might induce some bias.
+
+You should remove traits that by definition are not independent from your trait of interest. For example, before analysing BMI results, make sure to exclude "Height" from the prior GWASs used. You can use the function **`select_priorGWASs()`** to automatically exclude/include some traits or some files. You should also check for sample overlap, and remove prior GWASs that come from the same consortium as your data. If there are individuals in common between your conventional GWAS and prior GWASs, it might induce some bias.
 
 
 ```{r PriorGWASS}
@@ -156,7 +164,7 @@ AllStudies = list_priorGWASs()
 # select_priorGWASs will return the IDs of the files that are kept
 MyStudies = select_priorGWASs(include_traits=c("Heart Rate", "Body Mass Index", "Smoking"))
 # Match these IDs against the ones in the list of prior GWASs 
-AllStudies[AllStudies$ID %in% MyStudies, c("Name", "Trait", "Reference")]
+AllStudies[AllStudies$ID %in% MyStudies, ]
 ```
 
 
@@ -176,7 +184,7 @@ data("SmallGWAS_Timmers2019")
 MyStudies = select_priorGWASs(include_traits=c("Blood Pressure", "Education"),  
 include_files=c("cardiogram_gwas_results.txt", "All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq.gz"))
 # 6 Prior GWASs used
-list_priorGWASs(MyStudies)[, c("Name", "Trait", "Reference")]
+list_priorGWASs(MyStudies)[,c("Name", "Trait", "Reference")]
 ```
 
 
@@ -222,13 +230,14 @@ B = bGWAS(name = "Test_UsingGWASfromPriorGWASs",
 class(A)
 
 print(A)
+
+print_log_bGWAS(A)
 ```
 
 Functions to extract results from an object of class *bGWAS*:   
 ```{r extractA}
 hits = extract_results_bGWAS(A, "significant")
-colnames(hits)
-nrow(hits)
+hits
 
 all_results = extract_results_bGWAS(A, "all")
 nrow(all_results)
@@ -236,10 +245,8 @@ nrow(all_results)
 
 
 ```{r MRcoeffsA}
-MR_coefficients = extract_MRcoeffs_bGWAS(A)
-colnames(MR_coefficients)
+extract_MRcoeffs_bGWAS(A)[,1:12]
 
-MR_coefficients[1, 1:8]
 ```
 
 
@@ -270,7 +277,7 @@ A detailed description of these files can be found [here](doc/OutputFiles.md).
 
 Analysis using all the 38 prior GWASs available, for a conventional GWAS containing ~7M SNPs in common with the prior studies ~ 25 minutes (see complete Lifespan Analysis [here]()).
 
-Analysis using 6 prior GWASs, for a conventional GWAS containing ~ 400,000 SNPs in common with prior studies (see example A) ~ 2 minutes.
+Analysis using 6 prior GWASs, for a conventional GWAS containing ~ 300,000 SNPs in common with prior studies (see example A) ~ 2 minutes.
 
 
 ## Contact
