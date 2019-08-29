@@ -21,7 +21,17 @@ The last file, **ZMatrix_MR.csv.gz**, is actually a subset of the previous one. 
 ## Download
 [//]:*******
 
-...    
+You can download these files using this [link](https://drive.switch.ch/index.php/s/jvSwoIxRgCKUSI8) or following the instructions below.    
+
+- On UNIX/MACOSX, from a terminal:    
+``` bash
+wget https://drive.switch.ch/index.php/s/jvSwoIxRgCKUSI8/download -O ZMatrices.tar.gz
+tar xzvf ZMatrices.tar.gz
+``` 
+ - On WINDOWS, from a terminal:   
+``` bash
+...
+```   
 
 
 ## How to use your own data

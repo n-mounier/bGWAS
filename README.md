@@ -5,7 +5,7 @@
 [![](https://img.shields.io/github/last-commit/n-mounier/bGWAS.svg)](https://github.com/n-mounier/bGWAS/commits/master)
 [![](https://img.shields.io/badge/license-GPL--2.0-lightgrey.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
-# bGWAS <img src="inst/Figures/logo.png" align="right" height=140/>
+# bGWAS <img src="inst/Figures/logo.png" align="right" height=180/>
 
 <!--- 
 library(hexSticker)

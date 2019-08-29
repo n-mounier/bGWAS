@@ -49,7 +49,7 @@ badger::badge_custom("license", "GPL-2.0", "lightgrey", "https://www.gnu.org/lic
 ```
 
 
-# bGWAS  <img src="inst/Figures/logo.png" align="right" height=140/> 
+# bGWAS  <img src="inst/Figures/logo.png" align="right" height=180/> 
 <!--- 
 library(hexSticker)
 imgurl <- "inst/Figures/PriorEstimation.jpg"
