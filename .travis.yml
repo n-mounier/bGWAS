@@ -1,22 +1,32 @@
 # Use R language
 language: r
 
-# Define multiple R-versions, one from bioconductor
-r:
-#  - oldrel
-  - release #
-#  - devel
-#  - bioc-devel
 
-script:
-      - R CMD build --resave-data
+matrix:
+  include:
+  - r: oldrel
+    script:
+      - R CMD build . --compact-vignettes=gs+qpdf --resave-data
+      - R CMD check *tar.gz --as-cran 
+  - r: release
+    script:
+      - R CMD build . --compact-vignettes=gs+qpdf --resave-data
+      - R CMD check *tar.gz --as-cran     
+  - r: oldrel
+    os: osx
+    osx_image: xcode7.3
+    before_install:
+      - sudo tlmgr install framed titling
+    script:
+      - R CMD build . --compact-vignettes=gs+qpdf --resave-data
+      - R CMD check *tar.gz --as-cran
+  - r: release
+    os: osx
+    osx_image: xcode7.3
+    before_install:
+      - sudo tlmgr install framed titling
+    script:
+      - R CMD build . --compact-vignettes=gs+qpdf --resave-data
+      - R CMD check *tar.gz --as-cran
 
-# Set one of you dependencies from github
-#r_github_packages: r-lib/testthat
 
-# Set one of your dependencies from CRAN
-#r_packages: RTest
-
-# Set a Linux system dependency
-#apt_packages:
-#  - libxml2-dev
