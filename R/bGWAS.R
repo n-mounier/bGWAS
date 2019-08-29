@@ -245,6 +245,7 @@ bGWAS <- function(name,
       pull(.data$Trait) -> trait
     Info %>%
       filter(.data$Trait==trait) %>%
+      pull(.data$ID)-> ToExclude
     if(GWAS %in% ToExclude) ToExclude=ToExclude[ToExclude!=GWAS]
     if(any(ToExclude %in% prior_studies)){
       ToExclude = ToExclude[ToExclude %in% prior_studies]
