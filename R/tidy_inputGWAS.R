@@ -42,7 +42,7 @@ tidy_inputGWAS <- function(GWAS, Z_matrices = "~/ZMatrices/", verbose=FALSE){
     
     if(!GWAS %in% c(1:length(list_files(Z_matrices = Z_matrices)))) stop("The ID specified as a conventional GWAS is not in the list", call. = FALSE)
     
-    GWASData <- data.table::fread(file.path(Z_matrices, "ZMatrix_Imputed.csv.gz"), select=c(1:5, GWAS+5), showProgress = FALSE, data.table=F)
+    GWASData <- data.table::fread(file.path(Z_matrices, "ZMatrix_Full.csv.gz"), select=c(1:5, GWAS+5), showProgress = FALSE, data.table=F)
     attributes(GWASData)$GName <- colnames(GWASData)[6]
     colnames(GWASData)[6] = "Z"
     
