@@ -17,6 +17,7 @@ Depends:
 Suggests:
   testthat,
   knitr,
+  remotes,
   rmarkdown
 Imports:
   calibrate (>= 1.7.2),
