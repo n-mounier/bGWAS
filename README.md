@@ -5,9 +5,16 @@
 [![](https://img.shields.io/github/last-commit/n-mounier/bGWAS.svg)](https://github.com/n-mounier/bGWAS/commits/master)
 [![](https://img.shields.io/badge/license-GPL--2.0-lightgrey.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
-# bGWAS
+# bGWAS <img src="inst/Figures/logo.png" align="right" height=140/>
 
-<!--- <img src="doc/Figures/logo.svg" align="right" height=140/> --->
+<!--- 
+library(hexSticker)
+imgurl <- "inst/Figures/PriorEstimation.jpg"
+sticker(imgurl, 
+        package="bGWAS", p_size=8, p_color="#B4CE4E",
+        h_fill="white", h_color="#A7E4F8",
+        s_x=1, s_y=.8, s_width=.75,
+        filename="inst/Figures/logo.png", dpi=2000) --->
 
 :information\_source: `bGWAS` has been updated to version 1.0.0.  
 Check the [NEWS](NEWS.md) to learn more about what has been modified\!
@@ -150,16 +157,26 @@ GWASs available.
 
 </ul>
 
-<font color="red">**Problem with switch drive, download link will be
-added soon\!**</font>
+You can download these files using this
+[link](https://drive.switch.ch/index.php/s/jvSwoIxRgCKUSI8) or following
+the instructions below.
 
-<!---
-On UNIX/MACOSX, from a terminal:    
+  - On UNIX/MACOSX, from a terminal:  
+
+<!-- end list -->
+
 ``` bash
-wget --no-check-certificate ##https://drive.switch.ch/index.php/s/t3xepllvzobVTCh/download## -O ZMatrices.tar.gz
+wget https://drive.switch.ch/index.php/s/jvSwoIxRgCKUSI8/download -O ZMatrices.tar.gz
 tar xzvf ZMatrices.tar.gz
-``` 
-On WINDOWS:   --->
+```
+
+  - On WINDOWS, from a terminal:  
+
+<!-- end list -->
+
+``` bash
+...
+```
 
 <font color="grey"><small> If you want to use your own set of prior
 GWASs, please have a look [here](doc/ZMatrices.md) to see how you can
@@ -220,7 +237,7 @@ AllStudies[AllStudies$ID %in% MyStudies, ]
 <!-- end list -->
 
 ``` r
-# Using a small GWAS (100,000 SNPs, Timmers et al data - stored as a data.frame)
+# Using a small GWAS (400,000 SNPs, Timmers et al data - stored as a data.frame)
 # Please, not that this example is only for illustration, the method is designed
 # to be used genome-wide, and using such a low number of SNPs can not yield
 # interpretable results.
