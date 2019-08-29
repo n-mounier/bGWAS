@@ -3,10 +3,10 @@ output: github_document
 
 ---
 
-```{r setup, include=FALSE, cache=F}
+```{r setup, include=FALSE, cache=FALSE}
 setwd("/Users/nmounier/Documents/SGG/Projects/Packaging/Lifespan_v1.0.0")
 knitr::opts_chunk$set(echo = TRUE,
-                      fig.path = "doc/Figures/Lifespan-",
+                      fig.path = "LifespanAnalysis/Lifespan_v1.0.0-",
                       out.width = "100%",
                       cache = TRUE,
                       cache.lazy = FALSE)
@@ -26,6 +26,7 @@ Here, we assume that the `bGWAS` package is already installed, that the Z-matrix
 library(bGWAS)
 
 # Download data to working directory (~460 MB) if not already here
+print(getwd())
 if(!file.exists("lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")) download.file(url = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3209/lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz?sequence=1&isAllowed=y", destfile = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")
 
 Lifespan_Timmers2019 = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz"
@@ -34,6 +35,7 @@ Lifespan_Timmers2019 = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz"
 Now that we have the data in our working directory, we can launch the analysis (with default parameters):
 
 ```{r bGWAS, echo=TRUE}
+print(getwd())
 Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
                        GWAS = Lifespan_Timmers2019)
 ```
@@ -45,15 +47,16 @@ We can look at the results more in details.
 ## Prior GWASs used
 
 ```{r results1, dpi=300}
+print(getwd())
 coefficients_plot_bGWAS(Lifespan_bGWAS)
 ```
 
-7 prior GWASs are used to create the prior, the multivariate causal effect estimates are consistent with what we would expect. On this figure, the multivariate causal effect estimate and the 95\% interval from the multivariate MR model using all chromosomes (blac dot and bars) as well as the per-chromosome estimates (grey bars) are represented for each prior GWASs. Coronary Artery Disease (CAD) has the strongest negative effect on lifespan. High Diastolic Blood Pressure (DBP) and Body Mass Index (BMI) also decreases lifespan. We can also see that education, in this case the number of years of schooling, has a positive effect on lifespan.
+7 prior GWASs are used to create the prior, the multivariate causal effect estimates are consistent with what we would expect. On this figure, the multivariate causal effect estimate and the 95\% interval from the multivariate MR model using all chromosomes (black dot and bars) as well as the per-chromosome estimates (grey bars) are represented for each prior GWASs. Coronary Artery Disease (CAD) has the strongest negative effect on lifespan. High Diastolic Blood Pressure (DBP) and Body Mass Index (BMI) also decreases lifespan. We can also see that education, in this case the number of years of schooling, has a positive effect on lifespan.
 
 Overall, the squared correlation between prior and observed effects is about `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "all"), 3)` and goes up to `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "moderate"), 3)` when we consider only SNPs having at least a moderate effect on lifespan (observed p-value < 0.001).
 
 
-With this approach, we identified `nrow(extract_results_bGWAS(Lifespan_bGWAS))`:
+With this approach, we identified `r nrow(extract_results_bGWAS(Lifespan_bGWAS))`:
 
 ```{r results2, echo=TRUE}
 # all hits
@@ -66,9 +69,17 @@ extract_results_bGWAS(Lifespan_bGWAS) %>%
 knitr::kable(NEW %>% transmute(rsid, chrm_UK10K, pos_UK10K, z_obs, mu_prior_estimate, mu_prior_std_error, z_obs, BF, BF_p=as.character(format(BF_p, scientific=T))))
 ```
 
+`r nrow(extract_results_bGWAS(Lifespan_bGWAS))` of them are missed by the conventional GWAS (using same p-value threshold of 5e-8 to call significance).
+
+
 ```{r results3, dpi=300}
 manhattan_plot_bGWAS(Lifespan_bGWAS)
 ```
+
+```{r results5, dpi=300}
+heatmap_bGWAS(Lifespan_bGWAS)
+```
+
 
 
 We can use direct effects to identify SNPs significantly acting on lifespan independently from the prior GWASs used to create the prior:
@@ -82,8 +93,8 @@ extract_results_bGWAS(Lifespan_bGWAS) %>%
 knitr::kable(DIRECT %>% transmute(rsid, chrm_UK10K, pos_UK10K, z_obs, mu_prior_estimate, mu_prior_std_error,  mu_direct_estimate, mu_direct_std_error, direct_z, direct_p=as.character(format(direct_p, scientific=T))))
 ```
 
-Among these hits...: Not APOE (or CHRNA, but smoking not used so OK) ... needs to be looked at a bit more!    
-Should we also look at non significant SNPs (based on BF) but with significant direct effects?
+Among these hits...: Not APOE (or CHRNA, but smoking not used so makes sense?) ... needs to be looked at a bit more!    
+Should we also look at non significant SNPs (based on BFs) but with significant direct effects? -> create a function to extract SNPs having significant direct (posterior) SNPs independently of prior/BFs?
 
 
 \newpage

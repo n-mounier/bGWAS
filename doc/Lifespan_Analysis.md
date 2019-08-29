@@ -12,6 +12,7 @@ described [here](../README.md).
 library(bGWAS)
 
 # Download data to working directory (~460 MB) if not already here
+print(getwd())
 if(!file.exists("lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")) download.file(url = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3209/lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz?sequence=1&isAllowed=y", destfile = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")
 
 Lifespan_Timmers2019 = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz"
@@ -19,6 +20,12 @@ Lifespan_Timmers2019 = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz"
 
 Now that we have the data in our working directory, we can launch the
 analysis (with default parameters):
+
+``` r
+print(getwd())
+```
+
+    ## [1] "/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS/doc"
 
 ``` r
 Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
@@ -285,17 +292,23 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ## 25 SNPs left 
     ## Done! 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 921 minute(s) and 25 second(s).
+    ## Time of the analysis: 36 minute(s) and 15 second(s).
 
 We can look at the results more in details.
 
 ## Prior GWASs used
 
 ``` r
+print(getwd())
+```
+
+    ## [1] "/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS/doc"
+
+``` r
 coefficients_plot_bGWAS(Lifespan_bGWAS)
 ```
 
-<img src="doc/Figures/Lifespan-results1-1.png" width="100%" />
+<img src="LifespanAnalysis/Lifespan_v1.0.0-results1-1.png" width="100%" />
 
 7 prior GWASs are used to create the prior, the multivariate causal
 effect estimates are consistent with what we would expect. On this
@@ -376,7 +389,7 @@ knitr::kable(NEW %>% transmute(rsid, chrm_UK10K, pos_UK10K, z_obs, mu_prior_esti
 manhattan_plot_bGWAS(Lifespan_bGWAS)
 ```
 
-<img src="doc/Figures/Lifespan-results3-1.png" width="100%" />
+<img src="LifespanAnalysis/Lifespan_v1.0.0-results3-1.png" width="100%" />
 
 We can use direct effects to identify SNPs significantly acting on
 lifespan independently from the prior GWASs used to create the prior:
@@ -396,7 +409,8 @@ knitr::kable(DIRECT %>% transmute(rsid, chrm_UK10K, pos_UK10K, z_obs, mu_prior_e
 | rs10455872 |          10 |   37196047 | 10.28154 |           1.8779506 |              1.114773 |             8.403586 |               1.497571 |  5.611478 | 2.006052e-08 |
 | rs8042849  |           3 |   13384532 | 10.65939 |           0.1103939 |              1.084015 |            10.548993 |               1.474818 |  7.152742 | 8.506164e-13 |
 
-Among these hits…: Not APOE (or CHRNA, but smoking not used so OK) …
-needs to be looked at a bit more\!  
-Should we also look at non significant SNPs (based on BF) but with
-significant direct effects?
+Among these hits…: Not APOE (or CHRNA, but smoking not used so makes
+sense?) … needs to be looked at a bit more\!  
+Should we also look at non significant SNPs (based on BFs) but with
+significant direct effects? -\> create a function to extract SNPs having
+significant direct (posterior) SNPs independently of prior/BFs?
