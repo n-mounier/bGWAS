@@ -7,3 +7,7 @@ bGWAS.Rproj
 .Ruserdata
 .DS_Store
 inst/doc
+
+# Cache & Data for lifespan analysis
+doc/Lifespan_Analysis_cache/
+doc/lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz
