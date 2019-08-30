@@ -11,7 +11,7 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 Depends: 
-  R (>= 3.3.0), 
+  R (>= 3.5.0), 
   dplyr (>= 0.7.8), 
   magrittr (>= 1.5),
 Suggests:
