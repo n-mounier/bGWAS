@@ -4,14 +4,17 @@ language: r
 
 matrix:
   include:
+  # UNIX, old release (3.5.3)
   - r: oldrel
     script:
       - R CMD build . --compact-vignettes=gs+qpdf --resave-data
       - R CMD check *tar.gz --as-cran 
+  # UNIX, release (3.6.1)
   - r: release
     script:
       - R CMD build . --compact-vignettes=gs+qpdf --resave-data
-      - R CMD check *tar.gz --as-cran     
+      - R CMD check *tar.gz --as-cran  
+  # MACOS, old release (3.5.3)
   - r: oldrel
     os: osx
     before_install:
@@ -19,6 +22,7 @@ matrix:
     script:
       - R CMD build . --compact-vignettes=gs+qpdf --resave-data
       - R CMD check *tar.gz --as-cran
+  # MACOS, release (3.6.1)
   - r: release
     os: osx
     before_install:
