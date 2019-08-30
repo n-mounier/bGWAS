@@ -289,7 +289,7 @@ request_BFandP <- function(Prior, sign_thresh, use_permutations = F,
   Log = update_log(Log, tmp, verbose)
   
   Prior %>%
-    mutate(p_posterior = 2 * pnorm(-abs(.data$z_posterior))) -> Prior
+    mutate(p_posterior = 2 * stats::pnorm(-abs(.data$z_posterior))) -> Prior
   
   
   if(sign_method == "fdr"){
@@ -310,7 +310,7 @@ request_BFandP <- function(Prior, sign_thresh, use_permutations = F,
   Log = update_log(Log, tmp, verbose)
   
   Prior %>%
-    mutate(p_direct = 2 * pnorm(-abs(.data$z_direct))) -> Prior
+    mutate(p_direct = 2 * stats::pnorm(-abs(.data$z_direct))) -> Prior
   
   
   if(sign_method == "fdr"){

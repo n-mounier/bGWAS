@@ -84,13 +84,19 @@ all.equal.bGWAS <- function(obj1, obj2) {
 #'        analysis should be annotated on the plot, \code{default=TRUE}
 #'        If your results are not pruned or if you have a high number of significant SNPs,
 #'        be aware that \code{annotate=TRUE} might decrease readability of the figure.
-#'
+#' @param results, "BF" / "posterior" / "direct",  \code{default="BF"}
+#' 
+#' @details
+#' If \code{results = "BF"}, BF p-values / fdr-values will be used. \cr
+#' If \code{results = "direct"}, direct effect p-values / fdr-values will be used. \cr
+#' If \code{results = "posterior"}, posterior effect p-values / fdr-values will be used. \cr
+
 #' @return a Manhattan Plot
 #'
 #' @export
 
 manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
-                                  annotate=T) {
+                                  annotate=T, results="BF") {
 
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
@@ -115,12 +121,35 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
     "The threshold used is :")[[1]][2], ".", fixed=T)[[1]][1])
 
 
-  value = ifelse(method=="FDR", "BF_fdr", "BF_p")
   
-  obj$all_BFs %>%
-    select(rsid, chrm_UK10K, pos_UK10K, {{value}}) %>%
-    set_names(c("rsid", "chrm_UK10K", "pos_UK10K", "p")) %>%
-    filter(p<0.05) -> ToPlot
+  if(results == "BF"){
+    value = ifelse(method=="FDR", "BF_fdr", "BF_p")
+    obj$all_BFs %>%
+      select(.data$rsid, .data$chrm_UK10K, .data$pos_UK10K, {{value}}) %>%
+      set_names(c("rsid", "chrm_UK10K", "pos_UK10K", "p")) %>%
+      filter(.data$p<0.05) -> ToPlot
+    my_ylab=ifelse( method == "FDR" ,
+                 expression(-log[10](italic(fdr))) ,
+                 expression(-log[10](italic(p))) )
+  } else if(results == "posterior"){
+    value = ifelse(method=="FDR", "fdr_posterior", "p_posterior")
+    obj$all_BFs %>%
+      select(.data$rsid, .data$chrm_UK10K, .data$pos_UK10K, {{value}}) %>%
+      set_names(c("rsid", "chrm_UK10K", "pos_UK10K", "p")) %>%
+      filter(.data$p<0.05) -> ToPlot
+    my_ylab=ifelse( method == "FDR" ,
+                    expression(-log[10](italic(fdr))~-~posterior~effects) ,
+                    expression(-log[10](italic(p))~-~posterior~effects))
+  } else if(results == "direct"){
+    value = ifelse(method=="FDR", "fdr_direct", "p_direct")
+    obj$all_BFs %>%
+      select(.data$rsid, .data$chrm_UK10K, .data$pos_UK10K, {{value}}) %>%
+      set_names(c("rsid", "chrm_UK10K", "pos_UK10K", "p")) %>%
+      filter(.data$p<0.05) -> ToPlot
+    my_ylab=ifelse( method == "FDR" ,
+                    expression(-log[10](italic(fdr))~-~direct~effects) ,
+                    expression(-log[10](italic(p))~-~direct~effects))
+  }
 
 
   if(save_file) grDevices::png(file_name, width = 20, height = 12, units = "cm", res = 500)
@@ -138,25 +167,32 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
                    logp = TRUE,
                    annotatePval = NULL,
                    annotateTop = FALSE,
-                   ylab=ifelse( method == "FDR" ,
-                                expression(-log[10](italic(fdr))) ,
-                                expression(-log[10](italic(p))) )
-                   )
+                   ylab= my_ylab)
 
 
 
   if(annotate){ # significant SNPs from the analysis
     # extract them
-    ToPlot %>%
-      filter( .data$rsid %in% obj$significant_SNPs) -> SNPs_to_plot
-
+    if(results=="BF"){
+      ToPlot %>%
+        filter( .data$rsid %in% obj$significant_SNPs) -> SNPs_to_plot
+    } else if(results=="posterior"){
+      ToPlot %>%
+        filter( .data$rsid %in% obj$posterior_SNPs) -> SNPs_to_plot
+    } else if(results=="direct"){
+      ToPlot %>%
+        filter( .data$rsid %in% obj$direct_SNPs) -> SNPs_to_plot
+    } 
+    
+    
+    
     ToPlot %>%
       mutate(p=NULL) %>%
       arrange(.data$chrm_UK10K,.data$pos_UK10K) -> all
 
     # y = -log10(p) ou -log10(fdr)
     SNPs_to_plot %>%
-      mutate(y = -log10(p) - 0.3) -> SNPs_to_plot # to make sure all SNPs names are in plotting windows
+      mutate(y = -log10(.data$p) - 0.3) -> SNPs_to_plot # to make sure all SNPs names are in plotting windows
      # x = have to look at all SNPs chr/pos
     get_posx <- function(snp, all){
       chr = as.numeric(snp[2])
@@ -281,8 +317,38 @@ if(save_file) grDevices::dev.off()
 #'
 #'
 #' @param obj an object of class bGWAS created using \code{\link{bGWAS}()}
-#' @param SNPs, "all" / "significant"
-#' @param results, "BF" / "posterior" / "direct"
+#' @param SNPs, "all" / "significant", \code{default="significant"}
+#' @param results, "BF" / "posterior" / "direct", \code{default="BF"}
+#' 
+#' @details
+#' For all value of \code{results}, basic informations about the SNPs will be returned: \cr
+#' \code{rsid} : rs number \cr
+#' \code{chrm_UK10K} : chromosome (obtained from UK10K data)\cr
+#' \code{pos_UK10K} : position (obtained from UK10K data) \cr
+#' \code{alt} : alternative (effect) allele \cr
+#' \code{ref} : reference allele \cr
+#' \code{z_obs} : observed Z-score \cr
+#' 
+#' In addition, if \code{results = "BF"} the following information will be returned: \cr
+#' \code{mu_prior_estimate} : prior effect estimate (z-score scale) \cr
+#' \code{mu_prior_std_error} : prior effect standard error (z-score scale) \cr
+#' \code{BF} : Bayes Factor\cr
+#' \code{BF_p} : Bayes Factor p-value  \cr
+#' \code{BF_fdr} : Bayes Factor FDR (only if FDR used to identify significant SNPs) \cr
+#' 
+#' Alternatively, if \code{results = "posterior"} the following information will be returned: \cr
+#' \code{mu_posterior_estimate} : posterior effect estimate (z-score scale)  \cr
+#' \code{mu_posterior_std_error} : posterior effect standard error (z-score scale) \cr
+#' \code{z_posterior} : posterior Z-score \cr
+#' \code{p_posterior} : posterior effect p-value \cr
+#' \code{fdr_posterior} :  posterior effect FDR (only if FDR used to identify significant SNPs) \cr
+#' 
+#' Alternatively, if \code{results = "direct"} the following information will be returned: \cr
+#' \code{mu_direct_estimate} : direct effect estimate (z-score scale)\cr
+#' \code{mu_direct_std_error} : direct effect standard error (z-score scale) \cr
+#' \code{z_direct} : direct Z-score\cr
+#' \code{p_direct} : direct effect p-value \cr
+#' \code{fdr_direct} : direct effect FDR (only if FDR used to identify significant SNPs) \cr
 #'
 #' @return a \code{tibble} containing the results for all / significant SNPs
 #' @export
