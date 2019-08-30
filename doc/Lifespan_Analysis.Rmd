@@ -4,7 +4,6 @@ output: github_document
 ---
 
 ```{r setup, include=FALSE, cache=FALSE}
-setwd("/Users/nmounier/Documents/SGG/Projects/Packaging/Lifespan_v1.0.0")
 knitr::opts_chunk$set(echo = TRUE,
                       fig.path = "LifespanAnalysis/Lifespan_v1.0.0-",
                       out.width = "100%",
@@ -23,7 +22,7 @@ In this example, we will use the data from Timmers et al to apply our Bayesian G
 Here, we assume that the `bGWAS` package is already installed, that the Z-matrix files have already been downloaded and stored in "~/ZMatrices". If that is not the case, please follow the steps described [here](../README.md). 
 
 ```{r download-data, echo=TRUE, message=FALSE, results='hide', cache=F}
-library(bGWAS)
+library(bGWAS) # bGWAS github version:
 
 # Download data to working directory (~460 MB) if not already here
 print(getwd())
@@ -55,46 +54,45 @@ coefficients_plot_bGWAS(Lifespan_bGWAS)
 
 Overall, the squared correlation between prior and observed effects is about `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "all"), 3)` and goes up to `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "moderate"), 3)` when we consider only SNPs having at least a moderate effect on lifespan (observed p-value < 0.001).
 
+## Results - BF
+
 
 With this approach, we identified `r nrow(extract_results_bGWAS(Lifespan_bGWAS))`:
 
 ```{r results2, echo=TRUE}
 # all hits
-knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% transmute(rsid, chrm_UK10K, pos_UK10K, z_obs, mu_prior_estimate, mu_prior_std_error, z_obs, BF, BF_p=as.character(format(BF_p, scientific=T))))
+knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% mutate(BF_p=as.character(format(BF_p, scientific=T))))
 
 # new hits (compared to conventional GWAS)
 extract_results_bGWAS(Lifespan_bGWAS) %>%
   mutate(obs_p = 2*pnorm(-abs(z_obs))) %>%
   filter(obs_p>5e-8) -> NEW
-knitr::kable(NEW %>% transmute(rsid, chrm_UK10K, pos_UK10K, z_obs, mu_prior_estimate, mu_prior_std_error, z_obs, BF, BF_p=as.character(format(BF_p, scientific=T))))
+knitr::kable(NEW %>% mutate(BF_p=as.character(format(BF_p, scientific=T))))
 ```
 
-`r nrow(extract_results_bGWAS(Lifespan_bGWAS))` of them are missed by the conventional GWAS (using same p-value threshold of 5e-8 to call significance).
+`r nrow(NEW)` of them are missed by the conventional GWAS (using same p-value threshold of 5e-8 to call significance).
 
 
 ```{r results3, dpi=300}
 manhattan_plot_bGWAS(Lifespan_bGWAS)
 ```
 
-```{r results5, dpi=300}
+```{r results4, dpi=300}
 heatmap_bGWAS(Lifespan_bGWAS)
 ```
 
 
+## Results - Direct Effects
+
 
 We can use direct effects to identify SNPs significantly acting on lifespan independently from the prior GWASs used to create the prior:
 
-```{r results4, echo=TRUE}
-# new hits (compared to conventional GWAS)
-extract_results_bGWAS(Lifespan_bGWAS) %>%
-  mutate(direct_z = mu_direct_estimate / mu_direct_std_error,
-        direct_p = 2*pnorm(-abs(direct_z))) %>%
-  filter(direct_p<5e-8) -> DIRECT
-knitr::kable(DIRECT %>% transmute(rsid, chrm_UK10K, pos_UK10K, z_obs, mu_prior_estimate, mu_prior_std_error,  mu_direct_estimate, mu_direct_std_error, direct_z, direct_p=as.character(format(direct_p, scientific=T))))
+```{r results5, echo=TRUE}
+knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, "direct")  %>% mutate(p_direct=as.character(format(p_direct, scientific=T))))
 ```
 
 Among these hits...: Not APOE (or CHRNA, but smoking not used so makes sense?) ... needs to be looked at a bit more!    
-Should we also look at non significant SNPs (based on BFs) but with significant direct effects? -> create a function to extract SNPs having significant direct (posterior) SNPs independently of prior/BFs?
+
 
 
 \newpage
