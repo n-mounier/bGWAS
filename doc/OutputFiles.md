@@ -47,8 +47,10 @@ The output files created are:
         mu_prior_std_error : prior effect standard error (z-score scale)    <br/>
         mu_posterior_estimate : posterior effect estimate (z-score scale)    <br/>
         mu_posterior_std_error : posterior effect standard error (z-score scale)   <br/> 
+        z_posterior : posterior Z-score  <br/>
         mu_direct_estimate : direct effect estimate (z-score scale)   <br/>
         mu_direct_std_error : direct effect standard error (z-score scale)   <br/>
+        z_direct : direct Z-score  <br/>
         beta_prior_estimate : prior effect estimate (beta scale)   <br/>
         beta_prior_std_error : prior effect standard error (beta scale)  <br/>  
         beta_posterior_estimate : posterior effect estimate (beta scale)   <br/> 
@@ -56,7 +58,9 @@ The output files created are:
         beta_direct_estimate : direct effect estimate (beta scale)   <br/>
         beta_direct_std_error : direct effect standard error (beta scale)   <br/>
         BF : Bayes Factor        <br/>
-        BF_p/BF_fdr : Bayes Factor p-value / fdr  <br/>  </ul>
+        BF_p/BF_fdr : Bayes Factor p-value / fdr  <br/>  
+        p_posterior : posterior effect p-value / fdr  <br/> 
+        p_direct : direct effect p-value / fdr  <br/></ul>
 
 -   **SignificantSNPs.csv** : contains BF and p-values, prior, posterior and direct effects estimates for a subset of significant SNPs (subset of **PriorBFp.csv**)  
 
