@@ -280,7 +280,7 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
   # To create heatmap, need ZMat for significant SNPs
   All_ZMatrix %>%
     select(c(1:5), selected_studies) %>%
-    filter(.data$rs %in% PriorThr$rsid) -> Matrix_Heatmap
+    filter(.data$rs %in% BF_SNPs) -> Matrix_Heatmap
   
   res=list()
   res$log_info = Log
