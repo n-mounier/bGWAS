@@ -558,8 +558,8 @@ heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
   for(RF in RFs){
     Res_signif_aligned %>%
       mutate({{RF}} := case_when(
-                (alt == .data$ZMat_alt) ~ Matrix[,RF],
-                (alt == .data$Zmat_ref) ~ -Matrix[,RF],
+                (.data$alt == .data$ZMat_alt) ~ pull(Matrix, RF),
+                (.data$alt == .data$Zmat_ref) ~ -pull(Matrix,RF),
                 TRUE ~ NA_real_))-> Res_signif_aligned
   }
   
