@@ -8,6 +8,7 @@
 # bGWAS <img src="inst/Figures/logo.png" align="right" height=180/>
 
 <!--- 
+# https://github.com/GuangchuangYu/hexSticker
 library(hexSticker)
 imgurl <- "inst/Figures/PriorEstimation.jpg"
 sticker(imgurl, 
@@ -358,7 +359,7 @@ print_log_bGWAS(A)
     ## The conventional GWAS used as input the object: "GWAS".  
     ##    SNPID column, ok - ALT column, ok - REF column, ok - BETA column, ok - SE column, ok
     ## Posterior effects will be rescaled using BETA and SE.
-    ## The analysis will be run in the folder: "/Users/nmounier/Documents/SGG/Temp/Test_UsingSmallDataFrame".  
+    ## The analysis will be run in the folder: "/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS".  
     ## The p-value threshold used for selecting MR instruments is: 1e-06.  
     ## The minimum number instruments required for each trait is: 3.  
     ## The distance used for pruning MR instruments is: 500Kb.  
@@ -555,8 +556,13 @@ print_log_bGWAS(A)
     ## ... getting approximated p-values using non-linear quantiles  
     ## ... checking p-values near significance threshold  
     ##     everything is ok!  
+    ## # Estimating p-values for posterior effects... 
+    ## Done! 
+    ## # Estimating p-values for direct effects... 
+    ## Done! 
     ## Done! 
     ## > Pruning and identifying significant SNPs 
+    ## Identification based on BFs 
     ##    Starting with 286,807 SNPs 
     ## # Selecting significant SNPs according to p-values... 
     ## 31 SNPs left 
@@ -565,57 +571,86 @@ print_log_bGWAS(A)
     ##    distance : 500Kb 
     ## 11 SNPs left 
     ## Done! 
+    ## Identification based on posterior effects 
+    ##    Starting with 286,807 SNPs 
+    ## # Selecting significant SNPs according to p-values... 
+    ## 11 SNPs left 
+    ## Done! 
+    ## # Pruning significant SNPs... 
+    ##    distance : 500Kb 
+    ## 6 SNPs left 
+    ## Done! 
+    ## Identification based on direct effects 
+    ##    Starting with 286,807 SNPs 
+    ## # Selecting significant SNPs according to p-values... 
+    ## 3 SNPs left 
+    ## Done! 
+    ## # Pruning significant SNPs... 
+    ##    distance : 500Kb 
+    ## 2 SNPs left 
+    ## Done! 
     ## 
     ## 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 1 minute(s) and 57 second(s).
+    ## Time of the analysis: 2 minute(s) and 0 second(s).
 
 Functions to extract results from an object of class *bGWAS*:
 
 ``` r
-hits = extract_results_bGWAS(A, "significant")
+# by default, extract "BF" results...
+hits = extract_results_bGWAS(A, SNPs = "significant")
 hits
 ```
 
-    ## # A tibble: 11 x 22
-    ##    chrm_UK10K pos_UK10K rsid  alt   ref      beta      se  z_obs
-    ##         <dbl>     <dbl> <chr> <chr> <chr>   <dbl>   <dbl>  <dbl>
-    ##  1          1 225492545 rs42… T     C      0.106  0.00546  19.3 
-    ##  2          3  10540516 rs11… T     C     -0.0418 0.00410 -10.2 
-    ##  3          6  83562639 rs78… A     T      0.0240 0.00387   6.20
-    ##  4         10  30900081 rs94… A     G     -0.0875 0.0145   -6.03
-    ##  5          4 133885985 rs12… A     G     -0.0229 0.00399  -5.74
-    ##  6          8 120703781 rs56… A     G      0.0211 0.00406   5.19
-    ##  7          9  22362841 rs93… A     G      0.0219 0.00399   5.50
-    ##  8          2 174530122 rs37… T     C     -0.0260 0.00491  -5.30
-    ##  9          3  21881162 rs15… T     C      0.0201 0.00412   4.88
-    ## 10          4  55593481 rs47… T     G      0.0259 0.00487   5.31
-    ## 11         11 101608267 rs59… T     C      0.0206 0.00420   4.90
-    ##    mu_prior_estima… mu_prior_std_er… mu_posterior_es… mu_posterior_st…
-    ##               <dbl>            <dbl>            <dbl>            <dbl>
-    ##  1           -0.351             1.16            10.9             0.757
-    ##  2           -0.190             1.16            -5.94            0.758
-    ##  3            2.61              1.32             4.89            0.797
-    ##  4           -1.72              1.17            -4.21            0.760
-    ##  5           -2.34              1.20            -4.34            0.767
-    ##  6            3.37              1.23             4.47            0.776
-    ##  7            1.43              1.14             3.72            0.751
-    ##  8           -1.69              1.16            -3.76            0.757
-    ##  9            2.43              1.21             3.88            0.770
-    ## 10            1.16              1.16             3.54            0.757
-    ## 11            1.78              1.16             3.57            0.757
-    ## # … with 10 more variables: mu_direct_estimate <dbl>,
-    ## #   mu_direct_std_error <dbl>, beta_prior_estimate <dbl>,
-    ## #   beta_prior_std_error <dbl>, beta_posterior_estimate <dbl>,
-    ## #   beta_posterior_std_error <dbl>, beta_direct_estimate <dbl>,
-    ## #   beta_direct_std_error <dbl>, BF <dbl>, BF_p <dbl>
+    ## # A tibble: 11 x 10
+    ##    rsid       chrm_UK10K pos_UK10K alt   ref    z_obs mu_prior_estimate
+    ##    <chr>           <dbl>     <dbl> <chr> <chr>  <dbl>             <dbl>
+    ##  1 rs429358            1 225492545 T     C      19.3             -0.351
+    ##  2 rs11633958          3  10540516 T     C     -10.2             -0.190
+    ##  3 rs7857118           6  83562639 A     T       6.20             2.61 
+    ##  4 rs9457925          10  30900081 A     G      -6.03            -1.72 
+    ##  5 rs12828640          4 133885985 A     G      -5.74            -2.34 
+    ##  6 rs56179563          8 120703781 A     G       5.19             3.37 
+    ##  7 rs9379844           9  22362841 A     G       5.50             1.43 
+    ##  8 rs3794695           2 174530122 T     C      -5.30            -1.69 
+    ##  9 rs1573644           3  21881162 T     C       4.88             2.43 
+    ## 10 rs4762753           4  55593481 T     G       5.31             1.16 
+    ## 11 rs59613878         11 101608267 T     C       4.90             1.78 
+    ##    mu_prior_std_error      BF     BF_p
+    ##                 <dbl>   <dbl>    <dbl>
+    ##  1               1.16 1.24e45 6.01e-68
+    ##  2               1.16 1.30e13 1.85e-21
+    ##  3               1.32 1.26e 7 9.21e-13
+    ##  4               1.17 1.00e 6 4.19e-11
+    ##  5               1.20 8.51e 5 5.36e-11
+    ##  6               1.23 2.31e 5 3.93e-10
+    ##  7               1.14 6.57e 4 2.71e- 9
+    ##  8               1.16 5.16e 4 3.94e- 9
+    ##  9               1.21 2.76e 4 1.04e- 8
+    ## 10               1.16 2.20e 4 1.47e- 8
+    ## 11               1.16 1.36e 4 3.11e- 8
 
 ``` r
-all_results = extract_results_bGWAS(A, "all")
+all_results = extract_results_bGWAS(A, SNPs = "all")
 nrow(all_results)
 ```
 
     ## [1] 286807
+
+``` r
+# but also possible to extract SNPs with significant posterior/direct effects
+extract_results_bGWAS(A, SNPs = "significant", results = "direct")
+```
+
+    ## # A tibble: 2 x 10
+    ##   rsid       chrm_UK10K pos_UK10K alt   ref   z_obs mu_direct_estimate
+    ##   <chr>           <dbl>     <dbl> <chr> <chr> <dbl>              <dbl>
+    ## 1 rs429358            1 225492545 T     C      19.3              19.7 
+    ## 2 rs11633958          3  10540516 T     C     -10.2              -9.99
+    ##   mu_direct_std_error z_direct p_direct
+    ##                 <dbl>    <dbl>    <dbl>
+    ## 1                1.53    12.8  8.90e-38
+    ## 2                1.53    -6.51 7.28e-11
 
 ``` r
 extract_MRcoeffs_bGWAS(A)[,1:12]
@@ -638,16 +673,25 @@ extract_MRcoeffs_bGWAS(A)[,1:12]
 Functions for graphic representations:
 
 ``` r
-manhattan_plot_bGWAS(A)
+# Coefficients plot
+coefficients_plot_bGWAS(A) 
 ```
 
 <img src="doc/Figures/README-PlotsA-1.png" width="100%" />
 
 ``` r
-coefficients_plot_bGWAS(A) 
+# Manhattan plot using BFs p-values
+manhattan_plot_bGWAS(A)
 ```
 
 <img src="doc/Figures/README-PlotsA-2.png" width="100%" />
+
+``` r
+# Manhattan plot using posterior p-values
+manhattan_plot_bGWAS(A, results="posterior")
+```
+
+<img src="doc/Figures/README-PlotsA-3.png" width="100%" />
 
 ##### Aditionnaly, if `save_files=T`, several files are created in the folder `./name/` :
 
