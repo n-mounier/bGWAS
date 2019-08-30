@@ -280,11 +280,9 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
   P= with(coeffs,{ ggplot2::ggplot(data=coeffs, ggplot2::aes(x=Trait, y=estimate,
                      ymin=Lower,
                      ymax=Upper)) +
-   # "global estimates"
-   ggplot2::geom_pointrange(col="black", shape=21, fill="lightgray")+
+
    ggplot2::geom_hline(yintercept=0, lty=2) +  # add a dotted line at x=0 after flip
 
-   #geom_segment(x=3, xend=3, y=3.5, yend=3.7, lty=2, col="#169D74", lwd = 0.45)
    ggplot2::labs(title = "") +
    ggplot2::coord_flip() +  # flip coordinates (puts labels on y axis)
    ggplot2::xlab("") + ggplot2::ylab("Multivariate MR causal effect estimates (95% CI)") +
@@ -303,6 +301,10 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
                               col="darkgrey", lwd = 0.8)
    }
  }
+ 
+ P = P +
+   # "global estimates" : add them at end to make sure they are in front
+   ggplot2::geom_pointrange(col="black", shape=21, fill="black")
 if(save_file) grDevices::png(file_name, width = 20, height = 12, units = "cm", res = 500)
 print(P)
 if(save_file) grDevices::dev.off()
