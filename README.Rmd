@@ -244,11 +244,15 @@ print_log_bGWAS(A)
 
 Functions to extract results from an object of class *bGWAS*:   
 ```{r extractA}
-hits = extract_results_bGWAS(A, "significant")
+# by default, extract "BF" results...
+hits = extract_results_bGWAS(A, SNPs = "significant")
 hits
 
-all_results = extract_results_bGWAS(A, "all")
+all_results = extract_results_bGWAS(A, SNPs = "all")
 nrow(all_results)
+
+# but also possible to extract SNPs with significant posterior/direct effects
+extract_results_bGWAS(A, SNPs = "significant", results = "direct")
 ```
 
 
@@ -260,9 +264,15 @@ extract_MRcoeffs_bGWAS(A)[,1:12]
 
 Functions for graphic representations:   
 ```{r PlotsA, dpi=300}
+# Coefficients plot
+coefficients_plot_bGWAS(A) 
+
+# Manhattan plot using BFs p-values
 manhattan_plot_bGWAS(A)
 
-coefficients_plot_bGWAS(A) 
+# Manhattan plot using posterior p-values
+manhattan_plot_bGWAS(A, results="posterior")
+
 ```
 
 
