@@ -150,6 +150,16 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
                     expression(-log[10](italic(fdr))~-~direct~effects) ,
                     expression(-log[10](italic(p))~-~direct~effects))
   }
+  
+  
+  # for SNPs with super low p, shrink it and add a red point
+  ToPlot %>%
+    filter(.data$p<1e-20) -> SuperSignif
+  
+  ToPlot %>% 
+    mutate(p = case_when(
+      .data$p<10e-20 ~ 1e-20,
+      TRUE ~ .data$p)) -> ToPlot
 
 
   if(save_file) grDevices::png(file_name, width = 20, height = 12, units = "cm", res = 500)
@@ -167,7 +177,44 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
                    logp = TRUE,
                    annotatePval = NULL,
                    annotateTop = FALSE,
-                   ylab= my_ylab)
+                   ylab= my_ylab,
+                   ylim=c(1.3, ifelse(nrow(SuperSignif)>1, 21, -log10(min(ToPlot$p))+1)),
+                   cex.lab=1.2,
+                   cex.axis=0.8,
+                   yaxp  = c(0, 
+                             ifelse(nrow(SuperSignif)>1, 20, ceiling(-log10(min(ToPlot$p)))), 
+                             ifelse(nrow(SuperSignif)>1, 4, 5)))
+  abline(h=1.3, lwd=2)
+  
+  if(nrow(SuperSignif)>0){
+    ToPlot %>%
+      mutate(p=NULL) %>%
+      arrange(.data$chrm_UK10K,.data$pos_UK10K) -> all
+    
+    # y = -log10(1e20)
+    SuperSignif %>%
+      mutate(y = -log10(1e-20)) -> SuperSignif 
+    # x = have to look at all SNPs chr/pos
+    get_posx <- function(snp, all){
+      chr = as.numeric(snp[2])
+      pos = as.numeric(snp[3])
+      if(chr==1){
+        posx = pos
+      }
+      else{
+        posx=0
+        for(ch in 1:(chr-1)){
+          posx = posx + utils::tail(all %>% filter(.data$chrm_UK10K==ch) %>% pull(.data$pos_UK10K),1)
+        }
+        posx = posx + pos
+      }
+      return(posx)
+    }
+    
+    SuperSignif$x = apply(SuperSignif, 1, function(x) get_posx(x, all))
+    
+    points(x=SuperSignif$x, y=SuperSignif$y, col="blue")
+  }
 
 
 
@@ -192,7 +239,7 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
 
     # y = -log10(p) ou -log10(fdr)
     SNPs_to_plot %>%
-      mutate(y = -log10(.data$p) - 0.3) -> SNPs_to_plot # to make sure all SNPs names are in plotting windows
+      mutate(y = -log10(.data$p)) -> SNPs_to_plot # to make sure all SNPs names are in plotting windows
      # x = have to look at all SNPs chr/pos
     get_posx <- function(snp, all){
       chr = as.numeric(snp[2])
@@ -277,7 +324,7 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
           legend.title=ggplot2::element_blank())
 
   # use with to deal with R CMD check (because Trait / Estimate are not defined)
-  P= with(coeffs,{ ggplot2::ggplot(data=coeffs, ggplot2::aes(x=Trait, y=estimate,
+  P= ggplot2::ggplot(data=coeffs, ggplot2::aes(x=.data$Trait, y=.data$estimate,
                      ymin=Lower,
                      ymax=Upper)) +
 
@@ -287,8 +334,8 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
    ggplot2::coord_flip() +  # flip coordinates (puts labels on y axis)
    ggplot2::xlab("") + ggplot2::ylab("Multivariate MR causal effect estimates (95% CI)") +
    apatheme  # use a white background
-  })
- # "coefficient estimates")
+  
+ # "coefficient estimates"
  # ggplot order the studies by "Trait"
  coeffs = coeffs[order(coeffs$Trait),]
 
