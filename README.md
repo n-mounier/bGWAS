@@ -592,7 +592,7 @@ print_log_bGWAS(A)
     ## 
     ## 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 2 minute(s) and 0 second(s).
+    ## Time of the analysis: 1 minute(s) and 36 second(s).
 
 Functions to extract results from an object of class *bGWAS*:
 
@@ -605,17 +605,17 @@ hits
     ## # A tibble: 11 x 10
     ##    rsid       chrm_UK10K pos_UK10K alt   ref    z_obs mu_prior_estimate
     ##    <chr>           <dbl>     <dbl> <chr> <chr>  <dbl>             <dbl>
-    ##  1 rs429358            1 225492545 T     C      19.3             -0.351
-    ##  2 rs11633958          3  10540516 T     C     -10.2             -0.190
-    ##  3 rs7857118           6  83562639 A     T       6.20             2.61 
-    ##  4 rs9457925          10  30900081 A     G      -6.03            -1.72 
-    ##  5 rs12828640          4 133885985 A     G      -5.74            -2.34 
-    ##  6 rs56179563          8 120703781 A     G       5.19             3.37 
-    ##  7 rs9379844           9  22362841 A     G       5.50             1.43 
-    ##  8 rs3794695           2 174530122 T     C      -5.30            -1.69 
-    ##  9 rs1573644           3  21881162 T     C       4.88             2.43 
-    ## 10 rs4762753           4  55593481 T     G       5.31             1.16 
-    ## 11 rs59613878         11 101608267 T     C       4.90             1.78 
+    ##  1 rs429358           19  45411941 T     C      19.3             -0.351
+    ##  2 rs11633958         15  78862064 T     C     -10.2             -0.190
+    ##  3 rs7857118           9  22124140 A     T       6.20             2.61 
+    ##  4 rs9457925           6 160848743 A     G      -6.03            -1.72 
+    ##  5 rs12828640         12 111361298 A     G      -5.74            -2.34 
+    ##  6 rs56179563          7 129685597 A     G       5.19             3.37 
+    ##  7 rs9379844           6  26291527 A     G       5.50             1.43 
+    ##  8 rs3794695          16  72097827 T     C      -5.30            -1.69 
+    ##  9 rs1573644          15  91421283 T     C       4.88             2.43 
+    ## 10 rs4762753          12  20579969 T     G       5.31             1.16 
+    ## 11 rs59613878          4   3139152 T     C       4.90             1.78 
     ##    mu_prior_std_error      BF     BF_p
     ##                 <dbl>   <dbl>    <dbl>
     ##  1               1.16 1.24e45 6.01e-68
@@ -645,8 +645,8 @@ extract_results_bGWAS(A, SNPs = "significant", results = "direct")
     ## # A tibble: 2 x 10
     ##   rsid       chrm_UK10K pos_UK10K alt   ref   z_obs mu_direct_estimate
     ##   <chr>           <dbl>     <dbl> <chr> <chr> <dbl>              <dbl>
-    ## 1 rs429358            1 225492545 T     C      19.3              19.7 
-    ## 2 rs11633958          3  10540516 T     C     -10.2              -9.99
+    ## 1 rs429358           19  45411941 T     C      19.3              19.7 
+    ## 2 rs11633958         15  78862064 T     C     -10.2              -9.99
     ##   mu_direct_std_error z_direct p_direct
     ##                 <dbl>    <dbl>    <dbl>
     ## 1                1.53    12.8  8.90e-38

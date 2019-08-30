@@ -14,9 +14,9 @@ options(pillar.neg=F, # do no print neg number in red
         tibble.width = 130) # default=95, increase it to make it readable
 A = readRDS("inst/Data/A.RDS")
 # automatically updates manual
-devtools::check(pkg = ".", manual = TRUE, check_dir = "../bGWAS.check")
-system("mv ../bGWAS.check/bGWAS.Rcheck/bGWAS-manual.pdf doc/")
-# 
+devtools::build_manual()
+system("mv ../bGWAS_1.0.0.pdf doc/bGWAS-manual.pdf")
+#
 remove.packages("bGWAS")
 ```
 
