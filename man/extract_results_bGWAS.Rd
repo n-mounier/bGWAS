@@ -4,17 +4,19 @@
 \alias{extract_results_bGWAS}
 \title{Extract SNPs results from bGWAS results}
 \usage{
-extract_results_bGWAS(obj, SNPs = "significant")
+extract_results_bGWAS(obj, SNPs = "significant", results = "BF")
 }
 \arguments{
 \item{obj}{an object of class bGWAS created using \code{\link{bGWAS}()}}
 
 \item{SNPs, }{"all" / "significant"}
+
+\item{results, }{"BF" / "posterior" / "direct"}
 }
 \value{
 a \code{tibble} containing the results for all / significant SNPs
 }
 \description{
 Extracts SNPs results from bGWAS results (BFs, p-value, prior, posterior and 
-direct effects)
+direct effects, depending on the value of the parameter \code{results})
 }

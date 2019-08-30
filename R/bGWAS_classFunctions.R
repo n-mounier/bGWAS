@@ -277,29 +277,61 @@ if(save_file) grDevices::dev.off()
 #' Extract SNPs results from bGWAS results
 #'
 #' Extracts SNPs results from bGWAS results (BFs, p-value, prior, posterior and 
-#' direct effects)
+#' direct effects, depending on the value of the parameter \code{results})
 #'
 #'
 #' @param obj an object of class bGWAS created using \code{\link{bGWAS}()}
 #' @param SNPs, "all" / "significant"
+#' @param results, "BF" / "posterior" / "direct"
 #'
 #' @return a \code{tibble} containing the results for all / significant SNPs
 #' @export
 
-extract_results_bGWAS <- function(obj, SNPs="significant"){
+extract_results_bGWAS <- function(obj, SNPs="significant", results="BF"){
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
   if(!SNPs %in% c("all", "significant")) stop("SNPs : should be \"all\" or \"significant\".")
-
+  if(!results %in% c("BF", "posterior", "direct")) stop("results : should be \"BF\", \"posterior\" or \"direct\".")
+  
   if(SNPs=="all"){
     Res = obj$all_BFs
   } else {
-    if(length(obj$significant_SNPs)==0){
-      stop("You can't extract \"significant\" results , because the analysis has been limited to prior estimation", call. = F)
+    if(results=="BF"){
+      if(length(obj$significant_SNPs)==0){
+        stop("You can't extract \"significant\" results , there is no significant SNPs", call. = F)
+      }
+      Res = obj$all_BFs %>% filter(.data$rsid %in% obj$significant_SNPs)
+    } else if(results=="posterior"){
+      if(length(obj$posterior_SNPs)==0){
+        stop("You can't extract \"significant\" results , there is no significant SNPs according to posterior p-value", call. = F)
+      }
+      Res = obj$all_BFs %>% filter(.data$rsid %in% obj$posterior_SNPs)
+    } else if(results=="direct"){
+      if(length(obj$direct_SNPs)==0){
+        stop("You can't extract \"significant\" results , there is no significant SNPs according to direct p-value", call. = F)
+      }
+      Res = obj$all_BFs %>% filter(.data$rsid %in% obj$direct_SNPs)
     }
-    Res = obj$all_BFs %>% filter(.data$rsid %in% obj$significant_SNPs)
   }
-
+  
+  if(results=="BF"){
+    Res %>%
+      select(.data$rsid, .data$chrm_UK10K, .data$pos_UK10K, .data$alt, .data$ref, .data$z_obs,
+             .data$mu_prior_estimate, .data$mu_prior_std_error, .data$BF, .data$BF_p, 
+             if("BF_fdr" %in% names(.data$.)) .data$BF_fdr else NULL) -> Res
+  } else if(results=="posterior"){
+    Res %>%
+      select(.data$rsid, .data$chrm_UK10K, .data$pos_UK10K, .data$alt, .data$ref, .data$z_obs,
+             .data$mu_posterior_estimate, .data$mu_posterior_std_error, .data$z_posterior, .data$p_posterior, 
+             if("fdr_posterior" %in% names(.data$.)) .data$fdr_posterior else NULL) -> Res
+  } else if(results=="direct"){
+    Res %>%
+      select(.data$rsid, .data$chrm_UK10K, .data$pos_UK10K, .data$alt, .data$ref, .data$z_obs,
+             .data$mu_direct_estimate, .data$mu_direct_std_error, .data$z_direct, .data$p_direct, 
+             if("fdr_direct" %in% names(.data$.)) .data$fdr_direct else NULL) -> Res
+  }
+  
+  
   return(Res)
 }
 

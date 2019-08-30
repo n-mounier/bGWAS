@@ -196,8 +196,10 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, GWASData, r
              ((.data$mu_prior_estimate/.data$mu_prior_std_error**2) + .data$z_obs),
            mu_posterior_std_error = sqrt(.data$mu_prior_std_error**2/
                                            (.data$mu_prior_std_error**2+1)),
+           z_posterior = .data$mu_posterior_estimate/.data$mu_posterior_std_error,
            mu_direct_estimate = (.data$z_obs - .data$mu_prior_estimate),
-           mu_direct_std_error = sqrt(1 + .data$mu_prior_std_error**2)) -> Results
+           mu_direct_std_error = sqrt(1 + .data$mu_prior_std_error**2),
+           z_direct = .data$mu_direct_estimate/.data$mu_direct_std_error) -> Results
 
   
   # if rescaling

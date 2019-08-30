@@ -284,6 +284,50 @@ request_BFandP <- function(Prior, sign_thresh, use_permutations = F,
   }
   
   
+  ### add p-values for posterior / direct effects
+  tmp = "# Estimating p-values for posterior effects... \n"
+  Log = update_log(Log, tmp, verbose)
+  
+  Prior %>%
+    mutate(p_posterior = 2 * pnorm(-abs(.data$z_posterior))) -> Prior
+  
+  
+  if(sign_method == "fdr"){
+    tmp = "# Estimating FDR (Benjamini-Hochberg procedure) for posterior effects... \n"
+    Log = update_log(Log, tmp, verbose)
+    
+    Prior %>%
+      mutate(fdr_posterior = stats::p.adjust(.data$p_posterior)) -> Prior
+    
+    
+  }
+  
+  
+  tmp = "Done! \n"
+  Log = update_log(Log, tmp, verbose)
+  
+  tmp = "# Estimating p-values for direct effects... \n"
+  Log = update_log(Log, tmp, verbose)
+  
+  Prior %>%
+    mutate(p_direct = 2 * pnorm(-abs(.data$z_direct))) -> Prior
+  
+  
+  if(sign_method == "fdr"){
+    tmp = "# Estimating FDR (Benjamini-Hochberg procedure) for direct effects... \n"
+    Log = update_log(Log, tmp, verbose)
+    
+    Prior %>%
+      mutate(fdr_direct = stats::p.adjust(.data$p_direct)) -> Prior
+    
+    
+  }
+  
+  
+  tmp = "Done! \n"
+  Log = update_log(Log, tmp, verbose)
+  
+  
   
   if(save_files){
     system("rm Prior.csv")

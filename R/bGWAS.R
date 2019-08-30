@@ -526,6 +526,8 @@ bGWAS <- function(name,
   results=list()
   results$log_info = log_info
   results$significant_SNPs = Results$SNPs
+  results$posterior_SNPs = Results$posterior
+  results$direct_SNPs = Results$direct
   results$all_BFs = PriorWithBF$SNPs
   results$significant_studies = res_MR$coeffs
   results$all_MRcoeffs = Prior$all_coeffs

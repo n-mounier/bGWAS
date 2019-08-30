@@ -19,6 +19,13 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
   if(!sign_method %in% c("p", "fdr")) stop("method not accepted",  call. = FALSE)
   if(!is.numeric(sign_thresh)) stop("non numeric threshold",  call. = FALSE)
   
+  
+  
+  #### BFs ####
+  tmp = "Identification based on BFs \n"
+  Log = update_log(Log, tmp, verbose)
+  
+  
   tmp = paste0("   Starting with ", format(nrow(Prior), big.mark = ",", scientific = F), " SNPs \n")
   Log = update_log(Log, tmp, verbose)
   
@@ -93,6 +100,174 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
   }
   
   
+  BF_SNPs = pull(PriorThr, .data$rsid)
+  
+  
+  #### posterior ####
+  tmp = "Identification based on posterior effects \n"
+  Log = update_log(Log, tmp, verbose)
+  
+  
+  tmp = paste0("   Starting with ", format(nrow(Prior), big.mark = ",", scientific = F), " SNPs \n")
+  Log = update_log(Log, tmp, verbose)
+  
+  
+  if(sign_method == "fdr"){
+    tmp = "# Selecting significant SNPs according to FDR (Benjamini-Hochberg procedure)... \n"
+    Log = update_log(Log, tmp, verbose)
+  
+    
+    Prior %>%
+      filter(.data$fdr_posterior<sign_thresh) -> PriorThr
+    
+    tmp = paste0(format(nrow(PriorThr), big.mark = ",", scientific = F), " SNPs left \n")
+    Log = update_log(Log, tmp, verbose)
+    
+    
+    
+    tmp = "Done! \n"
+    Log = update_log(Log, tmp, verbose)
+    
+  }
+  
+  if(sign_method == "p"){
+    tmp = "# Selecting significant SNPs according to p-values... \n"
+    Log = update_log(Log, tmp, verbose)
+    
+    
+    Prior %>%
+      filter(.data$p_posterior<sign_thresh) -> PriorThr
+    
+    tmp = paste0(format(nrow(PriorThr), big.mark = ",", scientific = F), " SNPs left \n")
+    Log = update_log(Log, tmp, verbose)
+    
+    
+    tmp = "Done! \n"
+    Log = update_log(Log, tmp, verbose)
+    
+  }
+  
+  
+  
+  # pruning results only if res_pruning_dist!=0
+  if(!is.null(res_pruning_dist)){
+    tmp = "# Pruning significant SNPs... \n"
+    Log = update_log(Log, tmp, verbose)
+    # create rsid, chr, pos, p data.frame (all columns renamed in tidyinput, ok to use rsid directly)
+    PriorThr %>% 
+      transmute(SNP = .data$rsid,
+                chr_name = .data$chrm_UK10K,
+                chr_start = .data$pos_UK10K,
+                pval.exposure = .data$p_posterior) ->ToPrune 
+    if(res_pruning_LD>0){# LD-pruning
+      tmp = paste0("   distance : ", res_pruning_dist, "Kb", " - LD threshold : ", res_pruning_LD, "\n")
+      Log = update_log(Log, tmp, verbose)
+      # Do pruning, chr by chr
+      SNPsToKeep = c()
+      for(chr in unique(ToPrune$chr_name)){
+        SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = res_pruning_dist, clump_r2 = res_pruning_LD)$SNP))
+      }
+    } else {# distance pruning
+      tmp = paste0("   distance : ", res_pruning_dist, "Kb \n")
+      Log = update_log(Log, tmp, verbose)
+      SNPsToKeep = prune_byDistance(ToPrune, prune.dist=res_pruning_dist, byP=T)
+    }
+    PriorThr %>%
+      filter(.data$rsid %in% SNPsToKeep) -> PriorThr
+    
+    tmp = paste0(format(nrow(PriorThr), big.mark = ",", scientific = F), " SNPs left \n")
+    Log = update_log(Log, tmp, verbose)
+    
+    tmp = "Done! \n"
+    Log = update_log(Log, tmp, verbose)
+  }
+  
+  
+  posterior_SNPs = pull(PriorThr, .data$rsid)
+  
+  
+  #### direct ####
+  tmp = "Identification based on direct effects \n"
+  Log = update_log(Log, tmp, verbose)
+  
+  
+  tmp = paste0("   Starting with ", format(nrow(Prior), big.mark = ",", scientific = F), " SNPs \n")
+  Log = update_log(Log, tmp, verbose)
+  
+  
+  if(sign_method == "fdr"){
+    tmp = "# Selecting significant SNPs according to FDR (Benjamini-Hochberg procedure)... \n"
+    Log = update_log(Log, tmp, verbose)
+    
+    
+    Prior %>%
+      filter(.data$fdr_direct<sign_thresh) -> PriorThr
+    
+    tmp = paste0(format(nrow(PriorThr), big.mark = ",", scientific = F), " SNPs left \n")
+    Log = update_log(Log, tmp, verbose)
+    
+    
+    
+    tmp = "Done! \n"
+    Log = update_log(Log, tmp, verbose)
+    
+  }
+  
+  if(sign_method == "p"){
+    tmp = "# Selecting significant SNPs according to p-values... \n"
+    Log = update_log(Log, tmp, verbose)
+    
+    
+    Prior %>%
+      filter(.data$p_direct<sign_thresh) -> PriorThr
+    
+    tmp = paste0(format(nrow(PriorThr), big.mark = ",", scientific = F), " SNPs left \n")
+    Log = update_log(Log, tmp, verbose)
+    
+    
+    tmp = "Done! \n"
+    Log = update_log(Log, tmp, verbose)
+    
+  }
+  
+  
+  
+  # pruning results only if res_pruning_dist!=0
+  if(!is.null(res_pruning_dist)){
+    tmp = "# Pruning significant SNPs... \n"
+    Log = update_log(Log, tmp, verbose)
+    # create rsid, chr, pos, p data.frame (all columns renamed in tidyinput, ok to use rsid directly)
+    PriorThr %>% 
+      transmute(SNP = .data$rsid,
+                chr_name = .data$chrm_UK10K,
+                chr_start = .data$pos_UK10K,
+                pval.exposure = .data$p_direct) ->ToPrune 
+    if(res_pruning_LD>0){# LD-pruning
+      tmp = paste0("   distance : ", res_pruning_dist, "Kb", " - LD threshold : ", res_pruning_LD, "\n")
+      Log = update_log(Log, tmp, verbose)
+      # Do pruning, chr by chr
+      SNPsToKeep = c()
+      for(chr in unique(ToPrune$chr_name)){
+        SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = res_pruning_dist, clump_r2 = res_pruning_LD)$SNP))
+      }
+    } else {# distance pruning
+      tmp = paste0("   distance : ", res_pruning_dist, "Kb \n")
+      Log = update_log(Log, tmp, verbose)
+      SNPsToKeep = prune_byDistance(ToPrune, prune.dist=res_pruning_dist, byP=T)
+    }
+    PriorThr %>%
+      filter(.data$rsid %in% SNPsToKeep) -> PriorThr
+    
+    tmp = paste0(format(nrow(PriorThr), big.mark = ",", scientific = F), " SNPs left \n")
+    Log = update_log(Log, tmp, verbose)
+    
+    tmp = "Done! \n"
+    Log = update_log(Log, tmp, verbose)
+  }
+  
+  
+  direct_SNPs = pull(PriorThr, .data$rsid)
+  
   
   
   if(save_files){
@@ -109,7 +284,9 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
   
   res=list()
   res$log_info = Log
-  res$SNPs = pull(PriorThr, .data$rsid)
+  res$SNPs = BF_SNPs
+  res$posterior= posterior_SNPs
+  res$direct = direct_SNPs
   res$mat = Matrix_Heatmap
   return(res)
 }
