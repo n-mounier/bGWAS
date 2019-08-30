@@ -222,6 +222,7 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, GWASData, r
   
   # add UK10K chr/pos data.frame for SNPs that are kept
   All_ZMatrix %>%
+    slice(match(Results$rsid, .data$rs)) %>%
     transmute(chrm_UK10K=.data$chrm, 
            pos_UK10K=.data$pos) -> ChrPos
   bind_cols(ChrPos, Results) -> Results
