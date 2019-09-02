@@ -36,9 +36,7 @@ should be between 2 and 8, \code{default=3} (numeric)}
 (if 0, distance-based pruning is used), \code{default=0} (numeric)}
 
 \item{MR_shrinkage}{The p-value threshold used for shrinkage before performing MR, should be between
-\code{MR_threshold} and 1 (no shrinkage), \code{default=1} (numeric)
-#' @param prior_shrinkage The p-value threshold used for shrinkage before calculating the prior,
-should be between \code{MR_threshold} and 1, \code{default=1e-5} (numeric)}
+\code{MR_threshold} and 1 (no shrinkage), \code{default=1} (numeric)}
 
 \item{stepwise_threshold}{The p-value threshold used for inclusion/exclusion of Prior GWASs during the
 stepwise selection approach, should be between 0.05 and 0.0005, \code{default=NULL} will use 0.05 
