@@ -80,7 +80,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWASData, GName,
   # DO NOT USE THE LAST COLUMN!!
   ZMatrix %>%
     filter_at(vars(-c(1:5,as.numeric(ncol(ZMatrix)))), 
-              any_vars(abs(.) > Zlimit)) -> ZMatrix
+              any_vars(abs(.data$.) > Zlimit)) -> ZMatrix
   
   
   tmp = paste0(format(nrow(ZMatrix), big.mark = ",", scientific = F), " SNPs left after thresholding \n")
@@ -90,9 +90,9 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWASData, GName,
   # check that each study have at least two SNPs surviving pruning+thresholding
   ZMatrix %>%
     select(-c(1:5,as.numeric(ncol(ZMatrix)))) %>%
-    apply(., 2, function(col){
-      sum(abs(col)>Zlimit)>=MR_ninstruments}) -> StudiesToKeep
-  
+    apply(MARGIN = 2, FUN = function(col){
+      sum(abs(col)>Zlimit)>=MR_ninstruments})  -> StudiesToKeep
+
   
   if(!all(StudiesToKeep)){
     ZMatrix  %>%
@@ -122,7 +122,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWASData, GName,
   
   ZMatrix %>%
     select(-c(1:5,as.numeric(ncol(ZMatrix)))) %>%
-    apply(., 1, function(row){
+    apply(MARGIN = 1, FUN = function(row){
       max(abs(row))}) -> maxZ
  
   
@@ -161,7 +161,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWASData, GName,
   # check that each study have at least MR_ninstruments SNPs surviving pruning+thresholding
   ZMatrixPruned %>%
     select(-c(1:5,as.numeric(ncol(ZMatrixPruned)))) %>%
-    apply(., 2, function(col){
+    apply(MARGIN = 2, FUN = function(col){
       sum(abs(col)>Zlimit)>=MR_ninstruments}) -> StudiesToKeep
     
   
@@ -189,7 +189,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWASData, GName,
   # Further checking of the SNPs to remove SNPs associated with studies removed because only one SNP
   ZMatrixPruned %>%
     select(-c(1:5,as.numeric(ncol(ZMatrixPruned)))) %>%
-    apply(., 1, function(row){
+    apply(MARGIN = 1, FUN = function(row){
       any(abs(row)>Zlimit)}) -> SNPsToKeep  
   
     
@@ -204,8 +204,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWASData, GName,
 
   push_extreme_zs_back_a_little_towards_zero <- function(d) { # Some z-scores are just too far from zero
     maxAllowed_z = abs(stats::qnorm(1e-300 / 2)) # p=1e-300 is the max allowed now, truncate z-scores accordingly
-    names(d) %>% 
-      .[!. %in% c("rs","chrm","pos","alt","ref")] -> studies_here
+    names(d)[!names(d) %in% c("rs","chrm","pos","alt","ref")] -> studies_here
     for(n in studies_here) {
       d %>%
         mutate(!!n := case_when(
@@ -223,8 +222,7 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWASData, GName,
   
   # Set the z-scores to 0 for the regression if shrinkage
   if(MR_shrinkage < 1.0) {
-    names(ZMatrixPruned) %>% 
-      .[!. %in% c('rs','chrm','pos','alt','ref', GName)] -> Prior_study_names
+    names(ZMatrixPruned)[!names(ZMatrixPruned) %in% c('rs','chrm','pos','alt','ref', GName)] -> Prior_study_names
     threshold = abs(stats::qnorm(MR_shrinkage/2))
     for(column_of_zs in Prior_study_names) { 
       ZMatrixPruned %>%

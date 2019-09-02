@@ -72,8 +72,7 @@ makeFull_ZMatrix <- function(studies=NULL, GWASData, GName,  Z_matrices="~/Z_mat
   
   push_extreme_zs_back_a_little_towards_zero <- function(d) { # Some z-scores are just too far from zero
     maxAllowed_z = abs(stats::qnorm(1e-300 / 2)) # p=1e-300 is the max allowed now, truncate z-scores accordingly
-    names(d) %>% 
-      .[!. %in% c("rs","chrm","pos","alt","ref")] -> studies_here
+    names(d)[!names(d) %in% c("rs","chrm","pos","alt","ref")] -> studies_here
     for(n in studies_here) {
       d %>%
         mutate(!!n := case_when(
@@ -93,8 +92,7 @@ makeFull_ZMatrix <- function(studies=NULL, GWASData, GName,  Z_matrices="~/Z_mat
   
   # Set the z-scores to 0 for the regression if shrinkage
   if(prior_shrinkage < 1.0) {  
-    names(ZMatrix) %>% 
-      .[!. %in% c('rs','chrm','pos','alt','ref', GName)] -> Prior_study_names
+    names(ZMatrix)[!names(ZMatrix) %in% c('rs','chrm','pos','alt','ref', GName)] -> Prior_study_names
     threshold = abs(stats::qnorm(prior_shrinkage/2))
     for(column_of_zs in Prior_study_names) { 
       ZMatrix %>%
