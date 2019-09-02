@@ -196,7 +196,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
     # keep only our studies
     ZMatrix %>%
       select(-non_significant_studies) %>%
-      get_Instruments(., Zlimit) -> ZMatrix_subset
+      get_Instruments(Zlim=Zlimit) -> ZMatrix_subset
     
     ## RUN MODEL - with studies already included
     tmp="#Run model \n"
@@ -223,11 +223,10 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
       test_formula = generate_Formula(my_outcome, 
                                       c(significant_studies, one_to_add))
       # keep only our studies
-      studies_to_test %>%
-        .[!. %in% one_to_add] -> studies_not_used 
+      studies_to_test[!studies_to_test %in% one_to_add] -> studies_not_used 
       ZMatrix %>%
         select(-studies_not_used) %>%
-        get_Instruments(., Zlimit) -> ZMatrix_test
+        get_Instruments(Zlim=Zlimit) -> ZMatrix_test
       
       ## RUN MODEL
       model_test = stats::lm(data=ZMatrix_test, formula = test_formula) 
@@ -253,8 +252,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
         tmp = paste0("Study :", get_names(study_to_add, Z_matrices), " cannot be added, direction is not consistent between univariate and multivariate model.\n")
         Log = update_log(Log, tmp, verbose)
         
-        studies_to_test %>%
-          .[!. == study_to_add] -> studies_to_test
+        studies_to_test[!studies_to_test == study_to_add] -> studies_to_test
         
         if(save_files){ # add Status : AIC exclusion
           Files_Info$status[Files_Info$File %in% study_to_add] = "Excluded during forward selection (unconsistent direction)"
@@ -295,7 +293,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
     # keep only our studies
     ZMatrix %>% 
       select(-non_significant_studies) %>%
-      get_Instruments(., Zlimit) -> ZMatrix_subset
+      get_Instruments(Zlim=Zlimit) -> ZMatrix_subset
     
     
     ## RUN MODEL
@@ -322,16 +320,15 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
       no_change = F
       
       coefs %>%
-        pull(.data$nm) %>%
-        .[1] -> study_to_remove 
+        pull(.data$nm) -> st
+      st[1] -> study_to_remove 
       
       steps=rbind(steps, data.frame(Direction="-", Study=study_to_remove))
       
       tmp = paste0("Excluding one study :", get_names(study_to_remove, Z_matrices), " \n")
       Log = update_log(Log, tmp, verbose)
       
-      significant_studies %>%
-        .[!. %in% study_to_remove] -> significant_studies
+      significant_studies[!significant_studies %in% study_to_remove] -> significant_studies
       non_significant_studies = c(non_significant_studies,study_to_remove)
       studies_to_test = c(studies_to_test, study_to_remove)
       
@@ -375,7 +372,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
   
   ZMatrix %>% 
     select(1:5, significant_studies, ncol(ZMatrix)) %>%
-    get_Instruments(., Zlimit) -> ZMatrix_final
+    get_Instruments(Zlim=Zlimit) -> ZMatrix_final
   myFormula_final = generate_Formula(my_outcome, significant_studies)
   
   stats::lm(data=ZMatrix_final, formula = myFormula_final)  %>%
@@ -404,8 +401,8 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
   Log = update_log(Log, tmp, verbose)
   
   stats::lm(data=ZMatrix_final, formula = myFormula_final)  %>%
-    summary %>%
-    .["adj.r.squared"] %>% 
+    summary -> summary_lm
+  summary_lm["adj.r.squared"] %>% 
     as.numeric() -> R2_Multi 
   
   tmp = paste0("- in-sample adjusted R-squared for the all-chromosomes multivariate regression is ", round(R2_Multi,4), " \n")
