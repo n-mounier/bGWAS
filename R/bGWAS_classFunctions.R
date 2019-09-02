@@ -184,7 +184,7 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
                    yaxp  = c(0, 
                              ifelse(nrow(SuperSignif)>1, 20, ceiling(-log10(min(ToPlot$p)))), 
                              ifelse(nrow(SuperSignif)>1, 4, 5)))
-  abline(h=1.3, lwd=2)
+  graphics::abline(h=1.3, lwd=2)
   
   if(nrow(SuperSignif)>0){
     ToPlot %>%
@@ -213,7 +213,7 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
     
     SuperSignif$x = apply(SuperSignif, 1, function(x) get_posx(x, all))
     
-    points(x=SuperSignif$x, y=SuperSignif$y, col="blue")
+    graphics::points(x=SuperSignif$x, y=SuperSignif$y, col="blue")
   }
 
 
@@ -325,8 +325,8 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
 
   # use with to deal with R CMD check (because Trait / Estimate are not defined)
   P= ggplot2::ggplot(data=coeffs, ggplot2::aes(x=.data$Trait, y=.data$estimate,
-                     ymin=Lower,
-                     ymax=Upper)) +
+                     ymin=.data$Lower,
+                     ymax=.data$Upper)) +
 
    ggplot2::geom_hline(yintercept=0, lty=2) +  # add a dotted line at x=0 after flip
 
