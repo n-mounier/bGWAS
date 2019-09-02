@@ -47,7 +47,7 @@ request_BFandP <- function(Prior, sign_thresh, use_permutations = F,
     nrow(Prior) -> N.one.set.of.nulls
     
     # Function to count how many larger BF were observed in the simulation
-    Rcpp::cppFunction(' IntegerVector count_larger(NumericVector real, NumericVector null) {
+    count_larger <- Rcpp::cppFunction(' IntegerVector count_larger(NumericVector real, NumericVector null) {
                       int N_real = real.size();
                       int N_null = null.size();
                       // both files are in descending order. Make use of this
@@ -61,7 +61,7 @@ request_BFandP <- function(Prior, sign_thresh, use_permutations = F,
                       result.at(i) = j;
                       }
                       return result;
-  } ')
+  } ', env=NULL)
     
     
     
@@ -90,23 +90,20 @@ request_BFandP <- function(Prior, sign_thresh, use_permutations = F,
       # simulate z-score from normal distribution
       # ... but this does not account for the real "true distribution" (inflation?)
       # should we shuffle z-scores instead?
-      # Prior$z <-   rnorm(nrow(Prior), 0, 1)
-      Prior$z <- Prior$z_obs[sample(1:nrow(Prior))]
+      Prior %>%
+        mutate(z = stats::rnorm(N.one.set.of.nulls, 0, 1),
+               BF.null =  stats::dnorm(mean= .data$mu_prior_estimate, 
+                                    sd=sqrt(1+.data$mu_prior_std_error**2), 
+                                    x=.data$z) /
+                 stats::dnorm(mean= 0.0, 
+                              sd=sqrt(1),
+                              x=.data$z)) %>%
+        arrange(desc(.data$BF.null))-> Prior_BF
+     
       
-      Prior$BF.null =  stats::dnorm(mean= Prior$mu_prior_estimate, 
-                                    sd=sqrt(1+Prior$mu_prior_std_error**2), 
-                                    x=Prior$z) /
-        stats::dnorm(mean= 0.0, 
-                     sd=sqrt(1),
-                     x=Prior$z)
-      
-      TempP = Prior[order(-Prior$BF.null),]
-      nullbf = TempP$BF.nul
-      
-      N = length(nullbf)
-      
-      stopifnot(N == N.one.set.of.nulls)
-      #(!is.unsorted(-nullbf)) %|%stopifnot
+      Prior_BF %>%
+        pull(.data$BF.null) -> nullbf
+
       
       count_larger(Prior$BF, nullbf) -> counts
       stopifnot(length(counts) == nrow(Prior))
@@ -124,7 +121,7 @@ request_BFandP <- function(Prior, sign_thresh, use_permutations = F,
     Prior$z = NULL
     Prior$BF.null = NULL
     
-    Prior$BF_P = (running.total+1) / full.number.of.nulls.for.comparison
+    Prior$BF_p = (running.total+1) / full.number.of.nulls.for.comparison
     
     
   } else {
@@ -336,8 +333,6 @@ request_BFandP <- function(Prior, sign_thresh, use_permutations = F,
     Log = update_log(Log, tmp, verbose)
     
   }
-  tmp = "Done! \n"
-  Log = update_log(Log, tmp, verbose)
   
   
   
