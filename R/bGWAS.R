@@ -21,11 +21,9 @@
 #'        \code{default=500} (numeric)
 #' @param MR_pruning_LD The LD threshold used for pruning MR instruments, should be between 0 and 1
 #'        (if 0, distance-based pruning is used), \code{default=0} (numeric)
-#' @param prior_shrinkage The p-value threshold used for shrinkage before calculating the prior,
-#'        should be between \code{MR_threshold} and 1, \code{default=1e-5} (numeric)
 #' @param MR_shrinkage The p-value threshold used for shrinkage before performing MR, should be between
 #'        \code{MR_threshold} and 1 (no shrinkage), \code{default=1} (numeric)
-#'        #' @param prior_shrinkage The p-value threshold used for shrinkage before calculating the prior,
+#' @param prior_shrinkage The p-value threshold used for shrinkage before calculating the prior,
 #'        should be between \code{MR_threshold} and 1, \code{default=1e-5} (numeric)
 #' @param stepwise_threshold The p-value threshold used for inclusion/exclusion of Prior GWASs during the
 #'        stepwise selection approach, should be between 0.05 and 0.0005, \code{default=NULL} will use 0.05 
@@ -172,6 +170,7 @@ bGWAS <- function(name,
   
 
   #  if the directory already exists : error (only is save_files==T)
+  if(!is.logical(save_files)) stop("save_files : should be logical", call. = FALSE)
   if(save_files){
     ### the directory to store the results ###
     Dir = file.path(InitPath, name)
@@ -218,7 +217,6 @@ bGWAS <- function(name,
   log_info = update_log(log_info, tmp, verbose)
   
   ## save_files
-  if(!is.logical(save_files)) stop("save_files should be logical", call. = FALSE)
   if(save_files){
     tmp = paste0("Files will be saved in: \"", file.path(InitPath,  name), "\".  \n")
     log_info = update_log(log_info, tmp, verbose)
@@ -229,6 +227,7 @@ bGWAS <- function(name,
   # check that all the files required exist in our list of studies
   # should be specified as "File ID"
   if(is.null(prior_studies)) prior_studies = c(1:length(list_files(Z_matrices = Z_matrices)))
+  if(!is.numeric(prior_studies)) stop("prior_studies : should be numeric if not NULL", call. = FALSE)
   if(!all(prior_studies %in% c(1:length(list_files(Z_matrices = Z_matrices))))) stop("prior_studies : all the IDs provided should belong to the ones available", call. = FALSE)
   # if GWAS from data, make sure to remove it + the studies using the same trait!!!
   if(is.numeric(GWAS) && GWAS %in% prior_studies){
@@ -269,7 +268,7 @@ bGWAS <- function(name,
   
   ## MR_threshold -> should not be larger than 10-5, can only be more stringent
   if(!is.numeric(MR_threshold)) stop("MR_threshold : non-numeric argument", call. = FALSE)
-  if(MR_threshold>10^5) stop("MR_threshold : superior to the threshold limit (10^-5)", call. = FALSE)
+  if(MR_threshold>10^-5) stop("MR_threshold : superior to the threshold limit (10^-5)", call. = FALSE)
   
   tmp = paste0("The p-value threshold used for selecting MR instruments is: ", format(MR_threshold, scientific = T), ".  \n")
   log_info = update_log(log_info, tmp, verbose)
@@ -296,6 +295,7 @@ bGWAS <- function(name,
   ## MR_pruning_LD
   if(!is.numeric(MR_pruning_LD)) stop("MR_pruning_LD : non-numeric argument", call. = FALSE)
   if(MR_pruning_LD<0) stop("MR_pruning_LD : should be positive", call. = FALSE)
+  if(MR_pruning_LD>1) stop("MR_pruning_LD : should not be larger than 1", call. = FALSE)
   
   if(MR_pruning_LD>0){
     tmp = paste0("The LD threshold used for pruning MR instruments is: ",MR_pruning_LD, ".  \n")
@@ -329,7 +329,7 @@ bGWAS <- function(name,
     tmp = paste0("The p-value threshold used for stepwise selection is ", format(stepwise_threshold, scientific = F), ".  \n")
     log_info = update_log(log_info, tmp, verbose)
   } else{
-    stop("stepwise_threshold : should not numeric or NULL", call. = FALSE)
+    stop("stepwise_threshold : should be numeric or NULL", call. = FALSE)
   }
   
   
@@ -349,11 +349,13 @@ bGWAS <- function(name,
   
   
   ## sign_method -> should not be "p" or "fdr"
-  if(!sign_method %in% c("p", "fdr")) stop("sign_method : method not accepted, should be p or fdr", call. = FALSE)
+  if(!sign_method %in% c("p", "fdr")) stop("sign_method : method not accepted, should be \"p\" or \"fdr\"", call. = FALSE)
   
   ## sign_thresh -> should be numeric and lower (or equal) to 1
-  if(!is.numeric(sign_thresh)) stop("sign_thresh : non numeric threshold", call. = FALSE)
+  if(!is.numeric(sign_thresh)) stop("sign_thresh : non numeric argument", call. = FALSE)
   if(sign_thresh>1) stop("sign_thresh : a threshold higher than 1 does not make sense", call. = FALSE)
+  if(sign_thresh<0) stop("sign_thresh : should be positive", call. = FALSE)
+  
   
   if(sign_method=="p"){
     tmp = paste0("Significant SNPs will be identified according to p-value. The threshold used is :",
@@ -381,6 +383,8 @@ bGWAS <- function(name,
     ## res_pruning_LD
     if(!is.numeric(res_pruning_LD)) stop("res_pruning_LD : non-numeric argument", call. = FALSE)
     if(res_pruning_LD<0) stop("res_pruning_LD : should be positive", call. = FALSE)
+    if(res_pruning_LD>1) stop("res_pruning_LD : should not be larger than 1", call. = FALSE)
+    
     
     if(res_pruning_LD>0){
       tmp = paste0("The LD threshold used for pruning results is: ", res_pruning_LD, ".  \n")
