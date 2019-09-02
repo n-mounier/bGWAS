@@ -161,7 +161,7 @@ request_BFandP <- function(Prior, sign_thresh, use_permutations = F,
       })
       Data %>%
         mutate(pSNP = tidyr::replace_na(.data$pSNP, 1)) %>%  # if NA -> replace by 1, that means that the polynome has no real solution and Pr(allBF>BF)=1
-        summarize(mean(.data$pSNP)) -> p # here, we use all the prior values, so we can use an unweighted mean
+        summarize(mean(.data$pSNP)) %>% as.numeric() -> p # here, we use all the prior values, so we can use an unweighted mean
       return(p)
     }
     
