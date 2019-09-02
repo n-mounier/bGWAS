@@ -182,6 +182,9 @@ bGWAS <- function(name,
   
   ## ZMatrices
   if (is.character(Z_matrices)){
+    
+    if(!dir.exists(Z_matrices)) stop("Z_matrices : the folder do not exist", call. = FALSE)
+    
     # get absolute path
     Z_matrices = normalizePath(Z_matrices)
     
@@ -268,7 +271,7 @@ bGWAS <- function(name,
   
   ## MR_threshold -> should not be larger than 10-5, can only be more stringent
   if(!is.numeric(MR_threshold)) stop("MR_threshold : non-numeric argument", call. = FALSE)
-  if(MR_threshold>10^-5) stop("MR_threshold : superior to the threshold limit (10^-5)", call. = FALSE)
+  if(MR_threshold>10^-5) stop("MR_threshold : superior to the threshold limit", call. = FALSE)
   
   tmp = paste0("The p-value threshold used for selecting MR instruments is: ", format(MR_threshold, scientific = T), ".  \n")
   log_info = update_log(log_info, tmp, verbose)
@@ -352,7 +355,7 @@ bGWAS <- function(name,
   if(!sign_method %in% c("p", "fdr")) stop("sign_method : method not accepted, should be \"p\" or \"fdr\"", call. = FALSE)
   
   ## sign_thresh -> should be numeric and lower (or equal) to 1
-  if(!is.numeric(sign_thresh)) stop("sign_thresh : non numeric argument", call. = FALSE)
+  if(!is.numeric(sign_thresh)) stop("sign_thresh : non-numeric argument", call. = FALSE)
   if(sign_thresh>1) stop("sign_thresh : a threshold higher than 1 does not make sense", call. = FALSE)
   if(sign_thresh<0) stop("sign_thresh : should be positive", call. = FALSE)
   
