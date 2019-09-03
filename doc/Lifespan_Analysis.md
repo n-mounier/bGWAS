@@ -431,6 +431,18 @@ heatmap_bGWAS(Lifespan_bGWAS)
 
 <img src="LifespanAnalysis/Lifespan_v1.0.0-results4-1.png" width="100%" />
 
+FIX SIZE OF LABELS : NOT ALL SNPs RSIDS ARE PLOT, NOTHING IS
+ALIGNED\!\!\!\!
+
+Some traits have gigher contribution to prior effects in general
+(everything except height and T2D). Overall, lot of red (makes sense,
+SNPs aligned to be life-lengthening). Still, some SNPs with large
+contribution of one trait -\> can compensate smaller contributions in
+the other direction for other traits. And some SNPs with small effect
+(in the right direction) on most of the traits (pleiotropic).  
+\+ look at the significant negative effect on LDL (compensated by a
+significant positive effect on BP)
+
 ## Results - Direct Effects
 
 We can use direct effects to identify SNPs significantly acting on
@@ -446,5 +458,5 @@ knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, results="direct")  %>% mutate
 | rs55730499 |           6 |  161005610 | T   | C   | \-10.25780 |           \-8.534113 |               1.495823 | \-5.705294 | 1.161422e-08 |
 | rs8042849  |          15 |   78817929 | T   | C   |   10.65939 |            10.548993 |               1.474818 |   7.152742 | 8.506164e-13 |
 
-Among these hits…: Not APOE (or CHRNA, but smoking not used so makes
-sense?) … needs to be looked at a bit more\!
+APOE (highly pleiotropic, not capturing everything) + CHRNA (smoking not
+included) + LPA (?)

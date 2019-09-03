@@ -77,9 +77,15 @@ knitr::kable(NEW %>% mutate(BF_p=as.character(format(BF_p, scientific=T))))
 manhattan_plot_bGWAS(Lifespan_bGWAS)
 ```
 
+
 ```{r results4, dpi=300}
 heatmap_bGWAS(Lifespan_bGWAS)
 ```
+
+FIX SIZE OF LABELS : NOT ALL SNPs RSIDS ARE PLOT, NOTHING IS ALIGNED!!!!
+
+Some traits have gigher contribution to prior effects in general (everything except height and T2D). Overall, lot of red (makes sense, SNPs aligned to be life-lengthening). Still, some SNPs with large contribution of one trait -> can compensate smaller contributions in the other direction for other traits. And some SNPs with small effect (in the right direction) on most of the traits (pleiotropic).    
++ look at the significant negative effect on LDL (compensated by a significant positive effect on BP)   
 
 
 ## Results - Direct Effects
@@ -91,7 +97,7 @@ We can use direct effects to identify SNPs significantly acting on lifespan inde
 knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, results="direct")  %>% mutate(p_direct=as.character(format(p_direct, scientific=T))))
 ```
 
-APOE (highly pleiotropic, not capturing everything) + CHRNA (smoking not included)    
+APOE (highly pleiotropic, not capturing everything) + CHRNA (smoking not included) + LPA (?)    
 
 
 
