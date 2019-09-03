@@ -9,7 +9,7 @@ Z-matrix files have already been downloaded and stored in
 described [here](../README.md).
 
 ``` r
-library(bGWAS)
+library(bGWAS) # bGWAS github version:
 
 # Download data to working directory (~460 MB) if not already here
 print(getwd())
@@ -34,7 +34,12 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
 
     ## <<< Preparation of analysis >>> 
     ## > Checking parameters 
-    ## The name of your analysis is: "Lifespan_Timmers2019". 
+    ## The name of your analysis is: "Lifespan_Timmers2019".
+
+    ## Registered S3 method overwritten by 'R.oo':
+    ##   method        from       
+    ##   throw.default R.methodsS3
+
     ## The Z-Matrix files are stored in "/Users/nmounier/ZMatrices".  
     ## # Preparation of the data... 
     ## The conventional GWAS used as input is: "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz".  
@@ -281,18 +286,41 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ## ... getting approximated p-values using non-linear quantiles  
     ## ... checking p-values near significance threshold  
     ##     everything is ok!  
+    ## # Estimating p-values for posterior effects... 
+    ## Done! 
+    ## # Estimating p-values for direct effects... 
+    ## Done! 
     ## Done! 
     ## > Pruning and identifying significant SNPs 
+    ## Identification based on BFs 
     ##    Starting with 6,513,704 SNPs 
     ## # Selecting significant SNPs according to p-values... 
     ## 795 SNPs left 
     ## Done! 
     ## # Pruning significant SNPs... 
     ##    distance : 500Kb 
-    ## 25 SNPs left 
+    ## 27 SNPs left 
+    ## Done! 
+    ## Identification based on posterior effects 
+    ##    Starting with 6,513,704 SNPs 
+    ## # Selecting significant SNPs according to p-values... 
+    ## 296 SNPs left 
+    ## Done! 
+    ## # Pruning significant SNPs... 
+    ##    distance : 500Kb 
+    ## 10 SNPs left 
+    ## Done! 
+    ## Identification based on direct effects 
+    ##    Starting with 6,513,704 SNPs 
+    ## # Selecting significant SNPs according to p-values... 
+    ## 91 SNPs left 
+    ## Done! 
+    ## # Pruning significant SNPs... 
+    ##    distance : 500Kb 
+    ## 3 SNPs left 
     ## Done! 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 36 minute(s) and 15 second(s).
+    ## Time of the analysis: 37 minute(s) and 1 second(s).
 
 We can look at the results more in details.
 
@@ -313,77 +341,83 @@ coefficients_plot_bGWAS(Lifespan_bGWAS)
 7 prior GWASs are used to create the prior, the multivariate causal
 effect estimates are consistent with what we would expect. On this
 figure, the multivariate causal effect estimate and the 95% interval
-from the multivariate MR model using all chromosomes (blac dot and bars)
-as well as the per-chromosome estimates (grey bars) are represented for
-each prior GWASs. Coronary Artery Disease (CAD) has the strongest
-negative effect on lifespan. High Diastolic Blood Pressure (DBP) and
-Body Mass Index (BMI) also decreases lifespan. We can also see that
-education, in this case the number of years of schooling, has a positive
-effect on lifespan.
+from the multivariate MR model using all chromosomes (black dot and
+bars) as well as the per-chromosome estimates (grey bars) are
+represented for each prior GWASs. Coronary Artery Disease (CAD) has the
+strongest negative effect on lifespan. High Diastolic Blood Pressure
+(DBP) and Body Mass Index (BMI) also decreases lifespan. We can also see
+that education, in this case the number of years of schooling, has a
+positive effect on lifespan.
 
 Overall, the squared correlation between prior and observed effects is
 about 0.04 and goes up to 0.369 when we consider only SNPs having at
 least a moderate effect on lifespan (observed p-value \< 0.001).
 
-With this approach, we identified
-`nrow(extract_results_bGWAS(Lifespan_bGWAS))`:
+## Results - BF
+
+With this approach, we identified 27:
 
 ``` r
 # all hits
-knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% transmute(rsid, chrm_UK10K, pos_UK10K, z_obs, mu_prior_estimate, mu_prior_std_error, z_obs, BF, BF_p=as.character(format(BF_p, scientific=T))))
+knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% mutate(BF_p=as.character(format(BF_p, scientific=T))))
 ```
 
-| rsid       | chrm\_UK10K | pos\_UK10K |     z\_obs | mu\_prior\_estimate | mu\_prior\_std\_error |           BF | BF\_p        |
-| :--------- | ----------: | ---------: | ---------: | ------------------: | --------------------: | -----------: | :----------- |
-| rs429358   |           1 |  226237618 |  19.327786 |           1.4769473 |              1.185686 | 1.467887e+52 | 2.704073e-80 |
-| rs10455872 |          10 |   37196047 |  10.281536 |           1.8779506 |              1.114773 | 8.741030e+15 | 3.528841e-26 |
-| rs8042849  |           3 |   13384532 |  10.659387 |           0.1103939 |              1.084015 | 2.480031e+13 | 1.298723e-22 |
-| rs11065979 |           4 |  137826792 | \-7.128082 |         \-1.6730147 |              1.131280 | 1.046698e+08 | 5.983488e-15 |
-| rs2891168  |           6 |   86929591 |   6.601322 |           1.9599063 |              1.148937 | 1.835130e+07 | 8.576140e-14 |
-| rs6511720  |           1 |  194047517 |   5.630731 |           3.3639409 |              1.203012 | 1.715581e+06 | 3.580849e-12 |
-| rs8039305  |           3 |   24197617 |   6.413708 |           1.2254351 |              1.092939 | 1.253924e+06 | 5.916490e-12 |
-| rs12924886 |           2 |  177100492 |   5.679317 |           2.2737479 |              1.092808 | 4.848462e+05 | 2.740447e-11 |
-| rs61348208 |          11 |  104415621 |   5.823361 |           1.4487778 |              1.082599 | 1.914917e+05 | 1.244648e-10 |
-| rs9393691  |           9 |   25616157 | \-5.570119 |         \-1.7169124 |              1.090056 | 1.241246e+05 | 2.533583e-10 |
-| rs6719980  |          15 |   67150296 | \-5.406948 |         \-2.0140965 |              1.117846 | 1.151044e+05 | 2.867957e-10 |
-| rs1230666  |          20 |   34088151 | \-5.804747 |         \-1.1755926 |              1.084836 | 1.023964e+05 | 3.476352e-10 |
-| rs646776   |          20 |   24777265 | \-4.907710 |         \-4.1174475 |              1.195173 | 9.585604e+04 | 3.875245e-10 |
-| rs56179563 |           8 |  123452475 |   5.190489 |           2.3991295 |              1.110002 | 8.276393e+04 | 4.935786e-10 |
-| rs1275922  |          15 |   97402291 | \-5.816777 |         \-0.5943870 |              1.095019 | 3.040337e+04 | 2.588792e-09 |
-| rs59234174 |           6 |   80328206 | \-5.127057 |         \-1.2962002 |              1.084586 | 1.188369e+04 | 1.239443e-08 |
-| rs6558008  |           7 |   39617245 | \-5.424368 |         \-0.7778364 |              1.083506 | 1.159131e+04 | 1.292187e-08 |
-| rs62477737 |           8 |   71432846 | \-5.269231 |         \-0.9908613 |              1.085216 | 1.083516e+04 | 1.446615e-08 |
-| rs66720652 |           4 |   58305294 | \-5.346728 |         \-0.8580309 |              1.081783 | 1.055530e+04 | 1.511394e-08 |
-| rs7742789  |           9 |   37523652 | \-5.299223 |         \-0.8823839 |              1.085563 | 9.642818e+03 | 1.758482e-08 |
-| rs10465231 |           6 |  128337016 | \-5.155534 |         \-0.9065802 |              1.085858 | 6.360363e+03 | 3.534545e-08 |
-| rs7599488  |          16 |   49438040 | \-4.662859 |         \-1.8924839 |              1.094489 | 6.194382e+03 | 3.695131e-08 |
-| rs12459965 |           1 |  201155236 |   4.425792 |           2.5662130 |              1.091147 | 5.499658e+03 | 4.513166e-08 |
-| rs2519093  |           6 |  170070135 | \-4.517091 |         \-2.1886219 |              1.111998 | 5.364198e+03 | 4.706506e-08 |
-| rs2297359  |          10 |   36687959 |   5.407404 |           0.4532031 |              1.080801 | 5.286313e+03 | 4.823741e-08 |
+| rsid       | chrm\_UK10K | pos\_UK10K | alt | ref |     z\_obs | mu\_prior\_estimate | mu\_prior\_std\_error |           BF | BF\_p        |
+| :--------- | ----------: | ---------: | :-- | :-- | ---------: | ------------------: | --------------------: | -----------: | :----------- |
+| rs429358   |          19 |   45411941 | T   | C   |  19.327786 |           1.4769473 |              1.185686 | 1.467887e+52 | 2.704073e-80 |
+| rs10455872 |           6 |  161010118 | A   | G   |  10.281536 |           1.8779506 |              1.114773 | 8.741030e+15 | 3.528841e-26 |
+| rs8042849  |          15 |   78817929 | T   | C   |  10.659387 |           0.1103939 |              1.084015 | 2.480031e+13 | 1.298723e-22 |
+| rs11065979 |          12 |  112059557 | T   | C   | \-7.128082 |         \-1.6730147 |              1.131280 | 1.046698e+08 | 5.983488e-15 |
+| rs2891168  |           9 |   22098619 | A   | G   |   6.601322 |           1.9599063 |              1.148937 | 1.835130e+07 | 8.576140e-14 |
+| rs11066188 |          12 |  112610714 | A   | G   | \-6.523571 |         \-1.2837670 |              1.130564 | 2.788541e+06 | 1.650703e-12 |
+| rs6511720  |          19 |   11202306 | T   | G   |   5.630731 |           3.3639409 |              1.203012 | 1.715581e+06 | 3.580849e-12 |
+| rs8039305  |          15 |   91422543 | T   | C   |   6.413708 |           1.2254351 |              1.092939 | 1.253924e+06 | 5.916490e-12 |
+| rs12924886 |          16 |   72075593 | A   | T   |   5.679317 |           2.2737479 |              1.092808 | 4.848462e+05 | 2.740447e-11 |
+| rs61348208 |           4 |    3089564 | T   | C   |   5.823361 |           1.4487778 |              1.082599 | 1.914917e+05 | 1.244648e-10 |
+| rs9393691  |           6 |   26272829 | T   | C   | \-5.570119 |         \-1.7169124 |              1.090056 | 1.241246e+05 | 2.533583e-10 |
+| rs6719980  |           2 |     651507 | T   | C   | \-5.406948 |         \-2.0140965 |              1.117846 | 1.151044e+05 | 2.867957e-10 |
+| rs1230666  |           1 |  114173410 | A   | G   | \-5.804747 |         \-1.1755926 |              1.084836 | 1.023964e+05 | 3.476352e-10 |
+| rs646776   |           1 |  109818530 | T   | C   | \-4.907710 |         \-4.1174475 |              1.195173 | 9.585604e+04 | 3.875245e-10 |
+| rs56179563 |           7 |  129685597 | A   | G   |   5.190489 |           2.3991295 |              1.110002 | 8.276393e+04 | 4.935786e-10 |
+| rs12302980 |          12 |  111360290 | A   | G   | \-5.750164 |         \-1.0021544 |              1.095870 | 6.086260e+04 | 8.197067e-10 |
+| rs1275922  |           2 |   26932887 | A   | G   | \-5.816777 |         \-0.5943870 |              1.095019 | 3.040337e+04 | 2.588792e-09 |
+| rs59234174 |           9 |   16730258 | T   | C   | \-5.127057 |         \-1.2962002 |              1.084586 | 1.188369e+04 | 1.239443e-08 |
+| rs6558008  |           8 |   27438306 | A   | C   | \-5.424368 |         \-0.7778364 |              1.083506 | 1.159131e+04 | 1.292187e-08 |
+| rs62477737 |           7 |   75162278 | A   | G   | \-5.269231 |         \-0.9908613 |              1.085216 | 1.083516e+04 | 1.446615e-08 |
+| rs66720652 |          12 |   20582640 | A   | T   | \-5.346728 |         \-0.8580309 |              1.081783 | 1.055530e+04 | 1.511394e-08 |
+| rs7742789  |           6 |   43345803 | T   | C   | \-5.299223 |         \-0.8823839 |              1.085563 | 9.642818e+03 | 1.758482e-08 |
+| rs10465231 |           9 |   92183413 | T   | C   | \-5.155534 |         \-0.9065802 |              1.085858 | 6.360363e+03 | 3.534545e-08 |
+| rs7599488  |           2 |   60718347 | T   | C   | \-4.662859 |         \-1.8924839 |              1.094489 | 6.194382e+03 | 3.695131e-08 |
+| rs12459965 |          19 |   18452195 | T   | C   |   4.425792 |           2.5662130 |              1.091147 | 5.499658e+03 | 4.513166e-08 |
+| rs2519093  |           9 |  136141870 | T   | C   | \-4.517091 |         \-2.1886219 |              1.111998 | 5.364198e+03 | 4.706506e-08 |
+| rs2297359  |           6 |  160492613 | T   | C   |   5.407404 |           0.4532031 |              1.080801 | 5.286313e+03 | 4.823741e-08 |
 
 ``` r
 # new hits (compared to conventional GWAS)
 extract_results_bGWAS(Lifespan_bGWAS) %>%
   mutate(obs_p = 2*pnorm(-abs(z_obs))) %>%
   filter(obs_p>5e-8) -> NEW
-knitr::kable(NEW %>% transmute(rsid, chrm_UK10K, pos_UK10K, z_obs, mu_prior_estimate, mu_prior_std_error, z_obs, BF, BF_p=as.character(format(BF_p, scientific=T))))
+knitr::kable(NEW %>% mutate(BF_p=as.character(format(BF_p, scientific=T))))
 ```
 
-| rsid       | chrm\_UK10K | pos\_UK10K |     z\_obs | mu\_prior\_estimate | mu\_prior\_std\_error |         BF | BF\_p        |
-| :--------- | ----------: | ---------: | ---------: | ------------------: | --------------------: | ---------: | :----------- |
-| rs6719980  |          15 |   67150296 | \-5.406948 |         \-2.0140965 |              1.117846 | 115104.415 | 2.867957e-10 |
-| rs646776   |          20 |   24777265 | \-4.907710 |         \-4.1174475 |              1.195173 |  95856.035 | 3.875245e-10 |
-| rs56179563 |           8 |  123452475 |   5.190489 |           2.3991295 |              1.110002 |  82763.931 | 4.935786e-10 |
-| rs59234174 |           6 |   80328206 | \-5.127057 |         \-1.2962002 |              1.084586 |  11883.686 | 1.239443e-08 |
-| rs6558008  |           7 |   39617245 | \-5.424368 |         \-0.7778364 |              1.083506 |  11591.306 | 1.292187e-08 |
-| rs62477737 |           8 |   71432846 | \-5.269231 |         \-0.9908613 |              1.085216 |  10835.161 | 1.446615e-08 |
-| rs66720652 |           4 |   58305294 | \-5.346728 |         \-0.8580309 |              1.081783 |  10555.302 | 1.511394e-08 |
-| rs7742789  |           9 |   37523652 | \-5.299223 |         \-0.8823839 |              1.085563 |   9642.818 | 1.758482e-08 |
-| rs10465231 |           6 |  128337016 | \-5.155534 |         \-0.9065802 |              1.085858 |   6360.363 | 3.534545e-08 |
-| rs7599488  |          16 |   49438040 | \-4.662859 |         \-1.8924839 |              1.094489 |   6194.382 | 3.695131e-08 |
-| rs12459965 |           1 |  201155236 |   4.425792 |           2.5662130 |              1.091147 |   5499.658 | 4.513166e-08 |
-| rs2519093  |           6 |  170070135 | \-4.517091 |         \-2.1886219 |              1.111998 |   5364.198 | 4.706506e-08 |
-| rs2297359  |          10 |   36687959 |   5.407404 |           0.4532031 |              1.080801 |   5286.313 | 4.823741e-08 |
+| rsid       | chrm\_UK10K | pos\_UK10K | alt | ref |     z\_obs | mu\_prior\_estimate | mu\_prior\_std\_error |         BF | BF\_p        |  obs\_p |
+| :--------- | ----------: | ---------: | :-- | :-- | ---------: | ------------------: | --------------------: | ---------: | :----------- | ------: |
+| rs6719980  |           2 |     651507 | T   | C   | \-5.406948 |         \-2.0140965 |              1.117846 | 115104.415 | 2.867957e-10 | 1.0e-07 |
+| rs646776   |           1 |  109818530 | T   | C   | \-4.907710 |         \-4.1174475 |              1.195173 |  95856.035 | 3.875245e-10 | 9.0e-07 |
+| rs56179563 |           7 |  129685597 | A   | G   |   5.190489 |           2.3991295 |              1.110002 |  82763.931 | 4.935786e-10 | 2.0e-07 |
+| rs59234174 |           9 |   16730258 | T   | C   | \-5.127057 |         \-1.2962002 |              1.084586 |  11883.686 | 1.239443e-08 | 3.0e-07 |
+| rs6558008  |           8 |   27438306 | A   | C   | \-5.424368 |         \-0.7778364 |              1.083506 |  11591.306 | 1.292187e-08 | 1.0e-07 |
+| rs62477737 |           7 |   75162278 | A   | G   | \-5.269231 |         \-0.9908613 |              1.085216 |  10835.161 | 1.446615e-08 | 1.0e-07 |
+| rs66720652 |          12 |   20582640 | A   | T   | \-5.346728 |         \-0.8580309 |              1.081783 |  10555.302 | 1.511394e-08 | 1.0e-07 |
+| rs7742789  |           6 |   43345803 | T   | C   | \-5.299223 |         \-0.8823839 |              1.085563 |   9642.818 | 1.758482e-08 | 1.0e-07 |
+| rs10465231 |           9 |   92183413 | T   | C   | \-5.155534 |         \-0.9065802 |              1.085858 |   6360.363 | 3.534545e-08 | 3.0e-07 |
+| rs7599488  |           2 |   60718347 | T   | C   | \-4.662859 |         \-1.8924839 |              1.094489 |   6194.382 | 3.695131e-08 | 3.1e-06 |
+| rs12459965 |          19 |   18452195 | T   | C   |   4.425792 |           2.5662130 |              1.091147 |   5499.658 | 4.513166e-08 | 9.6e-06 |
+| rs2519093  |           9 |  136141870 | T   | C   | \-4.517091 |         \-2.1886219 |              1.111998 |   5364.198 | 4.706506e-08 | 6.3e-06 |
+| rs2297359  |           6 |  160492613 | T   | C   |   5.407404 |           0.4532031 |              1.080801 |   5286.313 | 4.823741e-08 | 1.0e-07 |
+
+13 of them are missed by the conventional GWAS (using same p-value
+threshold of 5e-8 to call significance).
 
 ``` r
 manhattan_plot_bGWAS(Lifespan_bGWAS)
@@ -391,26 +425,26 @@ manhattan_plot_bGWAS(Lifespan_bGWAS)
 
 <img src="LifespanAnalysis/Lifespan_v1.0.0-results3-1.png" width="100%" />
 
+``` r
+heatmap_bGWAS(Lifespan_bGWAS)
+```
+
+<img src="LifespanAnalysis/Lifespan_v1.0.0-results4-1.png" width="100%" />
+
+## Results - Direct Effects
+
 We can use direct effects to identify SNPs significantly acting on
 lifespan independently from the prior GWASs used to create the prior:
 
 ``` r
-# new hits (compared to conventional GWAS)
-extract_results_bGWAS(Lifespan_bGWAS) %>%
-  mutate(direct_z = mu_direct_estimate / mu_direct_std_error,
-        direct_p = 2*pnorm(-abs(direct_z))) %>%
-  filter(direct_p<5e-8) -> DIRECT
-knitr::kable(DIRECT %>% transmute(rsid, chrm_UK10K, pos_UK10K, z_obs, mu_prior_estimate, mu_prior_std_error,  mu_direct_estimate, mu_direct_std_error, direct_z, direct_p=as.character(format(direct_p, scientific=T))))
+knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, results="direct")  %>% mutate(p_direct=as.character(format(p_direct, scientific=T))))
 ```
 
-| rsid       | chrm\_UK10K | pos\_UK10K |   z\_obs | mu\_prior\_estimate | mu\_prior\_std\_error | mu\_direct\_estimate | mu\_direct\_std\_error | direct\_z | direct\_p    |
-| :--------- | ----------: | ---------: | -------: | ------------------: | --------------------: | -------------------: | ---------------------: | --------: | :----------- |
-| rs429358   |           1 |  226237618 | 19.32779 |           1.4769473 |              1.185686 |            17.850838 |               1.551081 | 11.508644 | 1.193398e-30 |
-| rs10455872 |          10 |   37196047 | 10.28154 |           1.8779506 |              1.114773 |             8.403586 |               1.497571 |  5.611478 | 2.006052e-08 |
-| rs8042849  |           3 |   13384532 | 10.65939 |           0.1103939 |              1.084015 |            10.548993 |               1.474818 |  7.152742 | 8.506164e-13 |
+| rsid       | chrm\_UK10K | pos\_UK10K | alt | ref |     z\_obs | mu\_direct\_estimate | mu\_direct\_std\_error |  z\_direct | p\_direct    |
+| :--------- | ----------: | ---------: | :-- | :-- | ---------: | -------------------: | ---------------------: | ---------: | :----------- |
+| rs429358   |          19 |   45411941 | T   | C   |   19.32779 |            17.850838 |               1.551081 |  11.508644 | 1.193398e-30 |
+| rs55730499 |           6 |  161005610 | T   | C   | \-10.25780 |           \-8.534113 |               1.495823 | \-5.705294 | 1.161422e-08 |
+| rs8042849  |          15 |   78817929 | T   | C   |   10.65939 |            10.548993 |               1.474818 |   7.152742 | 8.506164e-13 |
 
 Among these hits…: Not APOE (or CHRNA, but smoking not used so makes
-sense?) … needs to be looked at a bit more\!  
-Should we also look at non significant SNPs (based on BFs) but with
-significant direct effects? -\> create a function to extract SNPs having
-significant direct (posterior) SNPs independently of prior/BFs?
+sense?) … needs to be looked at a bit more\!

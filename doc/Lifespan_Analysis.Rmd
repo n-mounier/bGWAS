@@ -88,10 +88,10 @@ heatmap_bGWAS(Lifespan_bGWAS)
 We can use direct effects to identify SNPs significantly acting on lifespan independently from the prior GWASs used to create the prior:
 
 ```{r results5, echo=TRUE}
-knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, "direct")  %>% mutate(p_direct=as.character(format(p_direct, scientific=T))))
+knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, results="direct")  %>% mutate(p_direct=as.character(format(p_direct, scientific=T))))
 ```
 
-Among these hits...: Not APOE (or CHRNA, but smoking not used so makes sense?) ... needs to be looked at a bit more!    
+APOE (highly pleiotropic, not capturing everything) + CHRNA (smoking not included)    
 
 
 
