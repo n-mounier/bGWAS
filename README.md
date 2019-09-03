@@ -714,7 +714,7 @@ A detailed description of these files can be found
 ## Runtime
 
 Analysis using all the 38 prior GWASs available, for a conventional GWAS
-containing \~7M SNPs in common with the prior studies \~ 25 minutes (see
+containing \~7M SNPs in common with the prior studies \~ 20 minutes (see
 complete Lifespan Analysis [here](doc/Lifespan_Analysis.md)).
 
 Analysis using 6 prior GWASs, for a conventional GWAS containing \~
