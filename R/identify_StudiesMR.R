@@ -151,7 +151,12 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
     filter(!.data$study %in% significant_studies) %>%
     pull(.data$study) -> non_significant_studies
   
-  studies_to_test = non_significant_studies # same now, but some studies (inconsistent direction / loop : might be removed from the test set, and not from the non.significant set)
+  #studies_to_test = non_significant_studies # same now, but some studies (inconsistent direction / loop : might be removed from the test set, and not from the non.significant set)
+  
+  all_uni_coefs %>%
+    filter(!.data$study %in% significant_studies) %>%
+    filter(P<0.05) %>%
+    pull(.data$study) ->  studies_to_test
   
   if(save_files){ # add Status : stepwise exclusion, will be updated if the studies are added
     Files_Info$status[Files_Info$File %in% non_significant_studies] = "Excluded during stepwise selection"
@@ -166,24 +171,20 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
   
   it = 0
   while(!Convergence){
-    if(nrow(steps)>7){ # are we in a loop?
-      if(steps$Study[nrow(steps)-6]==steps$Study[nrow(steps)] & steps$Study[nrow(steps)-7]==steps$Study[nrow(steps)-1] & steps$Study[nrow(steps)-1]!=""){
-        # keep the last one
-        tokeep = steps$Study[nrow(steps)]
-        # remove the one before
-        toexclude = steps$Study[nrow(steps)-1]
-        # add the last one to our list of study
-        non_significant_studies = non_significant_studies[!non_significant_studies %in% tokeep]
-        significant_studies = c(significant_studies, tokeep)
-        # remove the one before (definitely, to avoid looping again)
-        significant_studies = significant_studies[!significant_studies %in% toexclude]
-        studies_to_test = studies_to_test[!studies_to_test %in% toexclude]
-        non_significant_studies = c(non_significant_studies, toexclude)
-        
-        tmp=paste0("We are in a loop: ", get_names(toexclude, Z_matrices), " will be excluded from our set of studies and ", get_names(tokeep, Z_matrices), " will be added back in the model \n")
-        update_log(Log, tmp, verbose)
-      }
+    if(it>50){ # are we in a loop?
+      tmp=c("We are probably in a loop...\n ", "Analysis failed \n",
+            "Please have a look at the stepwise procedure results ", 
+            "and update \"prior_studies\" before relaunching the analysis ",
+            "to avoid looping again.")
+      update_log(Log, tmp, verbose)
+      
+      if(save_files) utils::write.table(Files_Info, file="PriorGWASs.tsv", sep="\t", quote=F, row.names=F )
+      
+      res=list(log_info = Log,
+               stop = T)
+      return(res)
     }
+    
     
     it=it+1
     tmp=paste0("  iteration ", it, ": ", length(significant_studies), " studies \n")
@@ -223,7 +224,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
       test_formula = generate_Formula(my_outcome, 
                                       c(significant_studies, one_to_add))
       # keep only our studies
-      studies_to_test[!studies_to_test %in% one_to_add] -> studies_not_used 
+      non_significant_studies[!non_significant_studies %in% one_to_add] -> studies_not_used 
       ZMatrix %>%
         select(-studies_not_used) %>%
         get_Instruments(Zlim=Zlimit) -> ZMatrix_test
@@ -346,6 +347,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
       
     } 
     
+
     
     if(no_change){
       tmp = paste0("It converged! \n")

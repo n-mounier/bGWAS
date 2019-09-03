@@ -6,9 +6,11 @@
 
 Now, the posterior effects (`mu_posterior_estimate` - `mu_posterior_std_error`) and the direct effects (`mu_direct_estimate` - `mu_direct_std_error`) are estimated simultaneously with the prior effects (`mu_prior_estimate` - `mu_prior_std_error`). The analysis is performed on the z-score scale, and these effects are automatically rescaled to the observed effect size beta scale when possible (`beta_posterior_estimate`, `beta_posterior_std_error`, `beta_direct_estimate`, `beta_direct_std_error`).   
 
-- Add stepwise_threshold    
+- Stepwise selection : `stepwise_threshold` and studies tested       
 
-By default, the stepwise selection threshold was set to : 0.05 / (the number of prior GWASs used). Now, we allow the user to provide a custom threshold (that could be less stringent, since some of the prior GWASs might be correlated).    
+By default, the stepwise selection threshold was set to : 0.05 / (the number of prior GWASs used). Now, we allow the user to provide a custom threshold (that could be less stringent, since some of the prior GWASs might be correlated).  
+We also changed the subset of studies included in the stepwise selection procedure: to increase the robustness of the study identification, only the ones reaching nominal significance in univariate regression are included and tested (note that this does not affect the `stepwise_threshold` value).    
+If convergence is not achieved after 50 iterations in the stepwise procedure, there is probably a loop (adding/removing the same studies iteratively). In such cases, the analysis is stopped and the user is invited to relaunch the analysis with a different set of `prior_studies` to avoid this behavior.     
 
 - Update of the Z-matrices files    
 
