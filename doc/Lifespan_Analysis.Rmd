@@ -5,7 +5,7 @@ output: github_document
 
 ```{r setup, include=FALSE, cache=FALSE}
 knitr::opts_chunk$set(echo = TRUE,
-                      fig.path = "LifespanAnalysis/Lifespan_v1.0.0-",
+                      fig.path = "Figures/Lifespan_v1.0.0-",
                       out.width = "100%",
                       cache = TRUE,
                       cache.lazy = FALSE)
@@ -25,7 +25,6 @@ Here, we assume that the `bGWAS` package is already installed, that the Z-matrix
 library(bGWAS) # bGWAS github version:
 
 # Download data to working directory (~460 MB) if not already here
-print(getwd())
 if(!file.exists("lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")) download.file(url = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3209/lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz?sequence=1&isAllowed=y", destfile = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")
 
 Lifespan_Timmers2019 = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz"
@@ -50,28 +49,28 @@ print(getwd())
 coefficients_plot_bGWAS(Lifespan_bGWAS)
 ```
 
-7 prior GWASs are used to create the prior, the multivariate causal effect estimates are consistent with what we would expect. On this figure, the multivariate causal effect estimate and the 95\% interval from the multivariate MR model using all chromosomes (black dot and bars) as well as the per-chromosome estimates (grey bars) are represented for each prior GWASs. Coronary Artery Disease (CAD) has the strongest negative effect on lifespan. High Diastolic Blood Pressure (DBP) and Body Mass Index (BMI) also decreases lifespan. We can also see that education, in this case the number of years of schooling, has a positive effect on lifespan.
+7 prior GWASs are used to create the prior, the multivariate causal effect estimates are consistent with what we would expect. On this figure, the multivariate causal effect estimate and the 95\% interval from the multivariate MR model using all chromosomes (black dot and bars) as well as the 22 per-chromosome estimates (grey bars) are represented for each prior GWASs. Coronary Artery Disease (CAD) has the strongest negative effect on lifespan. High Diastolic Blood Pressure (DBP) and Body Mass Index (BMI) also decreases lifespan. We can also see that education, in this case the number of years of schooling, has a positive effect on lifespan.
 
-Overall, the squared correlation between prior and observed effects is about `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "all"), 3)` and goes up to `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "moderate"), 3)` when we consider only SNPs having at least a moderate effect on lifespan (observed p-value < 0.001).
+Overall, the squared correlation between prior and observed effects is about `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "all"), 3)` and goes up to `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "moderate"), 3)` when we consider only SNPs having at least a moderate effect on lifespan (observed p-value < 0.001).   
+Using the previous version (Timmers et al), squared correlation was: \textcolor{red}{to add}   
 
 ## Results - BF
-
 
 With this approach, we identified `r nrow(extract_results_bGWAS(Lifespan_bGWAS))`:
 
 ```{r results2, echo=TRUE}
 # all hits
-knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% mutate(BF_p=as.character(format(BF_p, scientific=T))))
+knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))), digits=3)
 
 # new hits (compared to conventional GWAS)
 extract_results_bGWAS(Lifespan_bGWAS) %>%
   mutate(obs_p = 2*pnorm(-abs(z_obs))) %>%
   filter(obs_p>5e-8) -> NEW
-knitr::kable(NEW %>% mutate(BF_p=as.character(format(BF_p, scientific=T))))
+knitr::kable(NEW %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))), digits=3)
 ```
 
-`r nrow(NEW)` of them are missed by the conventional GWAS (using same p-value threshold of 5e-8 to call significance).
-
+`r nrow(NEW)` of them are missed by the conventional GWAS (using same p-value threshold of 5e-8 to call significance).    
+Using the previous version (Timmers et al), we identified... \textcolor{red}{to add}
 
 ```{r results3, dpi=300}
 manhattan_plot_bGWAS(Lifespan_bGWAS)
@@ -82,10 +81,9 @@ manhattan_plot_bGWAS(Lifespan_bGWAS)
 heatmap_bGWAS(Lifespan_bGWAS)
 ```
 
-FIX SIZE OF LABELS : NOT ALL SNPs RSIDS ARE PLOT, NOTHING IS ALIGNED!!!!
+**FIX SIZE OF LABELS : NOT ALL SNPs RSIDS ARE PLOTTED, NOTHING IS ALIGNED!!!!**    
 
-Some traits have gigher contribution to prior effects in general (everything except height and T2D). Overall, lot of red (makes sense, SNPs aligned to be life-lengthening). Still, some SNPs with large contribution of one trait -> can compensate smaller contributions in the other direction for other traits. And some SNPs with small effect (in the right direction) on most of the traits (pleiotropic).    
-+ look at the significant negative effect on LDL (compensated by a significant positive effect on BP)   
+Some traits have higher contribution to prior effects in general (everything except height and T2D). Overall, lot of red (makes sense, SNPs aligned to be life-lengthening, we expect positive contributions to prior). Still, some SNPs with large contribution of one trait -> can compensate smaller contributions in the other direction for other traits \& look at the large significant negative effect on LDL (compensated by a significant positive effect on BP). And some SNPs with small effect (in the right direction) on most of the traits (pleiotropic effects).     
 
 
 ## Results - Direct Effects
@@ -94,7 +92,7 @@ Some traits have gigher contribution to prior effects in general (everything exc
 We can use direct effects to identify SNPs significantly acting on lifespan independently from the prior GWASs used to create the prior:
 
 ```{r results5, echo=TRUE}
-knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, results="direct")  %>% mutate(p_direct=as.character(format(p_direct, scientific=T))))
+knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, results="direct")  %>% mutate(p_direct=as.character(format(p_direct, scientific=T, digits=3))), digits=3)
 ```
 
 APOE (highly pleiotropic, not capturing everything) + CHRNA (smoking not included) + LPA (?)    

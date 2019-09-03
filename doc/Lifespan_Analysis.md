@@ -12,7 +12,6 @@ described [here](../README.md).
 library(bGWAS) # bGWAS github version:
 
 # Download data to working directory (~460 MB) if not already here
-print(getwd())
 if(!file.exists("lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")) download.file(url = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3209/lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz?sequence=1&isAllowed=y", destfile = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")
 
 Lifespan_Timmers2019 = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz"
@@ -141,20 +140,6 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ##   iteration 5: 5 studies 
     ## #Run model 
     ## #Test if any study can be added with p<0.0019 
-    ## Adding one study :Height (GIANT) 
-    ## Done! 
-    ## #Update model 
-    ## #Test if any study has p>0.0019 now 
-    ##   iteration 6: 6 studies 
-    ## #Run model 
-    ## #Test if any study can be added with p<0.0019 
-    ## Adding one study :Type 2 Diabetes (DIAGRAM) 
-    ## Done! 
-    ## #Update model 
-    ## #Test if any study has p>0.0019 now 
-    ##   iteration 7: 7 studies 
-    ## #Run model 
-    ## #Test if any study can be added with p<0.0019 
     ## #Update model 
     ## #Test if any study has p>0.0019 now 
     ## It converged! 
@@ -165,17 +150,15 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ## - Body Mass Index (GIANT)
     ## - Coronary Artery Disease (CARDIoGRAM)
     ## - Diastolic Blood Pressure (ICBP)
-    ## - Height (GIANT)
-    ## - Type 2 Diabetes (DIAGRAM)
     ## Estimating adjusted R-squared: 
-    ## - in-sample adjusted R-squared for the all-chromosomes multivariate regression is 0.3211 
+    ## - in-sample adjusted R-squared for the all-chromosomes multivariate regression is 0.5435 
     ## - out-of-sample R-squared (masking one chromosome at a time), for the multivariate regression will be estimated when calculating the prior. 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
     ## <<< Estimation of the prior >>>  
     ## > Creating the full Z-Matrix  
     ## # Loading the ZMatrix... 
     ## Selecting studies :
-    ## 7 studies 
+    ## 5 studies 
     ## 6,811,310 SNPs 
     ## # Adding data from the conventional GWAS : 
     ##  "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz" 
@@ -271,10 +254,10 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ## Running regression, 
     ## Calculating prior estimates for SNPs on this chromosome, 
     ## Calculating prior standard errors for SNPs on this chromosome, 
-    ## ## Out-of-sample R-squared for MR instruments across all chromosomes is 0.3131
-    ## ## Out-of-sample squared correlation for MR instruments across all chromosome is 0.3145
-    ## ## Correlation between prior and observed effects for all SNPs is 0.2006
-    ## ## Correlation between prior and observed effects for SNPs with GWAS p-value < 0.001 is 0.6078
+    ## ## Out-of-sample R-squared for MR instruments across all chromosomes is 0.5298
+    ## ## Out-of-sample squared correlation for MR instruments across all chromosome is 0.53
+    ## ## Correlation between prior and observed effects for all SNPs is 0.1953
+    ## ## Correlation between prior and observed effects for SNPs with GWAS p-value < 0.001 is 0.6141
     ## Done! 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
     ## <<< Calculation of Bayes Factors and p-values >>>  
@@ -290,37 +273,36 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ## Done! 
     ## # Estimating p-values for direct effects... 
     ## Done! 
-    ## Done! 
     ## > Pruning and identifying significant SNPs 
     ## Identification based on BFs 
     ##    Starting with 6,513,704 SNPs 
     ## # Selecting significant SNPs according to p-values... 
-    ## 795 SNPs left 
+    ## 782 SNPs left 
     ## Done! 
     ## # Pruning significant SNPs... 
     ##    distance : 500Kb 
-    ## 27 SNPs left 
+    ## 25 SNPs left 
     ## Done! 
     ## Identification based on posterior effects 
     ##    Starting with 6,513,704 SNPs 
     ## # Selecting significant SNPs according to p-values... 
-    ## 296 SNPs left 
+    ## 318 SNPs left 
     ## Done! 
     ## # Pruning significant SNPs... 
     ##    distance : 500Kb 
-    ## 10 SNPs left 
+    ## 11 SNPs left 
     ## Done! 
     ## Identification based on direct effects 
     ##    Starting with 6,513,704 SNPs 
     ## # Selecting significant SNPs according to p-values... 
-    ## 91 SNPs left 
+    ## 87 SNPs left 
     ## Done! 
     ## # Pruning significant SNPs... 
     ##    distance : 500Kb 
-    ## 3 SNPs left 
+    ## 2 SNPs left 
     ## Done! 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 37 minute(s) and 1 second(s).
+    ## Time of the analysis: 20 minute(s) and 27 second(s).
 
 We can look at the results more in details.
 
@@ -336,13 +318,13 @@ print(getwd())
 coefficients_plot_bGWAS(Lifespan_bGWAS)
 ```
 
-<img src="LifespanAnalysis/Lifespan_v1.0.0-results1-1.png" width="100%" />
+<img src="Figures/Lifespan_v1.0.0-results1-1.png" width="100%" />
 
 7 prior GWASs are used to create the prior, the multivariate causal
 effect estimates are consistent with what we would expect. On this
 figure, the multivariate causal effect estimate and the 95% interval
 from the multivariate MR model using all chromosomes (black dot and
-bars) as well as the per-chromosome estimates (grey bars) are
+bars) as well as the 22 per-chromosome estimates (grey bars) are
 represented for each prior GWASs. Coronary Artery Disease (CAD) has the
 strongest negative effect on lifespan. High Diastolic Blood Pressure
 (DBP) and Body Mass Index (BMI) also decreases lifespan. We can also see
@@ -350,98 +332,96 @@ that education, in this case the number of years of schooling, has a
 positive effect on lifespan.
 
 Overall, the squared correlation between prior and observed effects is
-about 0.04 and goes up to 0.369 when we consider only SNPs having at
-least a moderate effect on lifespan (observed p-value \< 0.001).
+about 0.038 and goes up to 0.377 when we consider only SNPs having at
+least a moderate effect on lifespan (observed p-value \< 0.001).  
+Using the previous version (Timmers et al), squared correlation was: 
 
 ## Results - BF
 
-With this approach, we identified 27:
+With this approach, we identified 25:
 
 ``` r
 # all hits
-knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% mutate(BF_p=as.character(format(BF_p, scientific=T))))
+knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))), digits=3)
 ```
 
-| rsid       | chrm\_UK10K | pos\_UK10K | alt | ref |     z\_obs | mu\_prior\_estimate | mu\_prior\_std\_error |           BF | BF\_p        |
-| :--------- | ----------: | ---------: | :-- | :-- | ---------: | ------------------: | --------------------: | -----------: | :----------- |
-| rs429358   |          19 |   45411941 | T   | C   |  19.327786 |           1.4769473 |              1.185686 | 1.467887e+52 | 2.704073e-80 |
-| rs10455872 |           6 |  161010118 | A   | G   |  10.281536 |           1.8779506 |              1.114773 | 8.741030e+15 | 3.528841e-26 |
-| rs8042849  |          15 |   78817929 | T   | C   |  10.659387 |           0.1103939 |              1.084015 | 2.480031e+13 | 1.298723e-22 |
-| rs11065979 |          12 |  112059557 | T   | C   | \-7.128082 |         \-1.6730147 |              1.131280 | 1.046698e+08 | 5.983488e-15 |
-| rs2891168  |           9 |   22098619 | A   | G   |   6.601322 |           1.9599063 |              1.148937 | 1.835130e+07 | 8.576140e-14 |
-| rs11066188 |          12 |  112610714 | A   | G   | \-6.523571 |         \-1.2837670 |              1.130564 | 2.788541e+06 | 1.650703e-12 |
-| rs6511720  |          19 |   11202306 | T   | G   |   5.630731 |           3.3639409 |              1.203012 | 1.715581e+06 | 3.580849e-12 |
-| rs8039305  |          15 |   91422543 | T   | C   |   6.413708 |           1.2254351 |              1.092939 | 1.253924e+06 | 5.916490e-12 |
-| rs12924886 |          16 |   72075593 | A   | T   |   5.679317 |           2.2737479 |              1.092808 | 4.848462e+05 | 2.740447e-11 |
-| rs61348208 |           4 |    3089564 | T   | C   |   5.823361 |           1.4487778 |              1.082599 | 1.914917e+05 | 1.244648e-10 |
-| rs9393691  |           6 |   26272829 | T   | C   | \-5.570119 |         \-1.7169124 |              1.090056 | 1.241246e+05 | 2.533583e-10 |
-| rs6719980  |           2 |     651507 | T   | C   | \-5.406948 |         \-2.0140965 |              1.117846 | 1.151044e+05 | 2.867957e-10 |
-| rs1230666  |           1 |  114173410 | A   | G   | \-5.804747 |         \-1.1755926 |              1.084836 | 1.023964e+05 | 3.476352e-10 |
-| rs646776   |           1 |  109818530 | T   | C   | \-4.907710 |         \-4.1174475 |              1.195173 | 9.585604e+04 | 3.875245e-10 |
-| rs56179563 |           7 |  129685597 | A   | G   |   5.190489 |           2.3991295 |              1.110002 | 8.276393e+04 | 4.935786e-10 |
-| rs12302980 |          12 |  111360290 | A   | G   | \-5.750164 |         \-1.0021544 |              1.095870 | 6.086260e+04 | 8.197067e-10 |
-| rs1275922  |           2 |   26932887 | A   | G   | \-5.816777 |         \-0.5943870 |              1.095019 | 3.040337e+04 | 2.588792e-09 |
-| rs59234174 |           9 |   16730258 | T   | C   | \-5.127057 |         \-1.2962002 |              1.084586 | 1.188369e+04 | 1.239443e-08 |
-| rs6558008  |           8 |   27438306 | A   | C   | \-5.424368 |         \-0.7778364 |              1.083506 | 1.159131e+04 | 1.292187e-08 |
-| rs62477737 |           7 |   75162278 | A   | G   | \-5.269231 |         \-0.9908613 |              1.085216 | 1.083516e+04 | 1.446615e-08 |
-| rs66720652 |          12 |   20582640 | A   | T   | \-5.346728 |         \-0.8580309 |              1.081783 | 1.055530e+04 | 1.511394e-08 |
-| rs7742789  |           6 |   43345803 | T   | C   | \-5.299223 |         \-0.8823839 |              1.085563 | 9.642818e+03 | 1.758482e-08 |
-| rs10465231 |           9 |   92183413 | T   | C   | \-5.155534 |         \-0.9065802 |              1.085858 | 6.360363e+03 | 3.534545e-08 |
-| rs7599488  |           2 |   60718347 | T   | C   | \-4.662859 |         \-1.8924839 |              1.094489 | 6.194382e+03 | 3.695131e-08 |
-| rs12459965 |          19 |   18452195 | T   | C   |   4.425792 |           2.5662130 |              1.091147 | 5.499658e+03 | 4.513166e-08 |
-| rs2519093  |           9 |  136141870 | T   | C   | \-4.517091 |         \-2.1886219 |              1.111998 | 5.364198e+03 | 4.706506e-08 |
-| rs2297359  |           6 |  160492613 | T   | C   |   5.407404 |           0.4532031 |              1.080801 | 5.286313e+03 | 4.823741e-08 |
+| rsid        | chrm\_UK10K | pos\_UK10K | alt | ref |  z\_obs | mu\_prior\_estimate | mu\_prior\_std\_error | BF       | BF\_p    |
+| :---------- | ----------: | ---------: | :-- | :-- | ------: | ------------------: | --------------------: | :------- | :------- |
+| rs429358    |          19 |   45411941 | T   | C   |  19.328 |               1.854 |                 1.217 | 1.59e+54 | 7.52e-80 |
+| rs10455872  |           6 |  161010118 | A   | G   |  10.282 |               2.150 |                 1.157 | 4.25e+16 | 1.27e-26 |
+| rs8042849   |          15 |   78817929 | T   | C   |  10.659 |               0.265 |                 1.105 | 8.57e+13 | 5.24e-23 |
+| rs11065979  |          12 |  112059557 | T   | C   | \-7.128 |             \-2.227 |                 1.220 | 5.48e+08 | 9.74e-16 |
+| rs2891168   |           9 |   22098619 | A   | G   |   6.601 |               2.327 |                 1.241 | 4.99e+07 | 3.52e-14 |
+| rs11066188  |          12 |  112610714 | A   | G   | \-6.524 |             \-1.846 |                 1.215 | 1.34e+07 | 2.64e-13 |
+| rs8039305   |          15 |   91422543 | T   | C   |   6.414 |               1.473 |                 1.129 | 2.65e+06 | 3.27e-12 |
+| rs138175288 |          19 |   11189980 | A   | C   |   5.733 |               3.305 |                 1.189 | 2.60e+06 | 3.36e-12 |
+| rs12924886  |          16 |   72075593 | A   | T   |   5.679 |               2.455 |                 1.116 | 6.65e+05 | 2.88e-11 |
+| rs61348208  |           4 |    3089564 | T   | C   |   5.823 |               1.479 |                 1.106 | 2.22e+05 | 1.66e-10 |
+| rs1230666   |           1 |  114173410 | A   | G   | \-5.805 |             \-1.433 |                 1.116 | 1.96e+05 | 2.01e-10 |
+| rs12302980  |          12 |  111360290 | A   | G   | \-5.750 |             \-1.390 |                 1.138 | 1.59e+05 | 2.82e-10 |
+| rs56179563  |           7 |  129685597 | A   | G   |   5.190 |               2.881 |                 1.165 | 1.49e+05 | 3.14e-10 |
+| rs646776    |           1 |  109818530 | T   | C   | \-4.908 |             \-4.822 |                 1.236 | 1.07e+05 | 5.36e-10 |
+| rs6719980   |           2 |     651507 | T   | C   | \-5.407 |             \-1.906 |                 1.143 | 1.03e+05 | 5.66e-10 |
+| rs9393691   |           6 |   26272829 | T   | C   | \-5.570 |             \-1.565 |                 1.107 | 9.97e+04 | 5.98e-10 |
+| rs1275922   |           2 |   26932887 | A   | G   | \-5.817 |             \-0.850 |                 1.111 | 5.95e+04 | 1.37e-09 |
+| rs59234174  |           9 |   16730258 | T   | C   | \-5.127 |             \-1.492 |                 1.107 | 1.76e+04 | 9.90e-09 |
+| rs6558008   |           8 |   27438306 | A   | C   | \-5.424 |             \-0.890 |                 1.106 | 1.61e+04 | 1.14e-08 |
+| rs62477737  |           7 |   75162278 | A   | G   | \-5.269 |             \-1.088 |                 1.110 | 1.43e+04 | 1.39e-08 |
+| rs66720652  |          12 |   20582640 | A   | T   | \-5.347 |             \-0.937 |                 1.110 | 1.38e+04 | 1.46e-08 |
+| rs7742789   |           6 |   43345803 | T   | C   | \-5.299 |             \-0.984 |                 1.110 | 1.30e+04 | 1.63e-08 |
+| rs10465231  |           9 |   92183413 | T   | C   | \-5.156 |             \-0.985 |                 1.109 | 8.00e+03 | 3.58e-08 |
+| rs7599488   |           2 |   60718347 | T   | C   | \-4.663 |             \-1.956 |                 1.114 | 6.86e+03 | 4.60e-08 |
+| rs12459965  |          19 |   18452195 | T   | C   |   4.426 |               2.781 |                 1.121 | 6.55e+03 | 4.96e-08 |
 
 ``` r
 # new hits (compared to conventional GWAS)
 extract_results_bGWAS(Lifespan_bGWAS) %>%
   mutate(obs_p = 2*pnorm(-abs(z_obs))) %>%
   filter(obs_p>5e-8) -> NEW
-knitr::kable(NEW %>% mutate(BF_p=as.character(format(BF_p, scientific=T))))
+knitr::kable(NEW %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))), digits=3)
 ```
 
-| rsid       | chrm\_UK10K | pos\_UK10K | alt | ref |     z\_obs | mu\_prior\_estimate | mu\_prior\_std\_error |         BF | BF\_p        |  obs\_p |
-| :--------- | ----------: | ---------: | :-- | :-- | ---------: | ------------------: | --------------------: | ---------: | :----------- | ------: |
-| rs6719980  |           2 |     651507 | T   | C   | \-5.406948 |         \-2.0140965 |              1.117846 | 115104.415 | 2.867957e-10 | 1.0e-07 |
-| rs646776   |           1 |  109818530 | T   | C   | \-4.907710 |         \-4.1174475 |              1.195173 |  95856.035 | 3.875245e-10 | 9.0e-07 |
-| rs56179563 |           7 |  129685597 | A   | G   |   5.190489 |           2.3991295 |              1.110002 |  82763.931 | 4.935786e-10 | 2.0e-07 |
-| rs59234174 |           9 |   16730258 | T   | C   | \-5.127057 |         \-1.2962002 |              1.084586 |  11883.686 | 1.239443e-08 | 3.0e-07 |
-| rs6558008  |           8 |   27438306 | A   | C   | \-5.424368 |         \-0.7778364 |              1.083506 |  11591.306 | 1.292187e-08 | 1.0e-07 |
-| rs62477737 |           7 |   75162278 | A   | G   | \-5.269231 |         \-0.9908613 |              1.085216 |  10835.161 | 1.446615e-08 | 1.0e-07 |
-| rs66720652 |          12 |   20582640 | A   | T   | \-5.346728 |         \-0.8580309 |              1.081783 |  10555.302 | 1.511394e-08 | 1.0e-07 |
-| rs7742789  |           6 |   43345803 | T   | C   | \-5.299223 |         \-0.8823839 |              1.085563 |   9642.818 | 1.758482e-08 | 1.0e-07 |
-| rs10465231 |           9 |   92183413 | T   | C   | \-5.155534 |         \-0.9065802 |              1.085858 |   6360.363 | 3.534545e-08 | 3.0e-07 |
-| rs7599488  |           2 |   60718347 | T   | C   | \-4.662859 |         \-1.8924839 |              1.094489 |   6194.382 | 3.695131e-08 | 3.1e-06 |
-| rs12459965 |          19 |   18452195 | T   | C   |   4.425792 |           2.5662130 |              1.091147 |   5499.658 | 4.513166e-08 | 9.6e-06 |
-| rs2519093  |           9 |  136141870 | T   | C   | \-4.517091 |         \-2.1886219 |              1.111998 |   5364.198 | 4.706506e-08 | 6.3e-06 |
-| rs2297359  |           6 |  160492613 | T   | C   |   5.407404 |           0.4532031 |              1.080801 |   5286.313 | 4.823741e-08 | 1.0e-07 |
+| rsid       | chrm\_UK10K | pos\_UK10K | alt | ref |  z\_obs | mu\_prior\_estimate | mu\_prior\_std\_error | BF       | BF\_p    | obs\_p |
+| :--------- | ----------: | ---------: | :-- | :-- | ------: | ------------------: | --------------------: | :------- | :------- | -----: |
+| rs56179563 |           7 |  129685597 | A   | G   |   5.190 |               2.881 |                 1.165 | 1.49e+05 | 3.14e-10 |      0 |
+| rs646776   |           1 |  109818530 | T   | C   | \-4.908 |             \-4.822 |                 1.236 | 1.07e+05 | 5.36e-10 |      0 |
+| rs6719980  |           2 |     651507 | T   | C   | \-5.407 |             \-1.906 |                 1.143 | 1.03e+05 | 5.66e-10 |      0 |
+| rs59234174 |           9 |   16730258 | T   | C   | \-5.127 |             \-1.492 |                 1.107 | 1.76e+04 | 9.90e-09 |      0 |
+| rs6558008  |           8 |   27438306 | A   | C   | \-5.424 |             \-0.890 |                 1.106 | 1.61e+04 | 1.14e-08 |      0 |
+| rs62477737 |           7 |   75162278 | A   | G   | \-5.269 |             \-1.088 |                 1.110 | 1.43e+04 | 1.39e-08 |      0 |
+| rs66720652 |          12 |   20582640 | A   | T   | \-5.347 |             \-0.937 |                 1.110 | 1.38e+04 | 1.46e-08 |      0 |
+| rs7742789  |           6 |   43345803 | T   | C   | \-5.299 |             \-0.984 |                 1.110 | 1.30e+04 | 1.63e-08 |      0 |
+| rs10465231 |           9 |   92183413 | T   | C   | \-5.156 |             \-0.985 |                 1.109 | 8.00e+03 | 3.58e-08 |      0 |
+| rs7599488  |           2 |   60718347 | T   | C   | \-4.663 |             \-1.956 |                 1.114 | 6.86e+03 | 4.60e-08 |      0 |
+| rs12459965 |          19 |   18452195 | T   | C   |   4.426 |               2.781 |                 1.121 | 6.55e+03 | 4.96e-08 |      0 |
 
-13 of them are missed by the conventional GWAS (using same p-value
-threshold of 5e-8 to call significance).
+11 of them are missed by the conventional GWAS (using same p-value
+threshold of 5e-8 to call significance).  
+Using the previous version (Timmers et al), we identified… 
 
 ``` r
 manhattan_plot_bGWAS(Lifespan_bGWAS)
 ```
 
-<img src="LifespanAnalysis/Lifespan_v1.0.0-results3-1.png" width="100%" />
+<img src="Figures/Lifespan_v1.0.0-results3-1.png" width="100%" />
 
 ``` r
 heatmap_bGWAS(Lifespan_bGWAS)
 ```
 
-<img src="LifespanAnalysis/Lifespan_v1.0.0-results4-1.png" width="100%" />
+<img src="Figures/Lifespan_v1.0.0-results4-1.png" width="100%" />
 
-FIX SIZE OF LABELS : NOT ALL SNPs RSIDS ARE PLOT, NOTHING IS
-ALIGNED\!\!\!\!
+**FIX SIZE OF LABELS : NOT ALL SNPs RSIDS ARE PLOTTED, NOTHING IS
+ALIGNED\!\!\!\!**
 
-Some traits have gigher contribution to prior effects in general
+Some traits have higher contribution to prior effects in general
 (everything except height and T2D). Overall, lot of red (makes sense,
-SNPs aligned to be life-lengthening). Still, some SNPs with large
-contribution of one trait -\> can compensate smaller contributions in
-the other direction for other traits. And some SNPs with small effect
-(in the right direction) on most of the traits (pleiotropic).  
-\+ look at the significant negative effect on LDL (compensated by a
-significant positive effect on BP)
+SNPs aligned to be life-lengthening, we expect positive contributions to
+prior). Still, some SNPs with large contribution of one trait -\> can
+compensate smaller contributions in the other direction for other traits
+& look at the large significant negative effect on LDL (compensated by a
+significant positive effect on BP). And some SNPs with small effect (in
+the right direction) on most of the traits (pleiotropic effects).
 
 ## Results - Direct Effects
 
@@ -449,14 +429,13 @@ We can use direct effects to identify SNPs significantly acting on
 lifespan independently from the prior GWASs used to create the prior:
 
 ``` r
-knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, results="direct")  %>% mutate(p_direct=as.character(format(p_direct, scientific=T))))
+knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, results="direct")  %>% mutate(p_direct=as.character(format(p_direct, scientific=T, digits=3))), digits=3)
 ```
 
-| rsid       | chrm\_UK10K | pos\_UK10K | alt | ref |     z\_obs | mu\_direct\_estimate | mu\_direct\_std\_error |  z\_direct | p\_direct    |
-| :--------- | ----------: | ---------: | :-- | :-- | ---------: | -------------------: | ---------------------: | ---------: | :----------- |
-| rs429358   |          19 |   45411941 | T   | C   |   19.32779 |            17.850838 |               1.551081 |  11.508644 | 1.193398e-30 |
-| rs55730499 |           6 |  161005610 | T   | C   | \-10.25780 |           \-8.534113 |               1.495823 | \-5.705294 | 1.161422e-08 |
-| rs8042849  |          15 |   78817929 | T   | C   |   10.65939 |            10.548993 |               1.474818 |   7.152742 | 8.506164e-13 |
+| rsid      | chrm\_UK10K | pos\_UK10K | alt | ref | z\_obs | mu\_direct\_estimate | mu\_direct\_std\_error | z\_direct | p\_direct |
+| :-------- | ----------: | ---------: | :-- | :-- | -----: | -------------------: | ---------------------: | --------: | :-------- |
+| rs429358  |          19 |   45411941 | T   | C   | 19.328 |               17.473 |                  1.575 |    11.093 | 1.36e-28  |
+| rs8042849 |          15 |   78817929 | T   | C   | 10.659 |               10.395 |                  1.490 |     6.976 | 3.04e-12  |
 
 APOE (highly pleiotropic, not capturing everything) + CHRNA (smoking not
 included) + LPA (?)
