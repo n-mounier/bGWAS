@@ -17,30 +17,34 @@ print.bGWAS <- function(x,...) {
                                     "SNPs \n \n" )
 
   cat("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ \n \n")
-
-  if(nrow(x$significant_studies)>1){
-    cat(nrow(x$significant_studies), "studies used to build the prior : \n")
-    print(x$significant_studies[,1:3], row.names=F)
-  } else {
-    cat(nrow(x$significant_studies), "study used to build the prior : \n")
-    print(x$significant_studies[,1:3], row.names=F)
-  }
-
-  cat("\n-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ \n \n")
-
-  if(length(x$significant_SNPs)==0){
-    cat("No significant SNP identified, because the analysis has been limited to prior estimation")
-  } else
-    if(length(x$significant_SNPs)==1){
-      cat(length(x$significant_SNPs), "significant SNP identified : \n ")
-      cat(x$significant_SNPs, sep=", ")
+  
+  if(any(stringr::str_detect(obj$log_info, "Analysis failed"))){
+     cat("Analysis failed")
+  }else{
+    if(nrow(x$significant_studies)>1){
+      cat(nrow(x$significant_studies), "studies used to build the prior : \n")
+      print(x$significant_studies[,1:3], row.names=F)
     } else {
-      cat(length(x$significant_SNPs), "significant SNPs identified : \n ")
-      cat(x$significant_SNPs, sep=", ")
+      cat(nrow(x$significant_studies), "study used to build the prior : \n")
+      print(x$significant_studies[,1:3], row.names=F)
     }
-  cat("\n\n-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ ")
-
+    
+    cat("\n-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ \n \n")
+    
+    if(length(x$significant_SNPs)==0){
+      cat("No significant SNP identified, because the analysis has been limited to prior estimation")
+    } else
+      if(length(x$significant_SNPs)==1){
+        cat(length(x$significant_SNPs), "significant SNP identified : \n ")
+        cat(x$significant_SNPs, sep=", ")
+      } else {
+        cat(length(x$significant_SNPs), "significant SNPs identified : \n ")
+        cat(x$significant_SNPs, sep=", ")
+      }
   }
+  cat("\n\n-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ ")
+  
+}
 
 
 
@@ -100,9 +104,12 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
 
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
-  if(length(obj$significant_SNPs)==0){
-    stop("Manhattan plot can't be displayed, because the analysis has been limited to prior estimation", call. = F)
+
+  
+  if(any(stringr::str_detect(obj$log_info, "Analysis failed"))){
+    stop("Manhattan plot can not be displayed, because the analysis failed", call. = F)
   }
+    
   if(!is.logical(save_file)) stop("save_file : should be logical")
   # if no name, use the one from the analysis (in log file)
   if(save_file && is.null(file_name)){
@@ -132,6 +139,7 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
                  expression(-log[10](italic(fdr))) ,
                  expression(-log[10](italic(p))) )
   } else if(results == "posterior"){
+    
     value = ifelse(method=="FDR", "fdr_posterior", "p_posterior")
     obj$all_BFs %>%
       select(.data$rsid, .data$chrm_UK10K, .data$pos_UK10K, {{value}}) %>%
@@ -288,6 +296,11 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
 coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
+  
+  if(any(stringr::str_detect(obj$log_info, "Analysis failed"))){
+    stop("Coefficients plot can not be displayed, because the analysis failed", call. = F)
+  }
+  
   if(is.null(obj$all_MRcoeffs)) stop("The prior has not been created using Prior GWASs, there are no coefficients to plot")
   if(!is.logical(save_file)) stop("save_file : should be logical")
   # if no name, use the one from the analysis (in log file)
@@ -405,6 +418,11 @@ if(save_file) grDevices::dev.off()
 extract_results_bGWAS <- function(obj, SNPs="significant", results="BF"){
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
+  if(any(stringr::str_detect(obj$log_info, "Analysis failed"))){
+    stop("Results can not be extracted, because the analysis failed", call. = F)
+  }
+  
+  
   if(!SNPs %in% c("all", "significant")) stop("SNPs : should be \"all\" or \"significant\".")
   if(!results %in% c("BF", "posterior", "direct")) stop("results : should be \"BF\", \"posterior\" or \"direct\".")
   
@@ -466,6 +484,11 @@ extract_results_bGWAS <- function(obj, SNPs="significant", results="BF"){
 extract_MRcoeffs_bGWAS <- function(obj){
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
+  
+  if(any(stringr::str_detect(obj$log_info, "Analysis failed"))){
+    stop("MR coefficients can not be extracted, because the analysis failed", call. = F)
+  }
+  
   if(is.null(obj$all_MRcoeffs)) stop("The prior has not been created using Prior GWASs, there are no coefficients to extract")
 
   # For each study :
@@ -510,6 +533,10 @@ heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
 
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
+  if(any(stringr::str_detect(obj$log_info, "Analysis failed"))){
+    stop("Heatmap can not be displayed, because the analysis failed", call. = F)
+  }
+  
   if(!is.logical(save_file)) stop("save_file : should be logical")
   # if no name, use the one from the analysis (in log file)
   if(save_file && is.null(file_name)){
@@ -636,6 +663,7 @@ get_RSquared_bGWAS <- function(obj, SNPs="all"){ # obj should be a bGWAS object
   if(!SNPs %in% c("all", "moderate", "instruments")) stop("SNPs : should be \"all\", \"moderate\" or \"instruments\".")
   
   R2=NA
+  if(any(stringr::str_detect(obj$log_info, "Analysis failed"))) return(NA)
   if(SNPs=="all"){
     Line =  obj$log_info[stringr::str_detect(obj$log_info, "Correlation between prior and observed effects for all SNPs is ")]
     R2 = as.numeric(stringr::str_split(Line, "is ")[[1]][2])^2
