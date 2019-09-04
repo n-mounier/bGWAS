@@ -176,7 +176,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
             "Please have a look at the stepwise procedure results ", 
             "and update \"prior_studies\" before relaunching the analysis ",
             "to avoid looping again.")
-      update_log(Log, tmp, verbose)
+      Log = update_log(Log, tmp, verbose)
       
       if(save_files) utils::write.table(Files_Info, file="PriorGWASs.tsv", sep="\t", quote=F, row.names=F )
       

@@ -18,7 +18,7 @@ print.bGWAS <- function(x,...) {
 
   cat("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ \n \n")
   
-  if(any(stringr::str_detect(obj$log_info, "Analysis failed"))){
+  if(any(stringr::str_detect(x$log_info, "Analysis failed"))){
      cat("Analysis failed")
   }else{
     if(nrow(x$significant_studies)>1){
