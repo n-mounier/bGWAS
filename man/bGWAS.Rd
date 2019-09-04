@@ -122,6 +122,7 @@ list_priorGWASs(MyStudies)
  A = bGWAS(name="Test_UsingSmallDataFrame",
           GWAS = SmallGWAS_Timmers2019,
           prior_studies=MyStudies,
+          MR_threshold = 1e-6,
           stepwise_threshold=0.05,
           save_files=T)
           }
