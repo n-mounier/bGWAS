@@ -115,8 +115,8 @@ have alternative names:
 
 <ul>
 
-SNP-identifier: `rs` or `rsid`, `snp`, `snpid`, `rnpid` Alternate
-allele: `a1` or `alt`, `alts`  
+SNP-identifier: `rs` or `rsid`, `snp`, `snpid`, `rnpid`    
+Alternate allele: `a1` or `alt`, `alts`  
 Reference allele: `a2` or `a0`, `ref`  
 Z-statistics: `z` or `Z`, `zscore`
 

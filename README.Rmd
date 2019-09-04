@@ -127,7 +127,8 @@ To run the analysis with `bGWAS` two inputs are needed:
 
 #### 1. The *GWAS* results to be tested   
 Can be a regular (space/tab/comma-separated) file or a gzipped file (.gz) or a `data.frame`. Must contain the following columns, which can have alternative names:  
-<ul>   SNP-identifier:  `rs` or `rsid`, `snp`, `snpid`, `rnpid`                       Alternate allele:  `a1` or `alt`, `alts`    
+<ul>   SNP-identifier:  `rs` or `rsid`, `snp`, `snpid`, `rnpid`     
+       Alternate allele:  `a1` or `alt`, `alts`    
        Reference allele: `a2` or `a0`, `ref`    
        Z-statistics: `z` or `Z`, `zscore`  </ul>     
 If the Z-statistics is not present, it will be automatically calculated from effect size and standard error, in which case the following columns should be provided:     
