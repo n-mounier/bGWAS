@@ -13,14 +13,14 @@ print.bGWAS <- function(x,...) {
   cat (paste0(" Analysis : \"",strsplit(strsplit(x$log_info[
     grep("The name of your analysis is: ", x$log_info)],
     "The name of your analysis is: \"", fixed=T)[[1]][2], "\"", fixed=T)[[1]][1],"\" \n"))
-  cat( "bGWAS performed on", format( nrow(x$all_BFs) , big.mark = "," , scientific = F) ,
-                                    "SNPs \n \n" )
-
-  cat("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ \n \n")
   
   if(any(stringr::str_detect(x$log_info, "Analysis failed"))){
      cat("Analysis failed")
   }else{
+    cat( "bGWAS performed on", format( nrow(x$all_BFs) , big.mark = "," , scientific = F) ,
+         "SNPs \n \n" )
+    
+    cat("-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ \n \n")
     if(nrow(x$significant_studies)>1){
       cat(nrow(x$significant_studies), "studies used to build the prior : \n")
       print(x$significant_studies[,1:3], row.names=F)
