@@ -200,9 +200,10 @@ list_priorGWASs(MyStudies)[,c("Name", "Trait", "Reference")]
 ```{r exampleA-part2, eval=F}
 A = bGWAS(name="Test_UsingSmallDataFrame",
           GWAS = SmallGWAS_Timmers2019,
+          MR_threshold = 1e-6,
           prior_studies = MyStudies,
           stepwise_threshold = 0.05)
-# MR instruments will be selected using default parameters,
+# MR instruments will be selected using a threshold of 1e-6,
 # MR will be performed using a threshold of 0.05 to select studies, and the default shrinkage threshold,
 # A subset of prior GWASs (MyStudies) will be used to create the prior,
 # Significant SNPs will be identified using default parameters (p<5e-8) and distance-pruned (500kb),
