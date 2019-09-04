@@ -5,7 +5,7 @@
 \title{bGWAS - main function}
 \usage{
 bGWAS(name, GWAS, Z_matrices = "~/ZMatrices/", prior_studies = NULL,
-  MR_threshold = 1e-06, MR_ninstruments = 3, MR_pruning_dist = 500,
+  MR_threshold = 1e-05, MR_ninstruments = 3, MR_pruning_dist = 500,
   MR_pruning_LD = 0, MR_shrinkage = 1, stepwise_threshold = NULL,
   prior_shrinkage = 1, sign_method = "p", sign_thresh = 5e-08,
   use_permutations = FALSE, res_pruning_dist = 500,
@@ -24,7 +24,7 @@ list of studies available (prior GWASs), or a \code{data.frame} (character, nume
 will include all the prior GWASs available (numeric vector)}
 
 \item{MR_threshold}{The threshold used to select strong instruments for MR, should be lower
-than 1e-5, \code{default=1e-6} (numeric)}
+than 1e-5, \code{default=1e-5} (numeric)}
 
 \item{MR_ninstruments}{The minimum number of strong instruments needed to use a prior GWAS, 
 should be between 2 and 8, \code{default=3} (numeric)}

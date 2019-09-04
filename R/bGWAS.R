@@ -14,7 +14,7 @@
 #' @param prior_studies The IDs of prior GWASs to use for the analysis, \code{default=NULL},
 #'        will include all the prior GWASs available (numeric vector)
 #' @param MR_threshold The threshold used to select strong instruments for MR, should be lower
-#'        than 1e-5, \code{default=1e-6} (numeric)
+#'        than 1e-5, \code{default=1e-5} (numeric)
 #' @param MR_ninstruments The minimum number of strong instruments needed to use a prior GWAS, 
 #'        should be between 2 and 8, \code{default=3} (numeric)
 #' @param MR_pruning_dist The distance used for pruning MR instruments (in Kb), should be between 10 and 1000,
@@ -120,7 +120,7 @@ bGWAS <- function(name,
                   GWAS,
                   Z_matrices = "~/ZMatrices/",
                   prior_studies = NULL,
-                  MR_threshold = 1e-6,
+                  MR_threshold = 1e-5,
                   MR_ninstruments = 3,
                   MR_pruning_dist = 500,
                   MR_pruning_LD = 0,
