@@ -115,7 +115,7 @@ have alternative names:
 
 <ul>
 
-SNP-identifier: `rs` or `rsid`, `snp`, `snpid`, `rnpid`    
+SNP-identifier: `rs` or `rsid`, `snp`, `snpid`, `rnpid`  
 Alternate allele: `a1` or `alt`, `alts`  
 Reference allele: `a2` or `a0`, `ref`  
 Z-statistics: `z` or `Z`, `zscore`
@@ -359,7 +359,7 @@ print_log_bGWAS(A)
     ## The conventional GWAS used as input the object: "GWAS".  
     ##    SNPID column, ok - ALT column, ok - REF column, ok - BETA column, ok - SE column, ok
     ## Posterior effects will be rescaled using BETA and SE.
-    ## The analysis will be run in the folder: "/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS".  
+    ## The analysis will be run in the folder: "/Users/nmounier/Documents/SGG/Temp".  
     ## The p-value threshold used for selecting MR instruments is: 1e-06.  
     ## The minimum number instruments required for each trait is: 3.  
     ## The distance used for pruning MR instruments is: 500Kb.  
@@ -560,7 +560,6 @@ print_log_bGWAS(A)
     ## Done! 
     ## # Estimating p-values for direct effects... 
     ## Done! 
-    ## Done! 
     ## > Pruning and identifying significant SNPs 
     ## Identification based on BFs 
     ##    Starting with 286,807 SNPs 
@@ -592,7 +591,7 @@ print_log_bGWAS(A)
     ## 
     ## 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 1 minute(s) and 36 second(s).
+    ## Time of the analysis: 2 minute(s) and 38 second(s).
 
 Functions to extract results from an object of class *bGWAS*:
 
