@@ -456,7 +456,7 @@ bGWAS <- function(name,
     
     if(save_files) write(log_info, paste0(name,".log"))
     
-    print("Analysis stopped : see log for more informations.")
+    cat("\nAnalysis stopped : see log for more informations.")
     
     results=list()
     results$log_info = log_info
