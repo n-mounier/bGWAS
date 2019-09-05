@@ -156,7 +156,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
     filter(P<0.05) %>%
     pull(.data$study) ->  studies_to_test
   
-  tmp = paste0("Studies tested (reaching p<0.05 in univariate models) : \n ", paste(get_names(studies_to_test, Z_matrices), collapse = " \n "), "\n")
+  tmp = paste0("Studies tested (reaching p<0.05 in univariate models) : \n ", paste(get_names(c(significant_studies,studies_to_test), Z_matrices), collapse = " \n "), "\n")
   Log = update_log(Log, tmp, verbose)
   
   
