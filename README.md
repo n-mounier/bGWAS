@@ -272,9 +272,9 @@ A = bGWAS(name="Test_UsingSmallDataFrame",
           GWAS = SmallGWAS_Timmers2019,
           prior_studies = MyStudies,
           stepwise_threshold = 0.05)
-# MR instruments will be selected using default parameters,
-# MR will be performed using a threshold of 0.05 to select studies, and the default shrinkage threshold,
-# A subset of prior GWASs (MyStudies) will be used to create the prior,
+# MR instruments will be selected using default parameter (1e-6) and distance-pruned (500Kb),
+# MR will be performed using a threshold of 0.05 to select studies, and the default shrinkage thresholds (1) will be used,
+# A subset of prior GWASs (MyStudies) will be used, and only the ones with at least 3 strong instruments will be kept to be tested and create the prior,
 # Significant SNPs will be identified using default parameters (p<5e-8) and distance-pruned (500kb),
 # No file will be saved.
 ```
@@ -359,14 +359,16 @@ print_log_bGWAS(A)
     ## The conventional GWAS used as input the object: "GWAS".  
     ##    SNPID column, ok - ALT column, ok - REF column, ok - BETA column, ok - SE column, ok
     ## Posterior effects will be rescaled using BETA and SE.
-    ## The analysis will be run in the folder: "/Users/nmounier/Documents/SGG/Temp".  
+    ## The analysis will be run in the folder: "/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS/doc".  
     ## The p-value threshold used for selecting MR instruments is: 1e-06.  
     ## The minimum number instruments required for each trait is: 3.  
     ## The distance used for pruning MR instruments is: 500Kb.  
     ## Distance-based pruning will be used for MR instruments.  
     ## No shrinkage applied before performing MR.
     ## The p-value threshold used for stepwise selection is 0.05.  
+    ## Using MR_shrinkage as default for prior_shrinkage:
     ## No shrinkage applied before performing calculating the prior.
+    ## The p-value threshold used for stepwise selection is 0.05.  
     ## Significant SNPs will be identified according to p-value. The threshold used is :5e-08.  
     ## The distance used for pruning results is: 500Kb.  
     ## Distance-based pruning will be used for results.  
@@ -393,7 +395,6 @@ print_log_bGWAS(A)
     ## 
     ## > Performing MR  
     ## #Preparation of the MR analyses to identify significant studies... 
-    ## Studies tested : Body Mass Index (GIANT) - Coronary Artery Disease (CARDIoGRAM) - Years of Schooling (SSGAC) - Systolic Blood Pressure (ICBP) - Diastolic Blood Pressure (ICBP) - College Completion (SSGAC)
     ## Conventionnal GWAS of interest : GWAS
     ## # Univariate regressions for each trait... 
     ##   Number of trait-specific instruments per univariate regression: 
@@ -405,6 +406,7 @@ print_log_bGWAS(A)
     ##   . College Completion (SSGAC) : 4 
     ## Done! 
     ## # Stepwise selection (all traits)... 
+    ## Studies tested (reaching p<0.05 in univariate models) :  Years of Schooling (SSGAC)  Body Mass Index (GIANT)  Coronary Artery Disease (CARDIoGRAM)  Systolic Blood Pressure (ICBP)  Diastolic Blood Pressure (ICBP)
     ## Adding the first study :Years of Schooling (SSGAC) 
     ## #Test if any study can be added with p<0.05 
     ## Adding one study :Systolic Blood Pressure (ICBP) 
@@ -591,7 +593,7 @@ print_log_bGWAS(A)
     ## 
     ## 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 2 minute(s) and 38 second(s).
+    ## Time of the analysis: 1 minute(s) and 48 second(s).
 
 Functions to extract results from an object of class *bGWAS*:
 
