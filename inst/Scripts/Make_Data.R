@@ -78,7 +78,7 @@ R.utils::gzip('~/Documents/SGG/Projects/Packaging/bGWAS/inst/Data/Z_Matrices/ZMa
 ## Rdata for tests
 library(bGWAS)
 
-#data("SmallGWAS_Timmers2019")
+data("SmallGWAS_Timmers2019")
 MyStudies = select_priorGWASs(include_traits=c("Blood Pressure", "Education"),  
                               include_files=c("cardiogram_gwas_results.txt", 
                                               "All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq.gz"))
