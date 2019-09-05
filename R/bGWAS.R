@@ -14,7 +14,7 @@
 #' @param prior_studies The IDs of prior GWASs to use for the analysis, \code{default=NULL},
 #'        will include all the prior GWASs available (numeric vector)
 #' @param MR_threshold The threshold used to select strong instruments for MR, should be lower
-#'        than 1e-5, \code{default=1e-5} (numeric)
+#'        than 1e-5, \code{default=1e-6} (numeric)
 #' @param MR_ninstruments The minimum number of strong instruments needed to use a prior GWAS, 
 #'        should be between 2 and 8, \code{default=3} (numeric)
 #' @param MR_pruning_dist The distance used for pruning MR instruments (in Kb), should be between 10 and 1000,
@@ -24,7 +24,7 @@
 #' @param MR_shrinkage The p-value threshold used for shrinkage before performing MR, should be between
 #'        \code{MR_threshold} and 1 (no shrinkage), \code{default=1} (numeric)
 #' @param prior_shrinkage The p-value threshold used for shrinkage before calculating the prior,
-#'        should be between \code{MR_threshold} and 1, \code{default=1e-5} (numeric)
+#'        should be between \code{MR_threshold} and 1, \code{default=NULL} will use \code{MR_shrinkage} (numeric)
 #' @param stepwise_threshold The p-value threshold used for inclusion/exclusion of Prior GWASs during the
 #'        stepwise selection approach, should be between 0.05 and 0.0005, \code{default=NULL} will use 0.05 
 #'        divided by the number of Prior GWASs tested (numeric)
@@ -121,11 +121,11 @@ bGWAS <- function(name,
                   GWAS,
                   Z_matrices = "~/ZMatrices/",
                   prior_studies = NULL,
-                  MR_threshold = 1e-5,
+                  MR_threshold = 1e-6,
                   MR_ninstruments = 3,
                   MR_pruning_dist = 500,
                   MR_pruning_LD = 0,
-                  MR_shrinkage = 1,
+                  MR_shrinkage = NULL,
                   stepwise_threshold = NULL,
                   prior_shrinkage = 1,
                   sign_method = "p",
@@ -338,6 +338,11 @@ bGWAS <- function(name,
   
   
   ## prior_shrinkage, should be between MR_threshold and 1
+  if(is.null(stepwise_threshold)){
+    tmp = "Using MR_shrinkage as default for prior_shrinkage:"
+    log_info = update_log(log_info, tmp, verbose)
+    prior_shrinkage = MR_shrinkage
+  } 
   if(!is.numeric(prior_shrinkage)) stop("prior_shrinkage : non-numeric argument", call. = FALSE)
   if(prior_shrinkage<0) stop("prior_shrinkage : should be positive", call. = FALSE)
   if(prior_shrinkage<MR_threshold) stop("prior_shrinkage : should be higher than the threshold used to select MR instruments", call. = FALSE)
@@ -350,8 +355,24 @@ bGWAS <- function(name,
     tmp = paste0("All p-values lower than ", format(prior_shrinkage, scientific = T), " will be shrunk to 0 before calculating the prior.  \n")
     log_info = update_log(log_info, tmp, verbose)
   }
+
   
   
+  
+  ## stepwise_threshold, should be between 0.05 and 0.0005 or NULL
+  if(is.null(stepwise_threshold)){
+    tmp = "The p-value threshold used for stepwise selection will be derived according to the number of Prior GWASs used.  \n"
+    log_info = update_log(log_info, tmp, verbose)
+  } else if(is.numeric(stepwise_threshold)){
+    if(stepwise_threshold<0.0005) stop("stepwise_threshold : should not be lower than 0.0005", call. = FALSE)
+    if(stepwise_threshold>0.05) stop("stepwise_threshold : should not be higher 0.05", call. = FALSE)
+    tmp = paste0("The p-value threshold used for stepwise selection is ", format(stepwise_threshold, scientific = F), ".  \n")
+    log_info = update_log(log_info, tmp, verbose)
+  } else{
+    stop("stepwise_threshold : should be numeric or NULL", call. = FALSE)
+  }
+  
+
   ## sign_method -> should not be "p" or "fdr"
   if(!sign_method %in% c("p", "fdr")) stop("sign_method : method not accepted, should be \"p\" or \"fdr\"", call. = FALSE)
   
@@ -456,7 +477,7 @@ bGWAS <- function(name,
     
     if(save_files) write(log_info, paste0(name,".log"))
     
-    cat("\nAnalysis stopped : see log for more informations.")
+    cat("\nAnalysis stopped : see log for more informations. \n")
     
     results=list()
     results$log_info = log_info

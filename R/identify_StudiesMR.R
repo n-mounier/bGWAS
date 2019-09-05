@@ -32,9 +32,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
     slice(-length(.data$.)) %>%
     pull() ->  Prior_study_names 
 
-  tmp = paste0("Studies tested : ", paste(get_names(Prior_study_names, Z_matrices), collapse = " - "), "\n")
-  Log = update_log(Log, tmp, verbose)
-  
+   
   tmp = paste0("Conventionnal GWAS of interest : ", All_study_names[length(All_study_names)], "\n")
   Log = update_log(Log, tmp, verbose)
   
@@ -157,6 +155,10 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
     filter(!.data$study %in% significant_studies) %>%
     filter(P<0.05) %>%
     pull(.data$study) ->  studies_to_test
+  
+  tmp = paste0("Studies tested (reaching p<0.05 in univariate models) : \n ", paste(get_names(studies_to_test, Z_matrices), collapse = " \n "), "\n")
+  Log = update_log(Log, tmp, verbose)
+  
   
   if(save_files){ # add Status : stepwise exclusion, will be updated if the studies are added
     Files_Info$status[Files_Info$File %in% non_significant_studies] = "Excluded during stepwise selection"

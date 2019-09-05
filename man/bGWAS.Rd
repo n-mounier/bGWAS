@@ -5,8 +5,8 @@
 \title{bGWAS - main function}
 \usage{
 bGWAS(name, GWAS, Z_matrices = "~/ZMatrices/", prior_studies = NULL,
-  MR_threshold = 1e-05, MR_ninstruments = 3, MR_pruning_dist = 500,
-  MR_pruning_LD = 0, MR_shrinkage = 1, stepwise_threshold = NULL,
+  MR_threshold = 1e-06, MR_ninstruments = 3, MR_pruning_dist = 500,
+  MR_pruning_LD = 0, MR_shrinkage = NULL, stepwise_threshold = NULL,
   prior_shrinkage = 1, sign_method = "p", sign_thresh = 5e-08,
   use_permutations = FALSE, res_pruning_dist = 500,
   res_pruning_LD = 0, save_files = FALSE, verbose = TRUE)
@@ -24,7 +24,7 @@ list of studies available (prior GWASs), or a \code{data.frame} (character, nume
 will include all the prior GWASs available (numeric vector)}
 
 \item{MR_threshold}{The threshold used to select strong instruments for MR, should be lower
-than 1e-5, \code{default=1e-5} (numeric)}
+than 1e-5, \code{default=1e-6} (numeric)}
 
 \item{MR_ninstruments}{The minimum number of strong instruments needed to use a prior GWAS, 
 should be between 2 and 8, \code{default=3} (numeric)}
@@ -43,7 +43,7 @@ stepwise selection approach, should be between 0.05 and 0.0005, \code{default=NU
 divided by the number of Prior GWASs tested (numeric)}
 
 \item{prior_shrinkage}{The p-value threshold used for shrinkage before calculating the prior,
-should be between \code{MR_threshold} and 1, \code{default=1e-5} (numeric)}
+should be between \code{MR_threshold} and 1, \code{default=NULL} will use \code{MR_shrinkage} (numeric)}
 
 \item{sign_method}{The method used to identify significant SNPs, should be \code{"p"} for
 p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)}
