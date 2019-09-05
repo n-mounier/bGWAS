@@ -18,13 +18,8 @@ Lifespan_Timmers2019 = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz"
 ```
 
 Now that we have the data in our working directory, we can launch the
-analysis (with default parameters):
-
-``` r
-print(getwd())
-```
-
-    ## [1] "/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS/doc"
+analysis (with default parameters **the default parameters might change
+depending on the different settings results**):
 
 ``` r
 Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
@@ -49,7 +44,8 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ## The distance used for pruning MR instruments is: 500Kb.  
     ## Distance-based pruning will be used for MR instruments.  
     ## No shrinkage applied before performing MR.The p-value threshold used for stepwise selection will be derived according to the number of Prior GWASs used.  
-    ## No shrinkage applied before performing calculating the prior.Significant SNPs will be identified according to p-value. The threshold used is :5e-08.  
+    ## Using MR_shrinkage as default for prior_shrinkage:No shrinkage applied before performing calculating the prior.The p-value threshold used for stepwise selection will be derived according to the number of Prior GWASs used.  
+    ## Significant SNPs will be identified according to p-value. The threshold used is :5e-08.  
     ## The distance used for pruning results is: 500Kb.  
     ## Distance-based pruning will be used for results.  
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
@@ -75,7 +71,6 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ## 1,927 SNPs left after removing studies with only one strong instrument 
     ## > Performing MR  
     ## #Preparation of the MR analyses to identify significant studies... 
-    ## Studies tested : Body Mass Index (GIANT) - Schizophrenia (PGC) - 2014 - Coronary Artery Disease (CARDIoGRAM) - Type 2 Diabetes (DIAGRAM) - Years of Schooling (SSGAC) - Glucose (ENGAGE) - Crohns Disease (IBD) - Ulcerative Colitis (IBD) - HDL Cholesterol (GLGC) - LDL Cholesterol (GLGC) - Total Cholesterol (GLGC) - Triglycerides (GLGC) - Glucose (MAGIC) - 2010 - HOMA-B (MAGIC) - Glucose (MAGIC) - Insulin (MAGIC) - Heart Rate (HRgene) - Height (GIANT) - Parkinsons - Neuroblastoma - Multiple Sclerosis - Systolic Blood Pressure (ICBP) - Diastolic Blood Pressure (ICBP) - Schizophrenia (PGC) - 2013 - Schizophrenia (PGC) - College Completion (SSGAC)
     ## Conventionnal GWAS of interest : lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz
     ## # Univariate regressions for each trait... 
     ##   Number of trait-specific instruments per univariate regression: 
@@ -108,6 +103,19 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ## Done! 
     ## # Stepwise selection (all traits)... 
     ## The p-value threshold used for stepwise selection is 0.0019 (26 Prior GWASs tested).  
+    ## Studies tested (reaching p<0.05 in univariate models) : 
+    ##  Years of Schooling (SSGAC) 
+    ##  Body Mass Index (GIANT) 
+    ##  Coronary Artery Disease (CARDIoGRAM) 
+    ##  Ulcerative Colitis (IBD) 
+    ##  HDL Cholesterol (GLGC) 
+    ##  LDL Cholesterol (GLGC) 
+    ##  Total Cholesterol (GLGC) 
+    ##  Triglycerides (GLGC) 
+    ##  Glucose (MAGIC) - 2010 
+    ##  Glucose (MAGIC) 
+    ##  Systolic Blood Pressure (ICBP) 
+    ##  Diastolic Blood Pressure (ICBP)
     ## Adding the first study :Years of Schooling (SSGAC) 
     ##   iteration 1: 1 studies 
     ## #Run model 
@@ -302,17 +310,11 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ## 2 SNPs left 
     ## Done! 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 20 minute(s) and 27 second(s).
+    ## Time of the analysis: 22 minute(s) and 29 second(s).
 
 We can look at the results more in details.
 
 ## Prior GWASs used
-
-``` r
-print(getwd())
-```
-
-    ## [1] "/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS/doc"
 
 ``` r
 coefficients_plot_bGWAS(Lifespan_bGWAS)
@@ -320,7 +322,7 @@ coefficients_plot_bGWAS(Lifespan_bGWAS)
 
 <img src="Figures/Lifespan_v1.0.0-results1-1.png" width="100%" />
 
-7 prior GWASs are used to create the prior, the multivariate causal
+5 prior GWASs are used to create the prior, the multivariate causal
 effect estimates are consistent with what we would expect. On this
 figure, the multivariate causal effect estimate and the 95% interval
 from the multivariate MR model using all chromosomes (black dot and
