@@ -338,7 +338,7 @@ bGWAS <- function(name,
   
   
   ## prior_shrinkage, should be between MR_threshold and 1
-  if(is.null(stepwise_threshold)){
+  if(is.null(prior_shrinkage)){
     tmp = "Using MR_shrinkage as default for prior_shrinkage:"
     log_info = update_log(log_info, tmp, verbose)
     prior_shrinkage = MR_shrinkage
