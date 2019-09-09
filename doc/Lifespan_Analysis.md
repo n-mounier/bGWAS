@@ -310,7 +310,7 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ## 2 SNPs left 
     ## Done! 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 22 minute(s) and 29 second(s).
+    ## Time of the analysis: 23 minute(s) and 38 second(s).
 
 We can look at the results more in details.
 
@@ -344,35 +344,35 @@ With this approach, we identified 25:
 
 ``` r
 # all hits
-knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))), digits=3)
+knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))) %>% arrange(chrm_UK10K), digits=3)
 ```
 
 | rsid        | chrm\_UK10K | pos\_UK10K | alt | ref |  z\_obs | mu\_prior\_estimate | mu\_prior\_std\_error | BF       | BF\_p    |
 | :---------- | ----------: | ---------: | :-- | :-- | ------: | ------------------: | --------------------: | :------- | :------- |
-| rs429358    |          19 |   45411941 | T   | C   |  19.328 |               1.854 |                 1.217 | 1.59e+54 | 7.52e-80 |
-| rs10455872  |           6 |  161010118 | A   | G   |  10.282 |               2.150 |                 1.157 | 4.25e+16 | 1.27e-26 |
-| rs8042849   |          15 |   78817929 | T   | C   |  10.659 |               0.265 |                 1.105 | 8.57e+13 | 5.24e-23 |
-| rs11065979  |          12 |  112059557 | T   | C   | \-7.128 |             \-2.227 |                 1.220 | 5.48e+08 | 9.74e-16 |
-| rs2891168   |           9 |   22098619 | A   | G   |   6.601 |               2.327 |                 1.241 | 4.99e+07 | 3.52e-14 |
-| rs11066188  |          12 |  112610714 | A   | G   | \-6.524 |             \-1.846 |                 1.215 | 1.34e+07 | 2.64e-13 |
-| rs8039305   |          15 |   91422543 | T   | C   |   6.414 |               1.473 |                 1.129 | 2.65e+06 | 3.27e-12 |
-| rs138175288 |          19 |   11189980 | A   | C   |   5.733 |               3.305 |                 1.189 | 2.60e+06 | 3.36e-12 |
-| rs12924886  |          16 |   72075593 | A   | T   |   5.679 |               2.455 |                 1.116 | 6.65e+05 | 2.88e-11 |
-| rs61348208  |           4 |    3089564 | T   | C   |   5.823 |               1.479 |                 1.106 | 2.22e+05 | 1.66e-10 |
 | rs1230666   |           1 |  114173410 | A   | G   | \-5.805 |             \-1.433 |                 1.116 | 1.96e+05 | 2.01e-10 |
-| rs12302980  |          12 |  111360290 | A   | G   | \-5.750 |             \-1.390 |                 1.138 | 1.59e+05 | 2.82e-10 |
-| rs56179563  |           7 |  129685597 | A   | G   |   5.190 |               2.881 |                 1.165 | 1.49e+05 | 3.14e-10 |
 | rs646776    |           1 |  109818530 | T   | C   | \-4.908 |             \-4.822 |                 1.236 | 1.07e+05 | 5.36e-10 |
 | rs6719980   |           2 |     651507 | T   | C   | \-5.407 |             \-1.906 |                 1.143 | 1.03e+05 | 5.66e-10 |
-| rs9393691   |           6 |   26272829 | T   | C   | \-5.570 |             \-1.565 |                 1.107 | 9.97e+04 | 5.98e-10 |
 | rs1275922   |           2 |   26932887 | A   | G   | \-5.817 |             \-0.850 |                 1.111 | 5.95e+04 | 1.37e-09 |
-| rs59234174  |           9 |   16730258 | T   | C   | \-5.127 |             \-1.492 |                 1.107 | 1.76e+04 | 9.90e-09 |
-| rs6558008   |           8 |   27438306 | A   | C   | \-5.424 |             \-0.890 |                 1.106 | 1.61e+04 | 1.14e-08 |
-| rs62477737  |           7 |   75162278 | A   | G   | \-5.269 |             \-1.088 |                 1.110 | 1.43e+04 | 1.39e-08 |
-| rs66720652  |          12 |   20582640 | A   | T   | \-5.347 |             \-0.937 |                 1.110 | 1.38e+04 | 1.46e-08 |
-| rs7742789   |           6 |   43345803 | T   | C   | \-5.299 |             \-0.984 |                 1.110 | 1.30e+04 | 1.63e-08 |
-| rs10465231  |           9 |   92183413 | T   | C   | \-5.156 |             \-0.985 |                 1.109 | 8.00e+03 | 3.58e-08 |
 | rs7599488   |           2 |   60718347 | T   | C   | \-4.663 |             \-1.956 |                 1.114 | 6.86e+03 | 4.60e-08 |
+| rs61348208  |           4 |    3089564 | T   | C   |   5.823 |               1.479 |                 1.106 | 2.22e+05 | 1.66e-10 |
+| rs10455872  |           6 |  161010118 | A   | G   |  10.282 |               2.150 |                 1.157 | 4.25e+16 | 1.27e-26 |
+| rs9393691   |           6 |   26272829 | T   | C   | \-5.570 |             \-1.565 |                 1.107 | 9.97e+04 | 5.98e-10 |
+| rs7742789   |           6 |   43345803 | T   | C   | \-5.299 |             \-0.984 |                 1.110 | 1.30e+04 | 1.63e-08 |
+| rs56179563  |           7 |  129685597 | A   | G   |   5.190 |               2.881 |                 1.165 | 1.49e+05 | 3.14e-10 |
+| rs62477737  |           7 |   75162278 | A   | G   | \-5.269 |             \-1.088 |                 1.110 | 1.43e+04 | 1.39e-08 |
+| rs6558008   |           8 |   27438306 | A   | C   | \-5.424 |             \-0.890 |                 1.106 | 1.61e+04 | 1.14e-08 |
+| rs2891168   |           9 |   22098619 | A   | G   |   6.601 |               2.327 |                 1.241 | 4.99e+07 | 3.52e-14 |
+| rs59234174  |           9 |   16730258 | T   | C   | \-5.127 |             \-1.492 |                 1.107 | 1.76e+04 | 9.90e-09 |
+| rs10465231  |           9 |   92183413 | T   | C   | \-5.156 |             \-0.985 |                 1.109 | 8.00e+03 | 3.58e-08 |
+| rs11065979  |          12 |  112059557 | T   | C   | \-7.128 |             \-2.227 |                 1.220 | 5.48e+08 | 9.74e-16 |
+| rs11066188  |          12 |  112610714 | A   | G   | \-6.524 |             \-1.846 |                 1.215 | 1.34e+07 | 2.64e-13 |
+| rs12302980  |          12 |  111360290 | A   | G   | \-5.750 |             \-1.390 |                 1.138 | 1.59e+05 | 2.82e-10 |
+| rs66720652  |          12 |   20582640 | A   | T   | \-5.347 |             \-0.937 |                 1.110 | 1.38e+04 | 1.46e-08 |
+| rs8042849   |          15 |   78817929 | T   | C   |  10.659 |               0.265 |                 1.105 | 8.57e+13 | 5.24e-23 |
+| rs8039305   |          15 |   91422543 | T   | C   |   6.414 |               1.473 |                 1.129 | 2.65e+06 | 3.27e-12 |
+| rs12924886  |          16 |   72075593 | A   | T   |   5.679 |               2.455 |                 1.116 | 6.65e+05 | 2.88e-11 |
+| rs429358    |          19 |   45411941 | T   | C   |  19.328 |               1.854 |                 1.217 | 1.59e+54 | 7.52e-80 |
+| rs138175288 |          19 |   11189980 | A   | C   |   5.733 |               3.305 |                 1.189 | 2.60e+06 | 3.36e-12 |
 | rs12459965  |          19 |   18452195 | T   | C   |   4.426 |               2.781 |                 1.121 | 6.55e+03 | 4.96e-08 |
 
 ``` r
@@ -402,28 +402,33 @@ threshold of 5e-8 to call significance).
 Using the previous version (Timmers et al), we identified… 
 
 ``` r
-manhattan_plot_bGWAS(Lifespan_bGWAS)
+# For the plots, we will use only the new hits
+my_SNPs = tibble(
+        rs = c("rs646776", "rs6719980", "rs7599488", "rs7742789", "rs56179563", "rs62477737", "rs6558008", "rs59234174", "rs10465231", "rs66720652", "rs12459965"),
+        gene = c("CELSR2/PSRC1", "TMEM18", "BCL11A", "ZNF318/ABCC10", "ZC3HC1", "POM21C", "EPHX2/CLU", "BNC2", "GADD45G", "PDE3A", "LSM4/PGPEP1"))
+
+manhattan_plot_bGWAS(Lifespan_bGWAS, SNPs=my_SNPs)
 ```
 
 <img src="Figures/Lifespan_v1.0.0-results3-1.png" width="100%" />
 
 ``` r
+my_SNPs %>%
+  mutate(color="#932735") -> my_SNPs
 heatmap_bGWAS(Lifespan_bGWAS)
 ```
 
 <img src="Figures/Lifespan_v1.0.0-results4-1.png" width="100%" />
 
-**FIX SIZE OF LABELS : NOT ALL SNPs RSIDS ARE PLOTTED, NOTHING IS
-ALIGNED\!\!\!\!**
-
-Some traits have higher contribution to prior effects in general
-(everything except height and T2D). Overall, lot of red (makes sense,
-SNPs aligned to be life-lengthening, we expect positive contributions to
-prior). Still, some SNPs with large contribution of one trait -\> can
-compensate smaller contributions in the other direction for other traits
-& look at the large significant negative effect on LDL (compensated by a
-significant positive effect on BP). And some SNPs with small effect (in
-the right direction) on most of the traits (pleiotropic effects).
+Overall, lot of red (makes sense, SNPs aligned to be life-lengthening,
+we expect positive contributions to prior). Among these 11 new variants,
+4 were known to be associated with at least one of the RFs (variant near
+CELSR2/PSRC1 associated with LDL cholesterol, variants near TMEM18 and
+LSM4/PGPEP1 associated with Body Mass Index, variant near BCL11A
+associated with Years of Schooling). 7 variants (near ZNF318, ZC3HC1,
+POM21C, EPHX2/CLU, BNC2, GADD45G and PDE3A) have not been previously
+associated with any of the RFs, suggesting that they could be acting on
+lifespan through smaller pleiotropic effects on several RFs
 
 ## Results - Direct Effects
 
@@ -440,4 +445,4 @@ knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, results="direct")  %>% mutate
 | rs8042849 |          15 |   78817929 | T   | C   | 10.659 |               10.395 |                  1.490 |     6.976 | 3.04e-12  |
 
 APOE (highly pleiotropic, not capturing everything) + CHRNA (smoking not
-included) + LPA (?)
+included)

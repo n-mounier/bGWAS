@@ -19,27 +19,25 @@ options(pillar.neg=F, # do no print neg number in red
 # Lifespan Analysis
 
 In this example, we will use the data from Timmers et al to apply our Bayesian GWAS approach to study lifespan.    
-Here, we assume that the `bGWAS` package is already installed, that the Z-matrix files have already been downloaded and stored in "~/ZMatrices". If that is not the case, please follow the steps described [here](../README.md). 
+Here, we assume that the `bGWAS` package is already installed, that the Z-matrix files have already been downloaded and stored in `"~/ZMatrices"`. If that is not the case, please follow the steps described [here](../README.md). 
 
 ```{r download-data, echo=TRUE, message=FALSE, results='hide', cache=F}
 library(bGWAS) # bGWAS github version:
 
 # Download data to working directory (~460 MB) if not already here
 if(!file.exists("lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")) download.file(url = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3209/lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz?sequence=1&isAllowed=y", destfile = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")
-
-Lifespan_Timmers2019 = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz"
 ```
 
-Now that we have the data in our working directory, we can launch the analysis (with default parameters **the default parameters might change depending on  the different settings results**):
+Now that we have the data in our working directory, we can launch the analysis (with default parameters):
 
 ```{r bGWAS, echo=TRUE}
 Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
-                       GWAS = Lifespan_Timmers2019)
+                       GWAS = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")
 ```
 
 
 
-We can look at the results more in details.
+We can now look at the results more in details.
 
 ## Prior GWASs used
 
@@ -47,23 +45,24 @@ We can look at the results more in details.
 coefficients_plot_bGWAS(Lifespan_bGWAS)
 ```
 
-`r nrow(extract_MRcoeffs_bGWAS(Lifespan_bGWAS))` prior GWASs are used to create the prior, the multivariate causal effect estimates are consistent with what we would expect. On this figure, the multivariate causal effect estimate and the 95\% interval from the multivariate MR model using all chromosomes (black dot and bars) as well as the 22 per-chromosome estimates (grey bars) are represented for each prior GWASs. Coronary Artery Disease (CAD) has the strongest negative effect on lifespan. High Diastolic Blood Pressure (DBP) and Body Mass Index (BMI) also decreases lifespan. We can also see that education, in this case the number of years of schooling, has a positive effect on lifespan.
+`r nrow(extract_MRcoeffs_bGWAS(Lifespan_bGWAS))` prior GWASs (risk factors) are used to create the prior, the multivariate causal effect estimates are consistent with what we would expect. On this figure, the multivariate causal effect estimate and the 95\% interval from the multivariate MR model using all chromosomes (black dot and bars) as well as the 22 per-chromosome estimates (grey bars) are represented for each prior GWASs. Coronary Artery Disease (CAD) has the strongest negative effect on lifespan. High Diastolic Blood Pressure (DBP) and Body Mass Index (BMI) also decreases lifespan. We can also see that education, in this case the number of years of schooling, has a positive effect on lifespan.
 
-Overall, the squared correlation between prior and observed effects is about `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "all"), 3)` and goes up to `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "moderate"), 3)` when we consider only SNPs having at least a moderate effect on lifespan (observed p-value < 0.001).   
-Using the previous version (Timmers et al), squared correlation was: \textcolor{red}{to add}   
+Overall, the squared correlation between prior and observed effects is about `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "all"), 3)` and goes up to `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "moderate"), 3)` when we consider only SNPs having at least a moderate effect on lifespan (observed p-value < 0.001).     
+Using the previous version (Timmers et al), squared correlation was around 0.003 when considering all SNPs and around 0.082 for SNPs having a moderate effect.    
 
 ## Results - BF
 
-With this approach, we identified `r nrow(extract_results_bGWAS(Lifespan_bGWAS))`:
+With this approach, we identified `r nrow(extract_results_bGWAS(Lifespan_bGWAS))` SNPs affecting lifespan through the identified risk factors:
 
 ```{r results2, echo=TRUE}
 # all hits
-knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))), digits=3)
+knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))) %>% arrange(chrm_UK10K), digits=3)
 
 # new hits (compared to conventional GWAS)
 extract_results_bGWAS(Lifespan_bGWAS) %>%
   mutate(obs_p = 2*pnorm(-abs(z_obs))) %>%
-  filter(obs_p>5e-8) -> NEW
+  filter(obs_p>5e-8) %>% 
+  arrange(chrm_UK10K) -> NEW
 knitr::kable(NEW %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))), digits=3)
 ```
 
@@ -71,17 +70,25 @@ knitr::kable(NEW %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)
 Using the previous version (Timmers et al), we identified... \textcolor{red}{to add}
 
 ```{r results3, dpi=300}
-manhattan_plot_bGWAS(Lifespan_bGWAS)
+# For the plots, we will use only the new hits
+NEW %>% 
+  tranmute(rs=rsid,
+		gene = c("CELSR2/PSRC1", "TMEM18", "BCL11A", "ZNF318/ABCC10", "ZC3HC1", "POM21C", "EPHX2/CLU", "BNC2", "GADD45G", "PDE3A", "LSM4/PGPEP1")) -> my_SNPs
+
+manhattan_plot_bGWAS(Lifespan_bGWAS, SNPs=my_SNPs)
 ```
 
 
 ```{r results4, dpi=300}
+my_SNPs %>%
+  mutate(color="#932735") -> my_SNPs
 heatmap_bGWAS(Lifespan_bGWAS)
 ```
 
-**FIX SIZE OF LABELS : NOT ALL SNPs RSIDS ARE PLOTTED, NOTHING IS ALIGNED!!!!**    
+    
 
-Some traits have higher contribution to prior effects in general (everything except height and T2D). Overall, lot of red (makes sense, SNPs aligned to be life-lengthening, we expect positive contributions to prior). Still, some SNPs with large contribution of one trait -> can compensate smaller contributions in the other direction for other traits \& look at the large significant negative effect on LDL (compensated by a significant positive effect on BP). And some SNPs with small effect (in the right direction) on most of the traits (pleiotropic effects).     
+Overall, lot of red (makes sense, SNPs aligned to be life-lengthening, we expect positive contributions to prior). Among these 11 new variants, 4 were known to be associated with at least one of the RFs (variant near CELSR2/PSRC1 associated with LDL cholesterol, variants near TMEM18 and LSM4/PGPEP1 associated with Body Mass Index, variant near BCL11A associated with Years of Schooling). 
+7 variants (near ZNF318, ZC3HC1, POM21C, EPHX2/CLU, BNC2, GADD45G and PDE3A) have not been previously associated with any of the RFs, suggesting that they could be acting on lifespan through smaller pleiotropic effects on several RFs
 
 
 ## Results - Direct Effects
@@ -93,7 +100,7 @@ We can use direct effects to identify SNPs significantly acting on lifespan inde
 knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, results="direct")  %>% mutate(p_direct=as.character(format(p_direct, scientific=T, digits=3))), digits=3)
 ```
 
-APOE (highly pleiotropic, not capturing everything) + CHRNA (smoking not included) + LPA (?)    
+APOE (highly pleiotropic, not capturing everything) + CHRNA (smoking not included)
 
 
 
