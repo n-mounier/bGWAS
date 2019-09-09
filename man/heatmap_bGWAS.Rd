@@ -4,10 +4,14 @@
 \alias{heatmap_bGWAS}
 \title{Heatmap of SNP effects on prior traits from bGWAS results}
 \usage{
-heatmap_bGWAS(obj, save_file = F, file_name = NULL)
+heatmap_bGWAS(obj, SNPs = NULL, save_file = F, file_name = NULL)
 }
 \arguments{
 \item{obj}{an object of class bGWAS created using \code{\link{bGWAS}()}}
+
+\item{SNPs}{A data.frame containing the SNPs (rsid) to use in the first column, and 
+optionnally the text that should be plotted in addition to rsid in the second 
+column \code{default=NULL}.}
 
 \item{save_file}{A logical indicating if the graphic should be saved,
 \code{default=FALSE}, graphic will be displayed on the on-screen device}

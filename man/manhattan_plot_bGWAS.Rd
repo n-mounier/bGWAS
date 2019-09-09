@@ -5,7 +5,7 @@
 \title{Manhattan Plot from bGWAS results}
 \usage{
 manhattan_plot_bGWAS(obj, save_file = F, file_name = NULL,
-  annotate = T, results = "BF")
+  annotate = T, SNPs = NULL, results = "BF")
 }
 \arguments{
 \item{obj}{an object of class bGWAS created using \code{\link{bGWAS}()}}
@@ -19,7 +19,12 @@ manhattan_plot_bGWAS(obj, save_file = F, file_name = NULL,
 \item{annotate}{A logical indicating if the significant SNPs identified in the
 analysis should be annotated on the plot, \code{default=TRUE}
 If your results are not pruned or if you have a high number of significant SNPs,
-be aware that \code{annotate=TRUE} might decrease readability of the figure.}
+be aware that \code{annotate=TRUE} might decrease readability of the figure. You
+could define a set of SNPs to annotate using \code{SNPs}.}
+
+\item{SNPs}{A data.frame containing the SNPs (rsid) to annotate in the first column, and 
+optionnally the text that should be plotted in the second column, and the color
+in the third column, \code{default=NULL}, only evaluated if \code{annotate=TRUE}.}
 
 \item{results, }{"BF" / "posterior" / "direct",  \code{default="BF"}}
 }

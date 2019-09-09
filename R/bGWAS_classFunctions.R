@@ -87,7 +87,11 @@ all.equal.bGWAS <- function(obj1, obj2) {
 #' @param annotate A logical indicating if the significant SNPs identified in the
 #'        analysis should be annotated on the plot, \code{default=TRUE}
 #'        If your results are not pruned or if you have a high number of significant SNPs,
-#'        be aware that \code{annotate=TRUE} might decrease readability of the figure.
+#'        be aware that \code{annotate=TRUE} might decrease readability of the figure. You
+#'        could define a set of SNPs to annotate using \code{SNPs}.
+#' @param SNPs A data.frame containing the SNPs (rsid) to annotate in the first column, and 
+#'        optionnally the text that should be plotted in the second column, and the color
+#'        in the third column, \code{default=NULL}, only evaluated if \code{annotate=TRUE}.
 #' @param results, "BF" / "posterior" / "direct",  \code{default="BF"}
 #' 
 #' @details
@@ -100,7 +104,7 @@ all.equal.bGWAS <- function(obj1, obj2) {
 #' @export
 
 manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
-                                  annotate=T, results="BF") {
+                                  annotate=T, SNPs = NULL, results="BF") {
 
   ## check parameters
   if(class(obj) != "bGWAS") stop("Function implemented for objets of class \"bGWAS\" only.")
@@ -126,8 +130,9 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
   threshold = as.numeric(strsplit(strsplit(obj$log_info[
     grep("Significant SNPs will be identified according to ", obj$log_info)],
     "The threshold used is :")[[1]][2], ".", fixed=T)[[1]][1])
-
-
+  if(annotate && !(is.data.frame(SNPs) | is.null(SNPs))) stop("SNPs : should be a data.frame")
+  if(is.data.frame(SNPs) && ncol(SNPs)>3)  stop("SNPs : should not have more than 2 columns")
+  
   
   if(results == "BF"){
     value = ifelse(method=="FDR", "BF_fdr", "BF_p")
@@ -172,6 +177,7 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
 
   if(save_file) grDevices::png(file_name, width = 20, height = 12, units = "cm", res = 500)
 
+  
   qqman::manhattan(ToPlot ,
                    chr = "chrm_UK10K" ,
                    bp = "pos_UK10K" ,
@@ -227,19 +233,44 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
 
 
   if(annotate){ # significant SNPs from the analysis
+    use_color=F
+    if(is.data.frame(SNPs)){ 
+      SNPs %>%
+        stats::setNames( c("rs", "name", "color")[1:ncol(SNPs)]) -> SNPs
+      SNPs %>%
+        pull(1) -> rsids
+      ToPlot %>%
+        slice(match(rsids,.data$rsid)) -> SNPs_to_plot
+      if(ncol(SNPs)>1){
+        SNPs %>%
+          slice(match(SNPs_to_plot$rsid, .data$rs)) %>%
+          pull(2) -> labels
+      } else {
+        SNPs_to_plot %>% pull(.data$rsid) -> labels
+      }
+      if(ncol(SNPs)>2){
+        use_color = T
+        SNPs %>%
+          slice(match(SNPs_to_plot$rsid, .data$rs)) %>%
+          pull(3) -> my_colors
+      }
+    } else {
     # extract them
-    if(results=="BF"){
-      ToPlot %>%
-        filter( .data$rsid %in% obj$significant_SNPs) -> SNPs_to_plot
-    } else if(results=="posterior"){
-      ToPlot %>%
-        filter( .data$rsid %in% obj$posterior_SNPs) -> SNPs_to_plot
-    } else if(results=="direct"){
-      ToPlot %>%
-        filter( .data$rsid %in% obj$direct_SNPs) -> SNPs_to_plot
-    } 
-    
-    
+      if(results=="BF"){
+        ToPlot %>%
+          filter( .data$rsid %in% obj$significant_SNPs) -> SNPs_to_plot
+        SNPs_to_plot %>% pull(.data$rsid) -> labels
+      } else if(results=="posterior"){
+        ToPlot %>%
+          filter( .data$rsid %in% obj$posterior_SNPs) -> SNPs_to_plot
+        SNPs_to_plot %>% pull(.data$rsid) -> labels
+      } else if(results=="direct"){
+        ToPlot %>%
+          filter( .data$rsid %in% obj$direct_SNPs) -> SNPs_to_plot
+        SNPs_to_plot %>% pull(.data$rsid) -> labels
+      } 
+      
+    }
     
     ToPlot %>%
       mutate(p=NULL) %>%
@@ -266,10 +297,18 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
     }
 
     SNPs_to_plot$x = apply(SNPs_to_plot, 1, function(x) get_posx(x, all))
-
-    calibrate::textxy(SNPs_to_plot$x, SNPs_to_plot$y,
-                      labs=SNPs_to_plot$rsid,
-                      offset = 0.625, cex=0.45)
+    
+    if(use_color){
+      graphics::points(x=SNPs_to_plot$x, y=SNPs_to_plot$y, col=my_colors, cex=.7)
+      
+      calibrate::textxy(SNPs_to_plot$x, SNPs_to_plot$y+0.5,
+                        labs= labels,
+                        col = my_colors,
+                        offset = 0.45, cex=0.6)
+    } else {
+      calibrate::textxy(SNPs_to_plot$x, SNPs_to_plot$y+0.5,
+                        labs= labels,
+                        offset = 0.45, cex=0.6)    }
   }
 
 
@@ -521,13 +560,16 @@ extract_MRcoeffs_bGWAS <- function(obj){
 #'        \code{default=FALSE}, graphic will be displayed on the on-screen device
 #' @param file_name The name of the file saved (is \code{save_file} is \code{TRUE})
 #'        \code{default=NULL}, will used NameOfYourAnalysis_Heatmap.png
+#' @param SNPs A data.frame containing the SNPs (rsid) to use in the first column, and 
+#'        optionnally the text that should be plotted in addition to rsid in the second 
+#'        column \code{default=NULL}.
 #' @return a Heatmap
 #'
 #' @importFrom rlang :=
 #' @export
 
 
-heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
+heatmap_bGWAS <- function(obj, SNPs=NULL, save_file=F, file_name=NULL) {
   # can only be run on significant SNPs?
   
 
@@ -552,10 +594,24 @@ heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
 
   if(length(obj$significant_SNPs)<2)  stop("heatmap can only be created if at least 2 significant hits have been identified")
     
+  if(!is.null(SNPs) && !is.data.frame(SNPs)) stop("SNPs : should be a data.frame")
+  if(!is.null(SNPs)){
+    SNPs %>%
+      stats::setNames( c("rs", "name")[1:ncol(SNPs)]) -> SNPs
+  }
+  if(is.data.frame(SNPs) && !all(SNPs$rs %in% extract_results_bGWAS(obj)$rsid)) stop("SNPs : the rsids provided do not match the ones of significant SNPs")
+  if(is.data.frame(SNPs) && ncol(SNPs)>2) stop("SNPs : should not have more than 2 columns")
+  
   if(save_file) grDevices::png(file_name, width = 20, height = 12, units = "cm", res = 500)
 
   Matrix = obj$matrix_heatmap
   Res_signif = extract_results_bGWAS(obj)
+  if(!is.null(SNPs)){
+    SNPs %>%
+      stats::setNames( c("rs", "name")[1:ncol(SNPs)]) -> SNPs
+    Res_signif %>%
+      slice(match(SNPs$rs, .data$rsid)) -> Res_signif
+  }
   all_causalestimates = obj$all_MRcoeffs
 
   # 1) align to have obs_effect >0
@@ -597,8 +653,8 @@ heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
   RF_contribution = RF_SNPs
   
   Res_signif_aligned %>%
-    pull(.data$rsid) -> SNPs
-  for(snp in 1:length(SNPs)){
+    pull(.data$rsid) -> all_SNPs
+  for(snp in 1:length(all_SNPs)){
     all_causalestimates %>%
       filter(.data$chrm==as.numeric(Res_signif_aligned[snp, "chrm_UK10K"])) -> causalestimates
     # re-order the RFs before multiplying
@@ -619,6 +675,10 @@ heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
     tidyr::unite(SNPs_Name, .data$rsid, .data$alt, sep = " - ") %>%
     pull(.data$SNPs_Name) -> SNPs_Name
   
+  if(!is.null(SNPs) && ncol(SNPs)>1){
+    SNPs_Name = paste0(SNPs_Name, " (", SNPs$name, ")")
+  }
+  
   Z_matrices = strsplit(obj$log_info[stringr::str_detect(obj$log_info, "The Z-Matrix files are stored in \"")], "\"")[[1]][2]
   
   RFs_Names = get_names(RFs, Z_matrices)
@@ -632,10 +692,10 @@ heatmap_bGWAS <- function(obj, save_file=F, file_name=NULL) {
             notecex = 2,
             Rowv=F, Colv=F,
             dendrogram="none", col=my_colors, trace="none",
-            margins=c(10, 10),labCol=RFs_Names, labRow=SNPs_Name , cexCol=0.8, cexRow=0.8,
+            margins=c(10, 10),labCol=RFs_Names, labRow=SNPs_Name , cexCol=0.8, cexRow=0.7,
             lwid=c(0.5, 3.5), keysize=0.75, key.ylab="", 
             key.par = list(cex=0.5, cex.main=0.0001,  cex.axis=1, cex.lab=1, cex.sub=1), srtCol=45,
-            density.info='none',
+            density.info='none', 
             key.xlab="Contribution to prior effects")
   
   
