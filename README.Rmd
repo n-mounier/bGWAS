@@ -40,10 +40,10 @@ badger::badge_lifecycle("maturing", "9cf"),
 badger::badge_last_commit("n-mounier/bGWAS"),
 
 #license
-badger::badge_custom("license", "GPL-2.0", "lightgrey", "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html")
+badger::badge_custom("license", "GPL-2.0", "lightgrey", "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html"),
 
 #DOI
-
+badger::badge_custom("poster", "10.5281/zenodo.3403093", "blueviolet", "https://doi.org/10.5281/zenodo.3403093")
 )
 
 ```

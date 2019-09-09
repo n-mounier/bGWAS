@@ -4,6 +4,7 @@
 [![](https://img.shields.io/badge/lifecycle-maturing-9cf.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![](https://img.shields.io/github/last-commit/n-mounier/bGWAS.svg)](https://github.com/n-mounier/bGWAS/commits/master)
 [![](https://img.shields.io/badge/license-GPL--2.0-lightgrey.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+[![](https://img.shields.io/badge/poster-10.5281/zenodo.3403093-blueviolet.svg)](https://doi.org/10.5281/zenodo.3403093)
 
 # bGWAS <img src="inst/Figures/logo.png" align="right" height=180/>
 
