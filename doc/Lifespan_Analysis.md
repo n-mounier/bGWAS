@@ -5,7 +5,7 @@ In this example, we will use the data from Timmers et al to apply our
 Bayesian GWAS approach to study lifespan.  
 Here, we assume that the `bGWAS` package is already installed, that the
 Z-matrix files have already been downloaded and stored in
-“\~/ZMatrices”. If that is not the case, please follow the steps
+`"~/ZMatrices"`. If that is not the case, please follow the steps
 described [here](../README.md).
 
 ``` r
@@ -13,17 +13,14 @@ library(bGWAS) # bGWAS github version:
 
 # Download data to working directory (~460 MB) if not already here
 if(!file.exists("lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")) download.file(url = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3209/lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz?sequence=1&isAllowed=y", destfile = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")
-
-Lifespan_Timmers2019 = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz"
 ```
 
 Now that we have the data in our working directory, we can launch the
-analysis (with default parameters **the default parameters might change
-depending on the different settings results**):
+analysis (with default parameters):
 
 ``` r
 Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
-                       GWAS = Lifespan_Timmers2019)
+                       GWAS = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")
 ```
 
     ## <<< Preparation of analysis >>> 
@@ -310,9 +307,9 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ## 2 SNPs left 
     ## Done! 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 23 minute(s) and 38 second(s).
+    ## Time of the analysis: 34 minute(s) and 1 second(s).
 
-We can look at the results more in details.
+We can now look at the results more in details.
 
 ## Prior GWASs used
 
@@ -322,11 +319,11 @@ coefficients_plot_bGWAS(Lifespan_bGWAS)
 
 <img src="Figures/Lifespan_v1.0.0-results1-1.png" width="100%" />
 
-5 prior GWASs are used to create the prior, the multivariate causal
-effect estimates are consistent with what we would expect. On this
-figure, the multivariate causal effect estimate and the 95% interval
-from the multivariate MR model using all chromosomes (black dot and
-bars) as well as the 22 per-chromosome estimates (grey bars) are
+5 prior GWASs (risk factors) are used to create the prior, the
+multivariate causal effect estimates are consistent with what we would
+expect. On this figure, the multivariate causal effect estimate and the
+95% interval from the multivariate MR model using all chromosomes (black
+dot and bars) as well as the 22 per-chromosome estimates (grey bars) are
 represented for each prior GWASs. Coronary Artery Disease (CAD) has the
 strongest negative effect on lifespan. High Diastolic Blood Pressure
 (DBP) and Body Mass Index (BMI) also decreases lifespan. We can also see
@@ -336,11 +333,14 @@ positive effect on lifespan.
 Overall, the squared correlation between prior and observed effects is
 about 0.038 and goes up to 0.377 when we consider only SNPs having at
 least a moderate effect on lifespan (observed p-value \< 0.001).  
-Using the previous version (Timmers et al), squared correlation was: 
+Using the previous version (Timmers et al), squared correlation was
+around 0.003 when considering all SNPs and around 0.082 for SNPs having
+a moderate effect.
 
 ## Results - BF
 
-With this approach, we identified 25:
+With this approach, we identified 25 SNPs affecting lifespan through the
+identified risk factors:
 
 ``` r
 # all hits
@@ -379,33 +379,37 @@ knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% mutate(BF = as.character(
 # new hits (compared to conventional GWAS)
 extract_results_bGWAS(Lifespan_bGWAS) %>%
   mutate(obs_p = 2*pnorm(-abs(z_obs))) %>%
-  filter(obs_p>5e-8) -> NEW
-knitr::kable(NEW %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))), digits=3)
+  filter(obs_p>5e-8) %>% 
+  arrange(chrm_UK10K) -> New_Hits
+knitr::kable(New_Hits %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))), digits=3)
 ```
 
 | rsid       | chrm\_UK10K | pos\_UK10K | alt | ref |  z\_obs | mu\_prior\_estimate | mu\_prior\_std\_error | BF       | BF\_p    | obs\_p |
 | :--------- | ----------: | ---------: | :-- | :-- | ------: | ------------------: | --------------------: | :------- | :------- | -----: |
-| rs56179563 |           7 |  129685597 | A   | G   |   5.190 |               2.881 |                 1.165 | 1.49e+05 | 3.14e-10 |      0 |
 | rs646776   |           1 |  109818530 | T   | C   | \-4.908 |             \-4.822 |                 1.236 | 1.07e+05 | 5.36e-10 |      0 |
 | rs6719980  |           2 |     651507 | T   | C   | \-5.407 |             \-1.906 |                 1.143 | 1.03e+05 | 5.66e-10 |      0 |
-| rs59234174 |           9 |   16730258 | T   | C   | \-5.127 |             \-1.492 |                 1.107 | 1.76e+04 | 9.90e-09 |      0 |
-| rs6558008  |           8 |   27438306 | A   | C   | \-5.424 |             \-0.890 |                 1.106 | 1.61e+04 | 1.14e-08 |      0 |
-| rs62477737 |           7 |   75162278 | A   | G   | \-5.269 |             \-1.088 |                 1.110 | 1.43e+04 | 1.39e-08 |      0 |
-| rs66720652 |          12 |   20582640 | A   | T   | \-5.347 |             \-0.937 |                 1.110 | 1.38e+04 | 1.46e-08 |      0 |
-| rs7742789  |           6 |   43345803 | T   | C   | \-5.299 |             \-0.984 |                 1.110 | 1.30e+04 | 1.63e-08 |      0 |
-| rs10465231 |           9 |   92183413 | T   | C   | \-5.156 |             \-0.985 |                 1.109 | 8.00e+03 | 3.58e-08 |      0 |
 | rs7599488  |           2 |   60718347 | T   | C   | \-4.663 |             \-1.956 |                 1.114 | 6.86e+03 | 4.60e-08 |      0 |
+| rs7742789  |           6 |   43345803 | T   | C   | \-5.299 |             \-0.984 |                 1.110 | 1.30e+04 | 1.63e-08 |      0 |
+| rs56179563 |           7 |  129685597 | A   | G   |   5.190 |               2.881 |                 1.165 | 1.49e+05 | 3.14e-10 |      0 |
+| rs62477737 |           7 |   75162278 | A   | G   | \-5.269 |             \-1.088 |                 1.110 | 1.43e+04 | 1.39e-08 |      0 |
+| rs6558008  |           8 |   27438306 | A   | C   | \-5.424 |             \-0.890 |                 1.106 | 1.61e+04 | 1.14e-08 |      0 |
+| rs59234174 |           9 |   16730258 | T   | C   | \-5.127 |             \-1.492 |                 1.107 | 1.76e+04 | 9.90e-09 |      0 |
+| rs10465231 |           9 |   92183413 | T   | C   | \-5.156 |             \-0.985 |                 1.109 | 8.00e+03 | 3.58e-08 |      0 |
+| rs66720652 |          12 |   20582640 | A   | T   | \-5.347 |             \-0.937 |                 1.110 | 1.38e+04 | 1.46e-08 |      0 |
 | rs12459965 |          19 |   18452195 | T   | C   |   4.426 |               2.781 |                 1.121 | 6.55e+03 | 4.96e-08 |      0 |
 
 11 of them are missed by the conventional GWAS (using same p-value
 threshold of 5e-8 to call significance).  
-Using the previous version (Timmers et al), we identified… 
+Using the previous version (Timmers et al), we identified 7 new variants
+(using a threshold of 2.5e-8 for both GWAS and bGWAS results). Using a
+threshold of 5e-8 would have resulted
 
 ``` r
 # For the plots, we will use only the new hits
-my_SNPs = tibble(
-        rs = c("rs646776", "rs6719980", "rs7599488", "rs7742789", "rs56179563", "rs62477737", "rs6558008", "rs59234174", "rs10465231", "rs66720652", "rs12459965"),
-        gene = c("CELSR2/PSRC1", "TMEM18", "BCL11A", "ZNF318/ABCC10", "ZC3HC1", "POM21C", "EPHX2/CLU", "BNC2", "GADD45G", "PDE3A", "LSM4/PGPEP1"))
+New_Hits %>% 
+  transmute(rs=rsid,
+        gene = c("CELSR2/PSRC1", "TMEM18", "BCL11A", "ZNF318/ABCC10", "ZC3HC1", "POM21C", "EPHX2/CLU", "BNC2", "GADD45G", "PDE3A", "LSM4/PGPEP1"),
+        color="#932735") -> my_SNPs
 
 manhattan_plot_bGWAS(Lifespan_bGWAS, SNPs=my_SNPs)
 ```
@@ -414,21 +418,58 @@ manhattan_plot_bGWAS(Lifespan_bGWAS, SNPs=my_SNPs)
 
 ``` r
 my_SNPs %>%
-  mutate(color="#932735") -> my_SNPs
-heatmap_bGWAS(Lifespan_bGWAS)
+  mutate(color=NULL) -> my_SNPs
+heatmap_bGWAS(Lifespan_bGWAS, SNPs = my_SNPs)
 ```
 
 <img src="Figures/Lifespan_v1.0.0-results4-1.png" width="100%" />
 
-Overall, lot of red (makes sense, SNPs aligned to be life-lengthening,
-we expect positive contributions to prior). Among these 11 new variants,
-4 were known to be associated with at least one of the RFs (variant near
+On this figure, the contribution of each risk factor to the prior
+effects of new hits (alleles aligned to be life-lengthening) is
+represented as a heatmap. Overall, we observe a lot of red, as expected
+since alleles are aligned to be life-lengthening.  
+Among these 11 new variants, 4 were known to be associated with at least
+one of the RFs (indicated with a star on the heatmap - variant near
 CELSR2/PSRC1 associated with LDL cholesterol, variants near TMEM18 and
 LSM4/PGPEP1 associated with Body Mass Index, variant near BCL11A
 associated with Years of Schooling). 7 variants (near ZNF318, ZC3HC1,
-POM21C, EPHX2/CLU, BNC2, GADD45G and PDE3A) have not been previously
-associated with any of the RFs, suggesting that they could be acting on
-lifespan through smaller pleiotropic effects on several RFs
+POM21C, EPHX2/CLU, BNC2, GADD45G and PDE3A) are not associated with any
+of the RFs (at least not in the summary statistics used to create the
+prior), suggesting that they could be acting on lifespan through smaller
+pleiotropic effects on several RFs.  
+These variants can be further investigated using the [GWAS
+Catalog](https://www.ebi.ac.uk/gwas/) and looking at SNPs in 500kb
+region, using [LDlink](https://ldlink.nci.nih.gov/) to get R2 estimates
+in EUR population.  
+**ZNF318**:  
+\- a variant in LD (R2=0.8401), rs2270860, associated with “Diastolic
+blood pressure (cigarette smoking interaction)” in [this
+paper](https://www.ncbi.nlm.nih.gov/pubmed/26390057)  
+\- a variant in LD (R2=0.8978), rs16896398, associated with “DBP” in a
+recent GWAS using Japanese population
+[here](https://www.ncbi.nlm.nih.gov/pubmed/29403010)  
+**ZC3HC1**  
+\- a variant in LD (R2=0.8661), rs11556924, associated with “CAD” in a
+recent GWAS using UKBB
+[here](https://www.ncbi.nlm.nih.gov/pubmed/29212778)  
+**POM21C**  
+\- two variants in LD (R2=0.1782), rs58862095, associated with “BMI” in
+a recent GWAS using UKBB
+[here](https://www.ncbi.nlm.nih.gov/pubmed/30595370)  
+\- a variant in LD (R2=0.1947), rs1167827, associated with “Education
+Attainment” in a recent GWAS
+[here](https://www.ncbi.nlm.nih.gov/pubmed/30038396) and with “BMI” in
+[this paper](https://www.ncbi.nlm.nih.gov/pubmed/26426971)  
+**EPHX2/CLU**  
+\- none of the risk factors  
+**BNC2**  
+\- a variant in LD (R2=0.7988), rs10962547, associated with “BMI” in a
+recent GWAS using UKBB
+[here](https://www.ncbi.nlm.nih.gov/pubmed/30595370)  
+**GADD45G**  
+\- none of the risk factors  
+**PDE3A**  
+\- none of the risk factors
 
 ## Results - Direct Effects
 
@@ -444,5 +485,9 @@ knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, results="direct")  %>% mutate
 | rs429358  |          19 |   45411941 | T   | C   | 19.328 |               17.473 |                  1.575 |    11.093 | 1.36e-28  |
 | rs8042849 |          15 |   78817929 | T   | C   | 10.659 |               10.395 |                  1.490 |     6.976 | 3.04e-12  |
 
-APOE (highly pleiotropic, not capturing everything) + CHRNA (smoking not
-included)
+Here, two variants (rs429358 near APOE and rs8042849 near HYKK/CHRNA3/5)
+have a significant corrected effect. This is expected since APOE is
+known to be highly pleiotropic and to notably have an affect on
+Alzheimer disease, not used to create the prior. The second variant is
+not associated with any of the risk factor, and therefore its prior
+effect (0.265) is very small compared to its observed effect (10.659).

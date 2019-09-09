@@ -62,18 +62,19 @@ knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% mutate(BF = as.character(
 extract_results_bGWAS(Lifespan_bGWAS) %>%
   mutate(obs_p = 2*pnorm(-abs(z_obs))) %>%
   filter(obs_p>5e-8) %>% 
-  arrange(chrm_UK10K) -> NEW
-knitr::kable(NEW %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))), digits=3)
+  arrange(chrm_UK10K) -> New_Hits
+knitr::kable(New_Hits %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))), digits=3)
 ```
 
-`r nrow(NEW)` of them are missed by the conventional GWAS (using same p-value threshold of 5e-8 to call significance).    
-Using the previous version (Timmers et al), we identified... \textcolor{red}{to add}
+`r nrow(New_Hits)` of them are missed by the conventional GWAS (using same p-value threshold of 5e-8 to call significance).    
+Using the previous version (Timmers et al), we identified 7 new variants (using a threshold of 2.5e-8 for both GWAS and bGWAS results). Using a threshold of 5e-8 would have resulted 
 
 ```{r results3, dpi=300}
 # For the plots, we will use only the new hits
-NEW %>% 
-  tranmute(rs=rsid,
-		gene = c("CELSR2/PSRC1", "TMEM18", "BCL11A", "ZNF318/ABCC10", "ZC3HC1", "POM21C", "EPHX2/CLU", "BNC2", "GADD45G", "PDE3A", "LSM4/PGPEP1")) -> my_SNPs
+New_Hits %>% 
+  transmute(rs=rsid,
+		gene = c("CELSR2/PSRC1", "TMEM18", "BCL11A", "ZNF318/ABCC10", "ZC3HC1", "POM21C", "EPHX2/CLU", "BNC2", "GADD45G", "PDE3A", "LSM4/PGPEP1"),
+		color="#932735") -> my_SNPs
 
 manhattan_plot_bGWAS(Lifespan_bGWAS, SNPs=my_SNPs)
 ```
@@ -81,14 +82,33 @@ manhattan_plot_bGWAS(Lifespan_bGWAS, SNPs=my_SNPs)
 
 ```{r results4, dpi=300}
 my_SNPs %>%
-  mutate(color="#932735") -> my_SNPs
-heatmap_bGWAS(Lifespan_bGWAS)
+  mutate(color=NULL) -> my_SNPs
+heatmap_bGWAS(Lifespan_bGWAS, SNPs = my_SNPs)
 ```
 
     
 
-Overall, lot of red (makes sense, SNPs aligned to be life-lengthening, we expect positive contributions to prior). Among these 11 new variants, 4 were known to be associated with at least one of the RFs (variant near CELSR2/PSRC1 associated with LDL cholesterol, variants near TMEM18 and LSM4/PGPEP1 associated with Body Mass Index, variant near BCL11A associated with Years of Schooling). 
-7 variants (near ZNF318, ZC3HC1, POM21C, EPHX2/CLU, BNC2, GADD45G and PDE3A) have not been previously associated with any of the RFs, suggesting that they could be acting on lifespan through smaller pleiotropic effects on several RFs
+On this figure, the contribution of each risk factor to the prior effects of new hits (alleles aligned to be life-lengthening) is represented as a heatmap. Overall, we observe a lot of red, as expected since alleles are aligned to be life-lengthening.    
+Among these 11 new variants, 4 were known to be associated with at least one of the RFs (indicated with a star on the heatmap - variant near CELSR2/PSRC1 associated with LDL cholesterol, variants near TMEM18 and LSM4/PGPEP1 associated with Body Mass Index, variant near BCL11A associated with Years of Schooling). 
+7 variants (near ZNF318, ZC3HC1, POM21C, EPHX2/CLU, BNC2, GADD45G and PDE3A) are not associated with any of the RFs (at least not in the summary statistics used to create the prior), suggesting that they could be acting on lifespan through smaller pleiotropic effects on several RFs.    
+These variants can be further investigated using the [GWAS Catalog](https://www.ebi.ac.uk/gwas/) and looking at SNPs in 500kb region, using [LDlink](https://ldlink.nci.nih.gov/) to get R2 estimates in EUR population.    
+**ZNF318**:      
+- a variant in LD (R2=0.8401), rs2270860, associated with "Diastolic blood pressure (cigarette smoking interaction)" in [this paper](https://www.ncbi.nlm.nih.gov/pubmed/26390057)      
+- a variant in LD (R2=0.8978), rs16896398, associated with "DBP" in a recent GWAS using Japanese population [here](https://www.ncbi.nlm.nih.gov/pubmed/29403010)      
+**ZC3HC1**     
+- a variant in LD (R2=0.8661), rs11556924, associated with "CAD" in a recent GWAS using UKBB  [here](https://www.ncbi.nlm.nih.gov/pubmed/29212778)     
+**POM21C**          
+- two variants in LD (R2=0.1782), rs58862095, associated with "BMI" in a recent GWAS using UKBB  [here](https://www.ncbi.nlm.nih.gov/pubmed/30595370)    
+- a variant in LD (R2=0.1947), rs1167827, associated with "Education Attainment" in a recent GWAS [here](https://www.ncbi.nlm.nih.gov/pubmed/30038396) and with "BMI" in [this paper](https://www.ncbi.nlm.nih.gov/pubmed/26426971)    
+**EPHX2/CLU**    
+- none of the risk factors    
+**BNC2**     
+- a variant in LD (R2=0.7988), rs10962547, associated with "BMI" in a recent GWAS using UKBB [here](https://www.ncbi.nlm.nih.gov/pubmed/30595370)     
+**GADD45G**     
+- none of the risk factors     
+**PDE3A**    
+- none of the risk factors
+
 
 
 ## Results - Direct Effects
@@ -100,7 +120,7 @@ We can use direct effects to identify SNPs significantly acting on lifespan inde
 knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, results="direct")  %>% mutate(p_direct=as.character(format(p_direct, scientific=T, digits=3))), digits=3)
 ```
 
-APOE (highly pleiotropic, not capturing everything) + CHRNA (smoking not included)
+Here, two variants (rs429358 near APOE and rs8042849 near HYKK/CHRNA3/5) have a significant corrected effect. This is expected since APOE is known to be highly pleiotropic and to notably have an affect on Alzheimer disease, not used to create the prior. The second variant is not associated with any of the risk factor, and therefore its prior effect (0.265) is very small compared to its observed effect (10.659).
 
 
 
