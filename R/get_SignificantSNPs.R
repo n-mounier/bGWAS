@@ -65,7 +65,7 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
   }
   
   
-  
+  if(nrow(PriorThr)>0){
   # pruning results only if res_pruning_dist!=0
   if(!is.null(res_pruning_dist)){
     tmp = "# Pruning significant SNPs... \n"
@@ -102,6 +102,14 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
   
   BF_SNPs = pull(PriorThr, .data$rsid)
   
+  if(save_files){
+    readr::write_csv(path="SignificantSNPs.csv",  x=PriorThr)
+    tmp = "The file \"SignificantSNPs.csv\" has been successfully created \n"
+    Log = update_log(Log, tmp, verbose)
+    
+  }
+  
+  }
   
   #### posterior ####
   tmp = "Identification based on posterior effects \n"
@@ -150,6 +158,7 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
   
   
   # pruning results only if res_pruning_dist!=0
+ if(nrow(PriorThr)>0){
   if(!is.null(res_pruning_dist)){
     tmp = "# Pruning significant SNPs... \n"
     Log = update_log(Log, tmp, verbose)
@@ -181,10 +190,10 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
     tmp = "Done! \n"
     Log = update_log(Log, tmp, verbose)
   }
-  
+ 
   
   posterior_SNPs = pull(PriorThr, .data$rsid)
-  
+ }
   
   #### direct ####
   tmp = "Identification based on direct effects \n"
@@ -233,6 +242,7 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
   
   
   # pruning results only if res_pruning_dist!=0
+  if(nrow(PriorThr)>0){
   if(!is.null(res_pruning_dist)){
     tmp = "# Pruning significant SNPs... \n"
     Log = update_log(Log, tmp, verbose)
@@ -267,15 +277,9 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
   
   
   direct_SNPs = pull(PriorThr, .data$rsid)
-  
-  
-  
-  if(save_files){
-    readr::write_csv(path="SignificantSNPs.csv",  x=PriorThr)
-    tmp = "The file \"SignificantSNPs.csv\" has been successfully created \n"
-    Log = update_log(Log, tmp, verbose)
-    
   }
+  
+  
   
   # To create heatmap, need ZMat for significant SNPs
   All_ZMatrix %>%
@@ -284,9 +288,9 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
   
   res=list()
   res$log_info = Log
-  res$SNPs = BF_SNPs
-  res$posterior= posterior_SNPs
-  res$direct = direct_SNPs
+  res$SNPs = ifelse(exists("BF_SNPs"), BF_SNPs, NA)
+  res$posterior= ifelse(exists("posterior_SNPs"), posterior_SNPs, NA)
+  res$direct = ifelse(exists("direct_SNPs"), direct_SNPs, NA)
   res$mat = Matrix_Heatmap
   return(res)
 }
