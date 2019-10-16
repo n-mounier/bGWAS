@@ -104,11 +104,16 @@ tidy_inputGWAS <- function(GWAS, Z_matrices = "~/ZMatrices/", verbose=FALSE){
     
     # if beta + se
     if(!all(!HeaderGWAS %in% GWASnames[["BETA"]]) & !all(!HeaderGWAS %in% GWASnames[["SE"]])){
+      if(!all(!HeaderGWAS %in% GWASnames[["Z"]])){
+        tmp = c(tmp, paste0("Z column, ok"))
+      } else { # by default, use Z, only use beta/se if z not provided
+        getZ=TRUE
+      }
+      
       tmp = c(tmp, paste0("BETA column, ok"))
       tmp = c(tmp, paste0("SE column, ok"))
       rescaling = TRUE
       tmp2 = paste0("\nPosterior effects will be rescaled using BETA and SE.")
-      if(all(!HeaderGWAS %in% GWASnames[["Z"]])) getZ=TRUE
       # if z, ok too
     } else if(!all(!HeaderGWAS %in% GWASnames[["Z"]])){
       tmp = c(tmp, paste0("Z column, ok"))
