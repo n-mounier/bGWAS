@@ -288,9 +288,23 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
   
   res=list()
   res$log_info = Log
-  res$SNPs = ifelse(exists("BF_SNPs"), BF_SNPs, NA)
-  res$posterior= ifelse(exists("posterior_SNPs"), posterior_SNPs, NA)
-  res$direct = ifelse(exists("direct_SNPs"), direct_SNPs, NA)
+  if(exists("BF_SNPs")){
+    res$SNPs = BF_SNPs
+  } else {
+    res$SNPs = NA
+  }
+  if(exists("posterior_SNPs")){
+    res$posterior = posterior_SNPs
+  } else {
+    res$posterior = NA
+  }
+  if(exists("direct_SNPs")){
+    res$direct = direct_SNPs
+  } else {
+    res$direct = NA
+  }
+ 
+  
   res$mat = Matrix_Heatmap
   return(res)
 }
