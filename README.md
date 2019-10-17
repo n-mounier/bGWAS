@@ -40,6 +40,7 @@ Randomization (MR) approach, are used to calculate the prior effects.
 Causal effects are estimated masking the focal chromosome to ensure
 independence.  
 <img src="inst/Figures/PriorEstimation.jpg" align="center" height=300/>
+
 Observed and prior effects are compared using Bayes Factors.
 Significance is assessed by calculating the probability of observing a
 value larger than the observed BF (P-value) given the prior
