@@ -307,7 +307,7 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ## 2 SNPs left 
     ## Done! 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 34 minute(s) and 1 second(s).
+    ## Time of the analysis: 29 minute(s) and 22 second(s).
 
 We can now look at the results more in details.
 
@@ -437,39 +437,101 @@ POM21C, EPHX2/CLU, BNC2, GADD45G and PDE3A) are not associated with any
 of the RFs (at least not in the summary statistics used to create the
 prior), suggesting that they could be acting on lifespan through smaller
 pleiotropic effects on several RFs.  
-These variants can be further investigated using the [GWAS
-Catalog](https://www.ebi.ac.uk/gwas/) and looking at SNPs in 500kb
-region, using [LDlink](https://ldlink.nci.nih.gov/) to get R2 estimates
-in EUR population.  
-**ZNF318**:  
-\- a variant in LD (R2=0.8401), rs2270860, associated with “Diastolic
-blood pressure (cigarette smoking interaction)” in [this
-paper](https://www.ncbi.nlm.nih.gov/pubmed/26390057)  
-\- a variant in LD (R2=0.8978), rs16896398, associated with “DBP” in a
-recent GWAS using Japanese population
-[here](https://www.ncbi.nlm.nih.gov/pubmed/29403010)  
-**ZC3HC1**  
-\- a variant in LD (R2=0.8661), rs11556924, associated with “CAD” in a
-recent GWAS using UKBB
-[here](https://www.ncbi.nlm.nih.gov/pubmed/29212778)  
-**POM21C**  
-\- two variants in LD (R2=0.1782), rs58862095, associated with “BMI” in
-a recent GWAS using UKBB
-[here](https://www.ncbi.nlm.nih.gov/pubmed/30595370)  
-\- a variant in LD (R2=0.1947), rs1167827, associated with “Education
-Attainment” in a recent GWAS
-[here](https://www.ncbi.nlm.nih.gov/pubmed/30038396) and with “BMI” in
-[this paper](https://www.ncbi.nlm.nih.gov/pubmed/26426971)  
-**EPHX2/CLU**  
-\- none of the risk factors  
-**BNC2**  
-\- a variant in LD (R2=0.7988), rs10962547, associated with “BMI” in a
-recent GWAS using UKBB
-[here](https://www.ncbi.nlm.nih.gov/pubmed/30595370)  
-**GADD45G**  
-\- none of the risk factors  
-**PDE3A**  
-\- none of the risk factors
+These variants (and the ones in a 100kb window) can be further
+investigated using the [GWAS Catalog](https://www.ebi.ac.uk/gwas/). R2
+estimates in EUR population from [LDlink](https://ldlink.nci.nih.gov/)
+are used to keep only SNPs in LD (R2\>0.1) with the variant identified.
+SNP-trait associations p-values below 5e-8 are reported below (for SNPs
+in LD, p-values adjusted for correlation are used).
+
+``` r
+suppressWarnings(suppressMessages(source(system.file("Scripts/Get_GenesAndTraits.R", package="bGWAS"))))
+New_Hits %>% 
+  mutate(gene = c("CELSR2/PSRC1", "TMEM18", "BCL11A", "ZNF318/ABCC10", "ZC3HC1", "POM21C", "EPHX2/CLU", "BNC2", "GADD45G", "PDE3A", "LSM4/PGPEP1")) %>%
+  filter(!rsid %in% c("rs646776", "rs6719980", "rs7599488", "rs12459965")) -> SNPs_lookup 
+for(i in 1:nrow(SNPs_lookup)){
+  Hit = SNPs_lookup[i,]
+  print(paste0("SNP - ", Hit$rsid, " (",Hit$gene,"):"))
+  
+  Info = get_associatedTraits(Hit$rsid, Hit$chrm_UK10K, Hit$pos_UK10K,
+                                    LD=0.1, distance=100000, P=5e-8,
+                                    gwascatdata = my_ebicat37)
+  # format for nice kable output
+  if(nrow(Info)>0){
+    Info %>%
+      mutate(p=as.character(format(p, scientific=T, digits=3))) -> Info
+    print(knitr::kable(Info, digits=3))
+  } else {
+    print("No association reported")
+  }
+  cat("\n")
+}
+```
+
+\[1\] “SNP - rs7742789 (ZNF318/ABCC10):”
+
+    ## Loading required package: LDlinkR
+
+| snp         | chrm |   posh19 | LD\_R2 | LD\_alleles               | trait                                                                | p     | adjusted\_p | effect                       | gene            | url                                  |
+| :---------- | :--- | -------: | -----: | :------------------------ | :------------------------------------------------------------------- | :---- | ----------: | :--------------------------- | :-------------- | :----------------------------------- |
+| rs7763350-? | 6    | 43349308 |  0.909 | rs7763350(C)/rs7742789(T) | Cardiovascular disease                                               | 4e-16 |           0 |                              | ZNF318 - ABCC10 | www.ncbi.nlm.nih.gov/pubmed/30595370 |
+| rs2270860-? | 6    | 43270151 |  0.840 | rs2270860(T)/rs7742789(T) | Diastolic blood pressure (cigarette smoking interaction)             | 4e-11 |           0 |                              | SLC22A7, CRIP3  | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| rs4714678-A | 6    | 43342591 |  0.675 | rs4714678(G)/rs7742789(C) | Mean arterial pressure                                               | 9e-16 |           0 | \[0.28-0.47\] unit increase  | ZNF318 - ABCC10 | www.ncbi.nlm.nih.gov/pubmed/30487518 |
+| rs7763558-A | 6    | 43349215 |  0.909 | rs7763558(G)/rs7742789(C) | Pulse pressure                                                       | 4e-14 |           0 | \[0.15-0.25\] mmHg increase  | ZNF318 - ABCC10 | www.ncbi.nlm.nih.gov/pubmed/30578418 |
+| rs7763558-A | 6    | 43349215 |  0.909 | rs7763558(G)/rs7742789(C) | Pulse pressure x alcohol consumption interaction (2df test)          | 2e-16 |           0 |                              | ZNF318 - ABCC10 | www.ncbi.nlm.nih.gov/pubmed/29912962 |
+| rs9394948-A | 6    | 43334755 |  0.614 | rs9394948(C)/rs7742789(C) | Serum uric acid levels                                               | 2e-13 |           0 | \[0.024-0.04\] unit increase | ZNF318          | www.ncbi.nlm.nih.gov/pubmed/30993211 |
+| rs7763558-A | 6    | 43349215 |  0.909 | rs7763558(G)/rs7742789(C) | Systolic blood pressure                                              | 3e-24 |           0 | \[0.28-0.42\] mmHg increase  | ZNF318 - ABCC10 | www.ncbi.nlm.nih.gov/pubmed/30578418 |
+| rs2270860-? | 6    | 43270151 |  0.840 | rs2270860(T)/rs7742789(T) | Systolic blood pressure (cigarette smoking interaction)              | 8e-23 |           0 |                              | SLC22A7, CRIP3  | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| rs1214759-A | 6    | 43352980 |  0.905 | rs1214759(G)/rs7742789(C) | Systolic blood pressure x alcohol consumption interaction (2df test) | 2e-22 |           0 |                              | ZNF318 - ABCC10 | www.ncbi.nlm.nih.gov/pubmed/29912962 |
+
+\[1\] “SNP - rs56179563 (ZC3HC1):”
+
+| snp          | chrm |    posh19 | LD\_R2 | LD\_alleles                 | trait                                                                                                                                                                      | p     | adjusted\_p | effect                        | gene               | url                                  |
+| :----------- | :--- | --------: | -----: | :-------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---- | ----------: | :---------------------------- | :----------------- | :----------------------------------- |
+| rs11556924-? | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Cardiovascular disease                                                                                                                                                     | 2e-13 |           0 |                               | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/30595370 |
+| rs11556924-T | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Coronary artery disease                                                                                                                                                    | 1e-24 |           0 | \[0.05-0.074\] unit decrease  | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/29212778 |
+| rs11556924-C | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Coronary artery disease (myocardial infarction, percutaneous transluminal coronary angioplasty, coronary artery bypass grafting, angina or chromic ischemic heart disease) | 6e-13 |           0 | \[1.05-1.09\]                 | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/28714975 |
+| rs11556924-? | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Coronary artery disease or ischemic stroke                                                                                                                                 | 9e-10 |           0 |                               | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/24262325 |
+| rs11556924-? | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Coronary artery disease or large artery stroke                                                                                                                             | 8e-10 |           0 |                               | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/24262325 |
+| rs11556924-C | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Coronary heart disease                                                                                                                                                     | 9e-18 |           0 | \[1.07-1.12\]                 | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/21378990 |
+| rs11556924-T | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Diastolic blood pressure                                                                                                                                                   | 8e-15 |           0 | \[0.16-0.27\] mm Hg decrease  | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/27618452 |
+| rs11556924-? | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Height                                                                                                                                                                     | 1e-19 |           0 |                               | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/30595370 |
+| rs11556924-T | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Platelet count                                                                                                                                                             | 2e-12 |           0 | \[0.019-0.034\] unit increase | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/27863252 |
+| rs11556924-T | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Plateletcrit                                                                                                                                                               | 4e-09 |           0 | \[0.015-0.029\] unit increase | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/27863252 |
+| rs11556924-T | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | White blood cell count (basophil)                                                                                                                                          | 1e-11 |           0 | \[0.017-0.031\] unit increase | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/27863252 |
+
+\[1\] “SNP - rs62477737 (POM21C):” \[1\] “No association reported”
+
+\[1\] “SNP - rs6558008 (EPHX2/CLU):”
+
+| snp          | chrm |   posh19 | LD\_R2 | LD\_alleles                | trait                                                     | p     | adjusted\_p | effect                        | gene  | url                                  |
+| :----------- | :--- | -------: | -----: | :------------------------- | :-------------------------------------------------------- | :---- | ----------: | :---------------------------- | :---- | :----------------------------------- |
+| rs11783093-T | 8    | 27425349 |  0.588 | rs11783093(T)/rs6558008(C) | Age of smoking initiation (MTAG)                          | 1e-31 |           0 | \[0.02-0.028\] unit increase  | GULOP | www.ncbi.nlm.nih.gov/pubmed/30643251 |
+| rs1565735-A  | 8    | 27426077 |  0.417 | rs1565735(T)/rs6558008(A)  | Smoking cessation (MTAG)                                  | 3e-18 |           0 | \[0.013-0.021\] unit decrease | GULOP | www.ncbi.nlm.nih.gov/pubmed/30643251 |
+| rs11783093-T | 8    | 27425349 |  0.588 | rs11783093(T)/rs6558008(C) | Smoking initiation (ever regular vs never regular)        | 2e-41 |           0 | \[0.04-0.054\] unit decrease  | GULOP | www.ncbi.nlm.nih.gov/pubmed/30643251 |
+| rs11783093-T | 8    | 27425349 |  0.588 | rs11783093(T)/rs6558008(C) | Smoking initiation (ever regular vs never regular) (MTAG) | 1e-56 |           0 | \[0.021-0.026\] unit decrease | GULOP | www.ncbi.nlm.nih.gov/pubmed/30643251 |
+
+\[1\] “SNP - rs59234174 (BNC2):” \[1\] “No association reported”
+
+\[1\] “SNP - rs10465231 (GADD45G):”
+
+| snp          | chrm |   posh19 | LD\_R2 | LD\_alleles                 | trait                             | p     | adjusted\_p | effect                          | gene       | url                                  |
+| :----------- | :--- | -------: | -----: | :-------------------------- | :-------------------------------- | :---- | ----------: | :------------------------------ | :--------- | :----------------------------------- |
+| rs11265835-A | 9    | 92216360 |  0.697 | rs11265835(C)/rs10465231(T) | Cognitive performance (MTAG)      | 8e-12 |           0 | \[0.011-0.02\] unit increase    | AL161910.1 | www.ncbi.nlm.nih.gov/pubmed/30038396 |
+| rs7040995-C  | 9    | 92226172 |  0.543 | rs7040995(G)/rs10465231(T)  | Educational attainment (MTAG)     | 9e-16 |           0 | \[0.008-0.013\] unit increase   | AL606807.1 | www.ncbi.nlm.nih.gov/pubmed/30038396 |
+| rs1007966-G  | 9    | 92213967 |  0.720 | rs1007966(G)/rs10465231(C)  | Highest math class taken          | 5e-11 |           0 | \[0.01-0.019\] unit increase    | AL161910.1 | www.ncbi.nlm.nih.gov/pubmed/30038396 |
+| rs3763669-C  | 9    | 92217645 |  0.704 | rs3763669(G)/rs10465231(C)  | Highest math class taken (MTAG)   | 2e-17 |           0 | \[0.011-0.017\] unit decrease   | AL161910.1 | www.ncbi.nlm.nih.gov/pubmed/30038396 |
+| rs1007966-A  | 9    | 92213967 |  0.720 | rs1007966(G)/rs10465231(C)  | Self-reported math ability (MTAG) | 4e-13 |           0 | \[0.0095-0.0165\] unit decrease | AL161910.1 | www.ncbi.nlm.nih.gov/pubmed/30038396 |
+
+\[1\] “SNP - rs66720652 (PDE3A):” \[1\] “No association reported”
+
+Interestingly, we can see that a few loci identified have been
+associated with some of the risk factors used to create the prior in
+more recent studies. Variants in LD with the variants identified near
+ZNF318 and ZC3HC1 have been associated with CAD and blood pressure, and
+a variant in LD with the variant identified near GADD45G has been
+associated with educational attainment. The other loci have not been
+associated with any of the risk factors.
 
 ## Results - Direct Effects
 
