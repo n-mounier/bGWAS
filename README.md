@@ -39,6 +39,7 @@ the focal phenotype, identified using a multivariate Mendelian
 Randomization (MR) approach, are used to calculate the prior effects.
 Causal effects are estimated masking the focal chromosome to ensure
 independence.  
+<img src="inst/Figures/PriorEstimation.jpg" align="center" height=300/>
 Observed and prior effects are compared using Bayes Factors.
 Significance is assessed by calculating the probability of observing a
 value larger than the observed BF (P-value) given the prior
@@ -360,7 +361,7 @@ print_log_bGWAS(A)
     ## The conventional GWAS used as input the object: "GWAS".  
     ##    SNPID column, ok - ALT column, ok - REF column, ok - BETA column, ok - SE column, ok
     ## Posterior effects will be rescaled using BETA and SE.
-    ## The analysis will be run in the folder: "/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS/doc".  
+    ## The analysis will be run in the folder: "/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS".  
     ## The p-value threshold used for selecting MR instruments is: 1e-06.  
     ## The minimum number instruments required for each trait is: 3.  
     ## The distance used for pruning MR instruments is: 500Kb.  
@@ -594,7 +595,7 @@ print_log_bGWAS(A)
     ## 
     ## 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 1 minute(s) and 48 second(s).
+    ## Time of the analysis: 1 minute(s) and 57 second(s).
 
 Functions to extract results from an object of class *bGWAS*:
 
@@ -716,11 +717,23 @@ A detailed description of these files can be found
 ## Runtime
 
 Analysis using all the 38 prior GWASs available, for a conventional GWAS
-containing \~7M SNPs in common with the prior studies \~ 20 minutes (see
-complete Lifespan Analysis [here](doc/Lifespan_Analysis.md)).
+containing \~7M SNPs in common with the prior studies \~ 25 minutes.
 
 Analysis using 6 prior GWASs, for a conventional GWAS containing \~
 300,000 SNPs in common with prior studies (see example A) \~ 2 minutes.
+
+## Application to Lifespan analysis
+
+This method has been applied to Lifespan analysis in [McDaid et
+al](https://www.ncbi.nlm.nih.gov/pubmed/28748955) and [Timmers et
+al](https://www.ncbi.nlm.nih.gov/pubmed/30642433).  
+The most recent results (obtained using `bGWAS` version 1.0.0) are
+available [here](doc/Lifespan_Analysis.md) and summarised in [this
+poster](https://doi.org/10.5281/zenodo.3403093).
+
+## Citation
+
+Manuscript in preparation.
 
 ## Contact
 
