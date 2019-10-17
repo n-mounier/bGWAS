@@ -216,7 +216,7 @@ get_geneInfo <- function(chr, pos, ref="0", alt="0"){
     setNames(c("Function", "Gene")) -> res
   
   # if intronic/exonic ... only gene name reported, ok
-  if(res$Function %in% c("intronic", "exonic")){
+  if(res$Function %in% c("intronic", "exonic", "ncRNA_intronic")){
     res %>%
       mutate(Distance=0) -> res
   # if UTR / splicing, need to clean gene name
@@ -309,6 +309,7 @@ get_geneInfo <- function(chr, pos, ref="0", alt="0"){
 # #exonic : ok
 # #splicing :	ok
 # #ncRNA : ?? variant overlaps a transcript without coding annotation in the gene definition (see Notes below for more explanation)	non_coding_transcript_variant (SO:0001619)
+# #   ncRNA_intronic
 # #UTR5	: ok
 # #UTR3	: ok
 # #intronic :	ok
