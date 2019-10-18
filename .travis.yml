@@ -24,7 +24,7 @@ matrix:
       - Rscript -e "cat('Hello')"
       #- Rscript -e "install.packages('devtools')"
       #- Rscript -e "devtools::install_version('data.table', version = '1.12.2', repos = 'http://cloud.r-project.org', type='binary')"
-      - Rscript -e "install.packages('https://cloud.r-project.org/bin/macosx/el-capitan/contrib/3.5/data.table_1.12.2.tgz')"
+      - Rscript -e "install.packages('https://cran.r-project.org/bin/macosx/el-capitan/contrib/3.5/data.table_1.12.2.tgz')"
     script:
       - R CMD build . --compact-vignettes=gs+qpdf --resave-data
       - R CMD check *tar.gz --as-cran
