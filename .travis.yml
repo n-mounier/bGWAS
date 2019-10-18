@@ -21,6 +21,10 @@ matrix:
       - sudo tlmgr install framed titling
       # deal with clang: error: unsupported option '-fopenmp'
       # for data.table v 1.12.4
+      - brew install llvm 
+      - export PATH="/usr/local/opt/llvm/bin:$PATH" 
+      - export LDFLAGS="-L/usr/local/opt/llvm/lib" 
+      - export CFLAGS="-I/usr/local/opt/llvm/include"
     script:
       - R CMD build . --compact-vignettes=gs+qpdf --resave-data
       - R CMD check *tar.gz --as-cran

@@ -35,5 +35,4 @@ Imports:
   TwoSampleMR (>= 0.3.0)
 Remotes: 
   MRCIEU/TwoSampleMR,
-  Rdatatable/data.table
 VignetteBuilder: knitr
