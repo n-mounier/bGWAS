@@ -19,9 +19,7 @@ matrix:
     os: osx
     before_install:
       - sudo tlmgr install framed titling
-      - wget http://releases.llvm.org/5.0.1/clang+llvm-5.0.1-x86_64-apple-darwin.tar.xz
-      - sudo tar -xzvf clang+llvm-5.0.1-x86_64-apple-darwin.tar.xz -C/usr/local --strip-components 
-      - sudo rm clang+llvm-5.0.1-x86_64-apple-darwin.tar.xz
+      - Rscript -e "devtools::install_version("data.table", version = "1.12.2")"
     script:
       - R CMD build . --compact-vignettes=gs+qpdf --resave-data
       - R CMD check *tar.gz --as-cran
