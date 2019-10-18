@@ -33,6 +33,6 @@ Imports:
   tibble (>= 2.1.1),
   tidyr (>= 0.8.3),
   TwoSampleMR (>= 0.3.0)
-Remotes: MRCIEU/TwoSampleMR
+Remotes: MRCIEU/TwoSampleMR,
   Rdatatable/data.table
 VignetteBuilder: knitr
