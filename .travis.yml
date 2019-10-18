@@ -19,6 +19,7 @@ matrix:
     os: osx
     before_install:
       - sudo tlmgr install framed titling
+      - Rscript -e "install.packages('devtools')"
       - Rscript -e "devtools::install_version('data.table', version = '1.12.2', repos = 'http://cran.us.r-project.org')"
     script:
       - R CMD build . --compact-vignettes=gs+qpdf --resave-data
