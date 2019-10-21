@@ -127,65 +127,65 @@ get_associatedTraits <- function(rsid, chr, pos, LD=0.05, distance=100000, P=5e-
 #### GET GENES NAMES USING ENSEMBL ####
 # not used actually, rather use annovar
 
-my_biomart = biomaRt::useMart(biomart="ENSEMBL_MART_ENSEMBL", 
-                           host="grch37.ensembl.org", path="/biomart/martservice", 
-                           dataset="hsapiens_gene_ensembl")
-
-
-get_gene <- function(chr, pos, biomart=NULL){
-  require(biomaRt)
-  
-  ### get ensembl data
-  if(is.null(biomart)){
-    biomart = biomaRt::useMart(biomart="ENSEMBL_MART_ENSEMBL", 
-                      host="grch37.ensembl.org", path="/biomart/martservice", 
-                      dataset="hsapiens_gene_ensembl")
-  }
-
-  # get gene(s) at this exact position
-  all.genes <- biomaRt::getBM(
-    attributes=c("ensembl_gene_id","hgnc_symbol","chromosome_name","start_position","end_position"),
-    filters=c("chromosome_name", "start", "end"),
-    values=list(chromosome=chr, start=pos, end=pos),
-    mart=biomart)
-  
-  all.genes %>% 
-    filter(!hgnc_symbol=="") -> all.genes
-  
-  if(nrow(all.genes)==1){
-    my_gene = all.genes
-    
-    ## what if several ones?
-  } else if(nrow(all.genes)>=1){
-    # get the closest?
-    all.genes %>% 
-      mutate(distance=pmin(abs(start_position-pos), abs(end_position-pos))) %>%
-      arrange(distance)-> all.genes
-    my_gene = all.genes[1,]  
-    ## what if no gene exactly here?
- } else if(nrow(all.genes)==0){
-   # look at the ones in a 500kb windows
-   all.genes <- biomaRt::getBM(
-     attributes=c("ensembl_gene_id","hgnc_symbol","chromosome_name","start_position","end_position"),
-     filters=c("chromosome_name", "start", "end"),
-     values=list(chromosome=chr, start=pos-500000, end=pos+500000),
-     mart=biomart) 
-   # get the closest?
-   all.genes %>% 
-     filter(!hgnc_symbol=="") %>% 
-     mutate(distance=pmin(abs(start_position-pos), abs(end_position-pos))) %>%
-     arrange(distance)-> all.genes
-   # get the most relevant one(s)
-   all.genes %>% 
-     filter(!hgnc_symbol=="") %>% 
-     mutate(distance=pmin(abs(start_position-pos), abs(end_position-pos))) %>%
-     arrange(distance)-> all.genes
-   my_gene = all.genes[1,]
- }
-  
-  return(my_gene$hgnc_symbol)
-  
-}
+# my_biomart = biomaRt::useMart(biomart="ENSEMBL_MART_ENSEMBL", 
+#                            host="grch37.ensembl.org", path="/biomart/martservice", 
+#                            dataset="hsapiens_gene_ensembl")
+# 
+# 
+# get_gene <- function(chr, pos, biomart=NULL){
+#   require(biomaRt)
+#   
+#   ### get ensembl data
+#   if(is.null(biomart)){
+#     biomart = biomaRt::useMart(biomart="ENSEMBL_MART_ENSEMBL", 
+#                       host="grch37.ensembl.org", path="/biomart/martservice", 
+#                       dataset="hsapiens_gene_ensembl")
+#   }
+# 
+#   # get gene(s) at this exact position
+#   all.genes <- biomaRt::getBM(
+#     attributes=c("ensembl_gene_id","hgnc_symbol","chromosome_name","start_position","end_position"),
+#     filters=c("chromosome_name", "start", "end"),
+#     values=list(chromosome=chr, start=pos, end=pos),
+#     mart=biomart)
+#   
+#   all.genes %>% 
+#     filter(!hgnc_symbol=="") -> all.genes
+#   
+#   if(nrow(all.genes)==1){
+#     my_gene = all.genes
+#     
+#     ## what if several ones?
+#   } else if(nrow(all.genes)>=1){
+#     # get the closest?
+#     all.genes %>% 
+#       mutate(distance=pmin(abs(start_position-pos), abs(end_position-pos))) %>%
+#       arrange(distance)-> all.genes
+#     my_gene = all.genes[1,]  
+#     ## what if no gene exactly here?
+#  } else if(nrow(all.genes)==0){
+#    # look at the ones in a 500kb windows
+#    all.genes <- biomaRt::getBM(
+#      attributes=c("ensembl_gene_id","hgnc_symbol","chromosome_name","start_position","end_position"),
+#      filters=c("chromosome_name", "start", "end"),
+#      values=list(chromosome=chr, start=pos-500000, end=pos+500000),
+#      mart=biomart) 
+#    # get the closest?
+#    all.genes %>% 
+#      filter(!hgnc_symbol=="") %>% 
+#      mutate(distance=pmin(abs(start_position-pos), abs(end_position-pos))) %>%
+#      arrange(distance)-> all.genes
+#    # get the most relevant one(s)
+#    all.genes %>% 
+#      filter(!hgnc_symbol=="") %>% 
+#      mutate(distance=pmin(abs(start_position-pos), abs(end_position-pos))) %>%
+#      arrange(distance)-> all.genes
+#    my_gene = all.genes[1,]
+#  }
+#   
+#   return(my_gene$hgnc_symbol)
+#   
+# }
 
 #### GET GENES NAMES USING ANNOVAR ####
 
