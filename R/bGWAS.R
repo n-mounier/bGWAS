@@ -522,7 +522,6 @@ bGWAS <- function(name,
   log_info = update_log(log_info, PriorWithBF$log_info, F)
   
   
-  
   ##### IDENTIFY SIGNIFICANT SNPS + PRUNING #####
   tmp = paste0("", "> Pruning and identifying significant SNPs \n")
   log_info = update_log(log_info, tmp, verbose)
@@ -557,10 +556,14 @@ bGWAS <- function(name,
   results$significant_SNPs = Results$SNPs
   results$posterior_SNPs = Results$posterior
   results$direct_SNPs = Results$direct
-  results$all_BFs = PriorWithBF$SNPs
+  if(!is.na(PriorWithBF$SNPs)){
+    results$all_BFs = PriorWithBF$SNPs
+    results$matrix_heatmap = Results$mat
+  } else {
+    results$all_BFs = NA
+  }
   results$significant_studies = res_MR$coeffs
   results$all_MRcoeffs = Prior$all_coeffs
-  results$matrix_heatmap = Results$mat
   
   class(results) = "bGWAS"
   return(results)
