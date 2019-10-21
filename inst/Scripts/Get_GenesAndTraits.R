@@ -77,10 +77,13 @@ get_associatedTraits <- function(rsid, chr, pos, LD=0.05, distance=100000, P=5e-
     alignment = paste0(alignment[1], "/", alignment[6])
     return(alignment)
   }
-  
-  
-  snps_nearby$LD_R2 = apply(snps_nearby, 1, function(x) suppressWarnings(get_R2(x[1], rsid)))
+  snps_nearby %>%
+    filter(!duplicated(snp)) ->  snps_nearby_unique 
+  snps_nearby_unique$LD_R2 = apply(snps_nearby_unique, 1, function(x) suppressWarnings(get_R2(x[1], rsid)))
  
+  snps_nearby %>%
+    mutate(LD_R2 = snps_nearby_unique$LD_R2[match(snp, snps_nearby_unique$snp)]) -> snps_nearby
+  
   # keep only the ones in LD with significant association
   snps_nearby %>%
     filter(LD_R2>LD) %>%
@@ -98,8 +101,15 @@ get_associatedTraits <- function(rsid, chr, pos, LD=0.05, distance=100000, P=5e-
     filter(!duplicated(trait)) -> snps_nearby
   
   # add info about alleles in LD
-  snps_nearby$LD_alleles = apply(snps_nearby, 1, function(x) suppressWarnings(get_allele(x[1], rsid)))
+  snps_nearby %>%
+    filter(!duplicated(snp)) ->  snps_nearby_unique 
+  snps_nearby_unique$LD_alleles = apply(snps_nearby_unique, 1, function(x) suppressWarnings(get_allele(x[1], rsid)))
   
+  snps_nearby %>%
+    mutate(LD_alleles = snps_nearby_unique$LD_alleles[match(snp, snps_nearby_unique$snp)]) -> snps_nearby
+  
+  
+
   if(exists("my_data")) bind_rows(my_data, snps_nearby) -> snps_nearby
 
   snps_nearby %>%
@@ -114,6 +124,7 @@ get_associatedTraits <- function(rsid, chr, pos, LD=0.05, distance=100000, P=5e-
 # chr=10
 # pos=114754071
 # get_associatedTraits(rsid, chr, pos, gwascatdata = my_ebicat37) -> A
+
 
 # # not in GWAS catalog, multiple SNPs nearby associated with several traits (at 500kb)
 # rsid="rs7630554"
