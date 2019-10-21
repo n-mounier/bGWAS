@@ -212,7 +212,8 @@ get_geneInfo <- function(chr, pos, ref="0", alt="0"){
   #The gene-based annotation can be issued by the following command (by default, --geneanno -dbtype refGene is assumed):
   # [kaiwang@biocluster ~/]$ annotate_variation.pl -out ex1 -build hg19 example/ex1.avinput humandb/
   
-  suppressMessages(system("perl annotate_variation.pl -out myres_", ID, " -build hg19 mydata humandb/",
+  suppressMessages(system(paste0("perl annotate_variation.pl -out myres_", ID, 
+  " -build hg19 mydata_", ID, " humandb/"),
                     intern = F, ignore.stdout=T, ignore.stderr=T))
   # creates myres.variant_function, myres.exonic_variant_function and myres.log / remove them afterwards
   
