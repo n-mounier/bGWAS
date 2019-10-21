@@ -304,6 +304,8 @@ get_significantSNPs <- function(Prior, sign_method="p", sign_thresh=5e-8, res_pr
       select(c(1:5), selected_studies) %>%
       filter(.data$rs %in% BF_SNPs) -> Matrix_Heatmap
     res$mat = Matrix_Heatmap
+  } else {
+    res$mat = NA
   }
   
   return(res)
