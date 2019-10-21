@@ -200,18 +200,23 @@ get_geneInfo <- function(chr, pos, ref="0", alt="0"){
   setwd(annovar.dir)
   if(!file.exists("humandb/hg19_refGene.txt")) suppressMessages(system("perl annotate_variation.pl -buildver hg19 -downdb -webfrom annovar refGene humandb/"))
   
-  write.table(data.frame(chr, pos, pos, ref, alt), "mydata", sep="\t", row.names=F, col.names=F, quote=F)
+  # since everyhting is done in the annovar/ folder
+  # creates an unique ID to be able to perform simultaneous analysis
+  # without problems of "same name" files
+  ID = sample(1:100000, 1)
+  
+  write.table(data.frame(chr, pos, pos, ref, alt), paste0("mydata_", ID), sep="\t", row.names=F, col.names=F, quote=F)
   
   
   
   #The gene-based annotation can be issued by the following command (by default, --geneanno -dbtype refGene is assumed):
   # [kaiwang@biocluster ~/]$ annotate_variation.pl -out ex1 -build hg19 example/ex1.avinput humandb/
   
-  suppressMessages(system("perl annotate_variation.pl -out myres -build hg19 mydata humandb/",
+  suppressMessages(system("perl annotate_variation.pl -out myres_", ID, " -build hg19 mydata humandb/",
                     intern = F, ignore.stdout=T, ignore.stderr=T))
   # creates myres.variant_function, myres.exonic_variant_function and myres.log / remove them afterwards
   
-  data.table::fread("myres.variant_function", data.table = F) %>% 
+  data.table::fread(paste0("myres_", ID, ".variant_function"), data.table = F) %>% 
     dplyr::select(c(1:2)) %>%
     setNames(c("Function", "Gene")) -> res
   
@@ -245,7 +250,7 @@ get_geneInfo <- function(chr, pos, ref="0", alt="0"){
              Distance=paste(my_distance1, my_distance2, sep="/")) -> res
   } 
   
-  system("rm myres.* mydata")
+  system(paste0("rm myres_", ID, ".* mydata_", ID))
   setwd(init.dir)
   return(res)
 }
