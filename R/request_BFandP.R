@@ -230,6 +230,7 @@ request_BFandP <- function(Prior, sign_thresh, use_permutations = F,
       
       
       # Identify first significant SNP
+      if(any(d$my_p<sign_thr)){
       snp = max(which(d$my_p<sign_thr))
       p_true = get_fullP(d$BF[snp], Data)
       NeedToCorrect = T
@@ -249,7 +250,7 @@ request_BFandP <- function(Prior, sign_thresh, use_permutations = F,
       if(count_corrected>1)  tmp = paste0("   ", count_corrected, " p-values have been re-estimated using the exact formula.  \n")
       
       Log = update_log(Log, tmp, verbose)
-      
+      }
       res = list()
       res$pValue = d$my_p
       res$log_info = Log
