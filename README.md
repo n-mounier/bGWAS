@@ -29,16 +29,19 @@ Note: some Prior GWASs have been removed, you can find more details
 
 ## Overview
 
-bGWAS is an R-package to perform a Bayesian GWAS, using summary
-statistics from a conventional GWAS as input. Briefly, it compares the
-observed Z-scores for a focal phenotype to prior effects. These prior
-effects are directly estimated from publicly available GWASs (currently,
-a set of 38 studies, last update 20-08-2019 - hereinafter referred to as
-“prior GWASs”). Only prior GWASs having a significant causal effect on
-the focal phenotype, identified using a multivariate Mendelian
-Randomization (MR) approach, are used to calculate the prior effects.
-Causal effects are estimated masking the focal chromosome to ensure
-independence.  
+bGWAS is an R-package to perform a Bayesian GWAS (Genome Wide
+Association Study), using summary statistics from a conventional GWAS as
+input. The aim of the approach is to increase power by leveraging
+information from related traits and by comparing the observed Z-scores
+from the focal phenotype (provided as input) to prior effects. These
+prior effects are directly estimated from publicly available GWASs
+(currently, a set of 38 studies, last update 20-08-2019 - hereinafter
+referred to as “prior GWASs” or “risk factors”). Only prior GWASs having
+a significant causal effect on the focal phenotype, identified using a
+multivariate Mendelian Randomization (MR) approach, are used to
+calculate the prior effects. Causal effects are estimated masking the
+focal chromosome to ensure independence, and the prior effects are
+estimated as described in the figure below.  
 <img src="inst/Figures/PriorEstimation.jpg" align="center" height=300/>
 
 Observed and prior effects are compared using Bayes Factors.
@@ -182,11 +185,8 @@ tar xzvf ZMatrices.tar.gz
 <font color="grey"><small> If you want to use your own set of prior
 GWASs, please have a look [here](doc/ZMatrices.md) to see how you can
 modify the files.  
-We focused on including prior GWASs that do not come from UKBB, assuming
-that the focal phenotype results are more likely to be obtained from
-UKBB. Sample overlap between the focal phenotype and the prior GWASs is
-not accounted for by our method, so we did not include any UKBB results
-in the prior GWASs.</font> </small>
+<!---We focused on including prior GWASs that do not come from UKBB, assuming that the focal phenotype results are more likely to be obtained from UKBB. Sample overlap between the focal phenotype and the prior GWASs is not accounted for by our method, so we did not include any UKBB results in the prior GWASs. --->
+</font> </small>
 
 ### Study Selection
 
