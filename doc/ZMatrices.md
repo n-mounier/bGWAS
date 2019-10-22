@@ -28,10 +28,10 @@ You can download these files using this [link](https://drive.switch.ch/index.php
 wget https://drive.switch.ch/index.php/s/jvSwoIxRgCKUSI8/download -O ZMatrices.tar.gz
 tar xzvf ZMatrices.tar.gz
 ``` 
- - On WINDOWS, from a terminal:   
+<!--- - On WINDOWS, from a terminal:   
 ``` bash
 ...
-```   
+```   --->
 
 
 ## How to use your own data
