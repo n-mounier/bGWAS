@@ -1,13 +1,13 @@
 # Output files
 [//]:========================================
 
-If `save_files=T`, several files are created in the folder `./name/`.
+If `save_files=TRUE`, several files are created in the folder `./<name>/`.
 
 ## Description
 [//]:*******
 
 The output files created are:    
--   **name.log** - report containing everything that has been printed during the bGWAS analysis (is `verbose=T`)     
+-   **<name>.log** - report containing everything that has been printed during the bGWAS analysis (is `verbose=TRUE`)     
     
     
 -   **PriorGWASs.tsv** : contains information about all prior GWASs (general info + status (used/removed) + MR coefficients):

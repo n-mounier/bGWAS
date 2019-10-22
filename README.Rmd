@@ -255,13 +255,13 @@ print_log_bGWAS(A)
     print_log_bGWAS(A)
     ```
     
-</details>    
+</details>       
+
+     
 
 
 
-
-
-Functions to extract results from an object of class *bGWAS*:   
+- Functions to extract results from an object of class *bGWAS*:   
 ```{r extractA}
 # by default, extract "BF" results...
 hits = extract_results_bGWAS(A, SNPs = "significant")
@@ -281,7 +281,7 @@ extract_MRcoeffs_bGWAS(A)[,1:12]
 ```
 
 
-Functions for graphic representations:   
+- Functions for graphic representations:   
 ```{r PlotsA, dpi=300}
 # Coefficients plot
 coefficients_plot_bGWAS(A) 
@@ -298,8 +298,8 @@ manhattan_plot_bGWAS(A, results="posterior")
    
    
    
-##### Aditionnaly, if `save_files=T`, several files are created in the folder `./name/` :
--   **name.log** - log file  
+##### Aditionnaly, if `save_files=TRUE`, several files are created in the folder `./<name>/` :
+-   **<name>.log** - log file  
 -   **PriorGWASs.tsv** - contains information about all prior GWASs (general info + status (used/removed) + univariate/multivariate MR estimates)   
 -   **CoefficientsByChromosome.csv** - contains the multivariate MR estimates when masking the focal chromosome (22 coefficients for each prior GWASs used for prior estimation)   
 -   **PriorBFp.csv** - contains BF and p-values, prior, posterior and direct effects estimates for all SNPs      
@@ -315,6 +315,8 @@ A detailed description of these files can be found [here](doc/OutputFiles.md).
 Analysis using all the 38 prior GWASs available, for a conventional GWAS containing ~7M SNPs in common with the prior studies ~ 25 minutes.
 
 Analysis using 6 prior GWASs, for a conventional GWAS containing ~ 300,000 SNPs in common with prior studies (see example A) ~ 2 minutes.
+
+<font color="grey"><small> Results from analyses performed on a MacBook Pro (Early 2015) - Processor : 2.9 GHz Intel Core i5 - Memory : 8 GB 1867 MHz DDR3.</font> </small>  
 
 
 ## Application to Lifespan analysis

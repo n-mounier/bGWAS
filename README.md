@@ -174,13 +174,10 @@ wget https://drive.switch.ch/index.php/s/jvSwoIxRgCKUSI8/download -O ZMatrices.t
 tar xzvf ZMatrices.tar.gz
 ```
 
-  - On WINDOWS, from a terminal:  
-
-<!-- end list -->
-
+<!--- - On WINDOWS, from a terminal:   
 ``` bash
 ...
-```
+``` --->
 
 <font color="grey"><small> If you want to use your own set of prior
 GWASs, please have a look [here](doc/ZMatrices.md) to see how you can
@@ -606,7 +603,9 @@ print_log_bGWAS(A)
 
 </details>
 
-Functions to extract results from an object of class *bGWAS*:
+  - Functions to extract results from an object of class *bGWAS*:
+
+<!-- end list -->
 
 ``` r
 # by default, extract "BF" results...
@@ -682,7 +681,9 @@ extract_MRcoeffs_bGWAS(A)[,1:12]
     ## 3          0.0616 4.27e-12         -0.439          0.0685 2.24e- 9
     ## 4          0.0619 3.78e- 5         -0.250          0.0653 1.93e- 4
 
-Functions for graphic representations:
+  - Functions for graphic representations:
+
+<!-- end list -->
 
 ``` r
 # Coefficients plot
@@ -705,9 +706,9 @@ manhattan_plot_bGWAS(A, results="posterior")
 
 <img src="doc/Figures/README-PlotsA-3.png" width="100%" />
 
-##### Aditionnaly, if `save_files=T`, several files are created in the folder `./name/` :
+##### Aditionnaly, if `save_files=TRUE`, several files are created in the folder `./<name>/` :
 
-  - **name.log** - log file  
+  - **<name>.log** - log file  
   - **PriorGWASs.tsv** - contains information about all prior GWASs
     (general info + status (used/removed) + univariate/multivariate MR
     estimates)  
@@ -730,6 +731,10 @@ containing \~7M SNPs in common with the prior studies \~ 25 minutes.
 
 Analysis using 6 prior GWASs, for a conventional GWAS containing \~
 300,000 SNPs in common with prior studies (see example A) \~ 2 minutes.
+
+<font color="grey"><small> Results from analyses performed on a MacBook
+Pro (Early 2015) - Processor : 2.9 GHz Intel Core i5 - Memory : 8 GB
+1867 MHz DDR3.</font> </small>
 
 ## Application to Lifespan analysis
 
