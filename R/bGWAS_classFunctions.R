@@ -31,7 +31,9 @@ print.bGWAS <- function(x,...) {
     
     cat("\n-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ \n \n")
     
-    if(length(x$significant_SNPs)==0){
+    if(any(is.na(x$significant_SNPs))){
+      cat ("No significant SNP identified.")
+    } else if(length(x$significant_SNPs)==0){
       cat("No significant SNP identified, because the analysis has been limited to prior estimation")
     } else
       if(length(x$significant_SNPs)==1){
@@ -578,6 +580,8 @@ heatmap_bGWAS <- function(obj, SNPs=NULL, save_file=F, file_name=NULL) {
   if(any(stringr::str_detect(obj$log_info, "Analysis failed"))){
     stop("Heatmap can not be displayed, because the analysis failed", call. = F)
   }
+  
+  if(any(is.na(obj$significant_SNPs))) stop("Heatmap can not be displayed, because there is no significant SNP", call. = F) 
   
   if(!is.logical(save_file)) stop("save_file : should be logical")
   # if no name, use the one from the analysis (in log file)

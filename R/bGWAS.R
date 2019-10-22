@@ -556,12 +556,8 @@ bGWAS <- function(name,
   results$significant_SNPs = Results$SNPs
   results$posterior_SNPs = Results$posterior
   results$direct_SNPs = Results$direct
-  if(!is.na(PriorWithBF$SNPs)){
-    results$all_BFs = PriorWithBF$SNPs
-    results$matrix_heatmap = Results$mat
-  } else {
-    results$all_BFs = NA
-  }
+  results$all_BFs = PriorWithBF$SNPs
+  results$matrix_heatmap = Results$mat
   results$significant_studies = res_MR$coeffs
   results$all_MRcoeffs = Prior$all_coeffs
   
