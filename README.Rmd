@@ -316,7 +316,8 @@ Analysis using all the 38 prior GWASs available, for a conventional GWAS contain
 
 Analysis using 6 prior GWASs, for a conventional GWAS containing ~ 300,000 SNPs in common with prior studies (see example A) ~ 2 minutes.
 
-<font color="grey"><small> Results from analyses performed on a MacBook Pro (Early 2015) - Processor : 2.9 GHz Intel Core i5 - Memory : 8 GB 1867 MHz DDR3.</font> </small>  
+
+<font color="grey"><small> Results from analyses performed on a MacBook Pro (Early 2015) - Processor : 2.9 GHz Intel Core i5 - Memory : 8 GB 1867 MHz DDR3.</font> </small>    
 
 
 ## Application to Lifespan analysis
