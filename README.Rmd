@@ -163,7 +163,7 @@ We focused on including prior GWASs that do not come from UKBB, assuming that th
 ### Study Selection
 [//]:-------------------------------
 
-Before running your analysis, you can select the prior GWASs you want to include. You can use the function **`list_prioGWASs()`** to get some information about the prior GWASs available.   
+Before running your analysis, you can select the prior GWASs you want to include. You can use the function **`list_priorGWASs()`** to get some information about the prior GWASs available.   
 
 You should remove traits that by definition are not independent from your trait of interest. For example, before analysing BMI results, make sure to exclude "Height" from the prior GWASs used. You can use the function **`select_priorGWASs()`** to automatically exclude/include some traits or some files. You should also check for sample overlap, and remove prior GWASs that come from the same consortium as your data. If there are individuals in common between your conventional GWAS and prior GWASs, it might induce some bias.
 
@@ -241,9 +241,19 @@ B = bGWAS(name = "Test_UsingGWASfromPriorGWASs",
 class(A)
 
 print(A)
+```
 
+```{r logA, eval=FALSE}
 print_log_bGWAS(A)
 ```
+
+<details>
+  <summary>Show log</summary>
+    ```{r logAdisplay,echo=FALSE, eval=TRUE}
+    print_log_bGWAS(A)
+    ```
+</details> 
+
 
 Functions to extract results from an object of class *bGWAS*:   
 ```{r extractA}

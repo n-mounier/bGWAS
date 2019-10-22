@@ -194,7 +194,7 @@ in the prior GWASs.</font> </small>
 ### Study Selection
 
 Before running your analysis, you can select the prior GWASs you want to
-include. You can use the function **`list_prioGWASs()`** to get some
+include. You can use the function **`list_priorGWASs()`** to get some
 information about the prior GWASs available.
 
 You should remove traits that by definition are not independent from
@@ -353,258 +353,266 @@ print(A)
 print_log_bGWAS(A)
 ```
 
-    ## <<< Preparation of analysis >>> 
-    ## 
-    ## > Checking parameters 
-    ## The name of your analysis is: "Test_UsingSmallDataFrame". 
-    ## The Z-Matrix files are stored in "/Users/nmounier/ZMatrices".  
-    ## # Preparation of the data... 
-    ## The conventional GWAS used as input the object: "GWAS".  
-    ##    SNPID column, ok - ALT column, ok - REF column, ok - BETA column, ok - SE column, ok
-    ## Posterior effects will be rescaled using BETA and SE.
-    ## The analysis will be run in the folder: "/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS".  
-    ## The p-value threshold used for selecting MR instruments is: 1e-06.  
-    ## The minimum number instruments required for each trait is: 3.  
-    ## The distance used for pruning MR instruments is: 500Kb.  
-    ## Distance-based pruning will be used for MR instruments.  
-    ## No shrinkage applied before performing MR.
-    ## The p-value threshold used for stepwise selection is 0.05.  
-    ## Using MR_shrinkage as default for prior_shrinkage:
-    ## No shrinkage applied before performing calculating the prior.
-    ## The p-value threshold used for stepwise selection is 0.05.  
-    ## Significant SNPs will be identified according to p-value. The threshold used is :5e-08.  
-    ## The distance used for pruning results is: 500Kb.  
-    ## Distance-based pruning will be used for results.  
-    ## 
-    ## 
-    ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
-    ## <<< Identification of significant prior GWASs for MR >>>  
-    ## 
-    ## > Creating the Z-Matrix of strong instruments 
-    ## # Loading the ZMatrix... 
-    ## Selecting studies :
-    ## 6 studies 
-    ## 209,840 SNPs 
-    ## # Adding data from the conventional GWAS :  "GWAS" 
-    ## Done! 
-    ## 8,813 SNPs in common between prior studies and the conventional GWAS 
-    ## # Thresholding... 
-    ## 767 SNPs left after thresholding 
-    ## 6 studies left after thresholding 
-    ## Pruning MR instruments... 
-    ##    distance : 500Kb 
-    ## 159 SNPs left after pruning 
-    ## 6 studies left after thresholding+pruning 
-    ## 
-    ## > Performing MR  
-    ## #Preparation of the MR analyses to identify significant studies... 
-    ## Conventionnal GWAS of interest : GWAS
-    ## # Univariate regressions for each trait... 
-    ##   Number of trait-specific instruments per univariate regression: 
-    ##   . Body Mass Index (GIANT) : 59 
-    ##   . Coronary Artery Disease (CARDIoGRAM) : 6 
-    ##   . Years of Schooling (SSGAC) : 83 
-    ##   . Systolic Blood Pressure (ICBP) : 8 
-    ##   . Diastolic Blood Pressure (ICBP) : 8 
-    ##   . College Completion (SSGAC) : 4 
-    ## Done! 
-    ## # Stepwise selection (all traits)... 
-    ## Studies tested (reaching p<0.05 in univariate models) :  Years of Schooling (SSGAC)  Body Mass Index (GIANT)  Coronary Artery Disease (CARDIoGRAM)  Systolic Blood Pressure (ICBP)  Diastolic Blood Pressure (ICBP)
-    ## Adding the first study :Years of Schooling (SSGAC) 
-    ## #Test if any study can be added with p<0.05 
-    ## Adding one study :Systolic Blood Pressure (ICBP) 
-    ## Done! 
-    ## #Test if any study has p>0.05 now 
-    ## #Test if any study can be added with p<0.05 
-    ## Adding one study :Body Mass Index (GIANT) 
-    ## Done! 
-    ## #Test if any study has p>0.05 now 
-    ## #Test if any study can be added with p<0.05 
-    ## Adding one study :Coronary Artery Disease (CARDIoGRAM) 
-    ## Done! 
-    ## #Test if any study has p>0.05 now 
-    ## #Test if any study can be added with p<0.05 
-    ## Adding one study :Diastolic Blood Pressure (ICBP) 
-    ## Done! 
-    ## #Test if any study has p>0.05 now 
-    ## Excluding one study :Systolic Blood Pressure (ICBP) 
-    ## Done! 
-    ## #Test if any study can be added with p<0.05 
-    ## #Test if any study has p>0.05 now 
-    ## It converged! 
-    ## # Final regression... 
-    ## The studies used are: 
-    ## - Years of Schooling (SSGAC)- Body Mass Index (GIANT)- Coronary Artery Disease (CARDIoGRAM)- Diastolic Blood Pressure (ICBP)
-    ## 
-    ## Estimating adjusted R-squared: 
-    ## - in-sample adjusted R-squared for the all-chromosomes multivariate regression is 0.5534 
-    ## - out-of-sample R-squared (masking one chromosome at a time), for the multivariate regression will be estimated when calculating the prior. 
-    ## 
-    ## 
-    ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
-    ## <<< Estimation of the prior >>>  
-    ## 
-    ## > Creating the full Z-Matrix  
-    ## # Loading the ZMatrix... 
-    ## Selecting studies :
-    ## 4 studies 
-    ## 6,811,310 SNPs 
-    ## # Adding data from the conventional GWAS :  "GWAS" 
-    ## Done! 
-    ## 286,807 SNPs in common between prior studies and the conventional GWAS 
-    ## 
-    ## > Computing prior  
-    ## # Calculating the prior chromosome by chromosome... 
-    ##    Chromosome 1
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 2
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 3
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 4
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 5
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 6
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 7
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 8
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 9
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 10
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 11
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 12
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 13
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 14
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 15
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 16
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 17
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 18
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 19
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 20
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 21
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ##    Chromosome 22
-    ## Running regression, 
-    ## Calculating prior estimates for SNPs on this chromosome, 
-    ## Calculating prior standard errors for SNPs on this chromosome, 
-    ## ## Out-of-sample R-squared for MR instruments across all chromosomes is 0.5206
-    ## ## Out-of-sample squared correlation for MR instruments across all chromosome is 0.5271
-    ## ## Correlation between prior and observed effects for all SNPs is 0.1855
-    ## ## Correlation between prior and observed effects for SNPs with GWAS p-value < 0.001 is 0.5944
-    ## Done! 
-    ## 
-    ## 
-    ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
-    ## <<< Calculation of Bayes Factors and p-values >>>  
-    ## 
-    ## > Calculating them for all SNPs  
-    ## # Computing observed Bayes Factor for all SNPs... 
-    ## Done! 
-    ## # Computing BF p-values... 
-    ##    using a distribution approach: 
-    ## ... getting approximated p-values using non-linear quantiles  
-    ## ... checking p-values near significance threshold  
-    ##     everything is ok!  
-    ## # Estimating p-values for posterior effects... 
-    ## Done! 
-    ## # Estimating p-values for direct effects... 
-    ## Done! 
-    ## > Pruning and identifying significant SNPs 
-    ## Identification based on BFs 
-    ##    Starting with 286,807 SNPs 
-    ## # Selecting significant SNPs according to p-values... 
-    ## 31 SNPs left 
-    ## Done! 
-    ## # Pruning significant SNPs... 
-    ##    distance : 500Kb 
-    ## 11 SNPs left 
-    ## Done! 
-    ## Identification based on posterior effects 
-    ##    Starting with 286,807 SNPs 
-    ## # Selecting significant SNPs according to p-values... 
-    ## 11 SNPs left 
-    ## Done! 
-    ## # Pruning significant SNPs... 
-    ##    distance : 500Kb 
-    ## 6 SNPs left 
-    ## Done! 
-    ## Identification based on direct effects 
-    ##    Starting with 286,807 SNPs 
-    ## # Selecting significant SNPs according to p-values... 
-    ## 3 SNPs left 
-    ## Done! 
-    ## # Pruning significant SNPs... 
-    ##    distance : 500Kb 
-    ## 2 SNPs left 
-    ## Done! 
-    ## 
-    ## 
-    ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 1 minute(s) and 57 second(s).
+<details>
 
-Functions to extract results from an object of class *bGWAS*:
+<summary>Show log</summary>
 
-``` r
+```` 
+  ## <<< Preparation of analysis >>> 
+  ## 
+  ## > Checking parameters 
+  ## The name of your analysis is: "Test_UsingSmallDataFrame". 
+  ## The Z-Matrix files are stored in "/Users/nmounier/ZMatrices".  
+  ## # Preparation of the data... 
+  ## The conventional GWAS used as input the object: "GWAS".  
+  ##    SNPID column, ok - ALT column, ok - REF column, ok - BETA column, ok - SE column, ok
+  ## Posterior effects will be rescaled using BETA and SE.
+  ## The analysis will be run in the folder: "/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS".  
+  ## The p-value threshold used for selecting MR instruments is: 1e-06.  
+  ## The minimum number instruments required for each trait is: 3.  
+  ## The distance used for pruning MR instruments is: 500Kb.  
+  ## Distance-based pruning will be used for MR instruments.  
+  ## No shrinkage applied before performing MR.
+  ## The p-value threshold used for stepwise selection is 0.05.  
+  ## Using MR_shrinkage as default for prior_shrinkage:
+  ## No shrinkage applied before performing calculating the prior.
+  ## The p-value threshold used for stepwise selection is 0.05.  
+  ## Significant SNPs will be identified according to p-value. The threshold used is :5e-08.  
+  ## The distance used for pruning results is: 500Kb.  
+  ## Distance-based pruning will be used for results.  
+  ## 
+  ## 
+  ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
+  ## <<< Identification of significant prior GWASs for MR >>>  
+  ## 
+  ## > Creating the Z-Matrix of strong instruments 
+  ## # Loading the ZMatrix... 
+  ## Selecting studies :
+  ## 6 studies 
+  ## 209,840 SNPs 
+  ## # Adding data from the conventional GWAS :  "GWAS" 
+  ## Done! 
+  ## 8,813 SNPs in common between prior studies and the conventional GWAS 
+  ## # Thresholding... 
+  ## 767 SNPs left after thresholding 
+  ## 6 studies left after thresholding 
+  ## Pruning MR instruments... 
+  ##    distance : 500Kb 
+  ## 159 SNPs left after pruning 
+  ## 6 studies left after thresholding+pruning 
+  ## 
+  ## > Performing MR  
+  ## #Preparation of the MR analyses to identify significant studies... 
+  ## Conventionnal GWAS of interest : GWAS
+  ## # Univariate regressions for each trait... 
+  ##   Number of trait-specific instruments per univariate regression: 
+  ##   . Body Mass Index (GIANT) : 59 
+  ##   . Coronary Artery Disease (CARDIoGRAM) : 6 
+  ##   . Years of Schooling (SSGAC) : 83 
+  ##   . Systolic Blood Pressure (ICBP) : 8 
+  ##   . Diastolic Blood Pressure (ICBP) : 8 
+  ##   . College Completion (SSGAC) : 4 
+  ## Done! 
+  ## # Stepwise selection (all traits)... 
+  ## Studies tested (reaching p<0.05 in univariate models) :  Years of Schooling (SSGAC)  Body Mass Index (GIANT)  Coronary Artery Disease (CARDIoGRAM)  Systolic Blood Pressure (ICBP)  Diastolic Blood Pressure (ICBP)
+  ## Adding the first study :Years of Schooling (SSGAC) 
+  ## #Test if any study can be added with p<0.05 
+  ## Adding one study :Systolic Blood Pressure (ICBP) 
+  ## Done! 
+  ## #Test if any study has p>0.05 now 
+  ## #Test if any study can be added with p<0.05 
+  ## Adding one study :Body Mass Index (GIANT) 
+  ## Done! 
+  ## #Test if any study has p>0.05 now 
+  ## #Test if any study can be added with p<0.05 
+  ## Adding one study :Coronary Artery Disease (CARDIoGRAM) 
+  ## Done! 
+  ## #Test if any study has p>0.05 now 
+  ## #Test if any study can be added with p<0.05 
+  ## Adding one study :Diastolic Blood Pressure (ICBP) 
+  ## Done! 
+  ## #Test if any study has p>0.05 now 
+  ## Excluding one study :Systolic Blood Pressure (ICBP) 
+  ## Done! 
+  ## #Test if any study can be added with p<0.05 
+  ## #Test if any study has p>0.05 now 
+  ## It converged! 
+  ## # Final regression... 
+  ## The studies used are: 
+  ## - Years of Schooling (SSGAC)- Body Mass Index (GIANT)- Coronary Artery Disease (CARDIoGRAM)- Diastolic Blood Pressure (ICBP)
+  ## 
+  ## Estimating adjusted R-squared: 
+  ## - in-sample adjusted R-squared for the all-chromosomes multivariate regression is 0.5534 
+  ## - out-of-sample R-squared (masking one chromosome at a time), for the multivariate regression will be estimated when calculating the prior. 
+  ## 
+  ## 
+  ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
+  ## <<< Estimation of the prior >>>  
+  ## 
+  ## > Creating the full Z-Matrix  
+  ## # Loading the ZMatrix... 
+  ## Selecting studies :
+  ## 4 studies 
+  ## 6,811,310 SNPs 
+  ## # Adding data from the conventional GWAS :  "GWAS" 
+  ## Done! 
+  ## 286,807 SNPs in common between prior studies and the conventional GWAS 
+  ## 
+  ## > Computing prior  
+  ## # Calculating the prior chromosome by chromosome... 
+  ##    Chromosome 1
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 2
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 3
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 4
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 5
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 6
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 7
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 8
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 9
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 10
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 11
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 12
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 13
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 14
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 15
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 16
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 17
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 18
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 19
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 20
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 21
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ##    Chromosome 22
+  ## Running regression, 
+  ## Calculating prior estimates for SNPs on this chromosome, 
+  ## Calculating prior standard errors for SNPs on this chromosome, 
+  ## ## Out-of-sample R-squared for MR instruments across all chromosomes is 0.5206
+  ## ## Out-of-sample squared correlation for MR instruments across all chromosome is 0.5271
+  ## ## Correlation between prior and observed effects for all SNPs is 0.1855
+  ## ## Correlation between prior and observed effects for SNPs with GWAS p-value < 0.001 is 0.5944
+  ## Done! 
+  ## 
+  ## 
+  ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
+  ## <<< Calculation of Bayes Factors and p-values >>>  
+  ## 
+  ## > Calculating them for all SNPs  
+  ## # Computing observed Bayes Factor for all SNPs... 
+  ## Done! 
+  ## # Computing BF p-values... 
+  ##    using a distribution approach: 
+  ## ... getting approximated p-values using non-linear quantiles  
+  ## ... checking p-values near significance threshold  
+  ##     everything is ok!  
+  ## # Estimating p-values for posterior effects... 
+  ## Done! 
+  ## # Estimating p-values for direct effects... 
+  ## Done! 
+  ## > Pruning and identifying significant SNPs 
+  ## Identification based on BFs 
+  ##    Starting with 286,807 SNPs 
+  ## # Selecting significant SNPs according to p-values... 
+  ## 31 SNPs left 
+  ## Done! 
+  ## # Pruning significant SNPs... 
+  ##    distance : 500Kb 
+  ## 11 SNPs left 
+  ## Done! 
+  ## Identification based on posterior effects 
+  ##    Starting with 286,807 SNPs 
+  ## # Selecting significant SNPs according to p-values... 
+  ## 11 SNPs left 
+  ## Done! 
+  ## # Pruning significant SNPs... 
+  ##    distance : 500Kb 
+  ## 6 SNPs left 
+  ## Done! 
+  ## Identification based on direct effects 
+  ##    Starting with 286,807 SNPs 
+  ## # Selecting significant SNPs according to p-values... 
+  ## 3 SNPs left 
+  ## Done! 
+  ## # Pruning significant SNPs... 
+  ##    distance : 500Kb 
+  ## 2 SNPs left 
+  ## Done! 
+  ## 
+  ## 
+  ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
+  ## Time of the analysis: 1 minute(s) and 57 second(s).
+  ```
+</details> 
+
+
+Functions to extract results from an object of class *bGWAS*:   
+
+```r
 # by default, extract "BF" results...
 hits = extract_results_bGWAS(A, SNPs = "significant")
 hits
-```
+````
 
     ## # A tibble: 11 x 10
     ##    rsid       chrm_UK10K pos_UK10K alt   ref    z_obs mu_prior_estimate
