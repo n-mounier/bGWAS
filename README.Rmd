@@ -152,10 +152,10 @@ You can download these files using this [link](https://drive.switch.ch/index.php
 wget https://drive.switch.ch/index.php/s/jvSwoIxRgCKUSI8/download -O ZMatrices.tar.gz
 tar xzvf ZMatrices.tar.gz
 ``` 
- - On WINDOWS, from a terminal:   
+<!--- - On WINDOWS, from a terminal:   
 ``` bash
 ...
-``` 
+``` --->
 
 <font color="grey"><small> If you want to use your own set of prior GWASs, please have a look [here](doc/ZMatrices.md) to see how you can modify the files.        
 We focused on including prior GWASs that do not come from UKBB, assuming that the focal phenotype results are more likely to be obtained from UKBB. Sample overlap between the focal phenotype and the prior GWASs is not accounted for by our method, so we did not include any UKBB results in the prior GWASs.</font> </small>  
@@ -248,11 +248,17 @@ print_log_bGWAS(A)
 ```
 
 <details>
+
   <summary>Show log</summary>
+  
     ```{r logAdisplay,echo=FALSE, eval=TRUE}
     print_log_bGWAS(A)
     ```
-</details> 
+    
+</details>    
+
+
+
 
 
 Functions to extract results from an object of class *bGWAS*:   
