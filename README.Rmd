@@ -40,10 +40,10 @@ badger::badge_lifecycle("maturing", "9cf"),
 badger::badge_last_commit("n-mounier/bGWAS"),
 
 #license
-badger::badge_custom("license", "GPL-2.0", "lightgrey", "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html"),
+badger::badge_custom("license", "GPL-2.0", "lightgrey", "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html")
 
 #DOI
-badger::badge_custom("poster", "10.5281/zenodo.3403093", "blueviolet", "https://doi.org/10.5281/zenodo.3403093")
+#badger::badge_custom("poster", "10.5281/zenodo.3403093", "blueviolet", "https://doi.org/10.5281/zenodo.3403093")
 )
 
 ```
@@ -60,8 +60,9 @@ sticker(imgurl,
         s_x=1, s_y=.8, s_width=.75,
         filename="inst/Figures/logo.png", dpi=2000) --->
 
-:information_source: `bGWAS` has been updated to version 1.0.0.     
-Check the [NEWS](NEWS.md) to learn more about what has been modified!
+:information\_source: `bGWAS` has been updated to version 1.0.1.    
+:warning: 28/10/2019 : The variance of the prior effects has been modified. If you used a previous version of the package, please re-run yout analys using this new version to get correct results.        
+Check the [NEWS](NEWS.md) to learn more about what has been modified\!
     
     
 :warning: If you downloaded the Z-Matrix files before 20/08/2019, they are now obsolete and you will not be able to use them with the newest version of the package.      

@@ -4,7 +4,6 @@
 [![](https://img.shields.io/badge/lifecycle-maturing-9cf.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![](https://img.shields.io/github/last-commit/n-mounier/bGWAS.svg)](https://github.com/n-mounier/bGWAS/commits/master)
 [![](https://img.shields.io/badge/license-GPL--2.0-lightgrey.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![](https://img.shields.io/badge/poster-10.5281/zenodo.3403093-blueviolet.svg)](https://doi.org/10.5281/zenodo.3403093)
 
 # bGWAS <img src="inst/Figures/logo.png" align="right" height=180/>
 
@@ -18,7 +17,10 @@ sticker(imgurl,
         s_x=1, s_y=.8, s_width=.75,
         filename="inst/Figures/logo.png", dpi=2000) --->
 
-:information\_source: `bGWAS` has been updated to version 1.0.0.  
+:information\_source: `bGWAS` has been updated to version 1.0.1.  
+:warning: 28/10/2019 : The variance of the prior effects has been
+modified. If you used a previous version of the package, please re-run
+yout analys using this new version to get correct results.  
 Check the [NEWS](NEWS.md) to learn more about what has been modified\!
 
 :warning: If you downloaded the Z-Matrix files before 20/08/2019, they

@@ -1,3 +1,12 @@
+ bGWAS 1.0.1 (2019-10-28)
+    
+
+## Changes
+- Variance of the prior effect    
+
+The variance of the prior effect was wrongly estimated (+1 unnecessarily added). The correct standard errors are now returned. This may affect BFs and p-values, but also posterior and direct effect estimates / standard errors.
+
+
 # bGWAS 1.0.0 (2019-08-26)
     
 

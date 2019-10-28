@@ -135,9 +135,8 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, GWASData, r
     d_test %>%
       select(c(1:5, ncol(d_test))) %>%
       mutate(fit=preds_test$fit,
-             se = sqrt(preds_test$se.fit^2 + c(extra.variance +1))) -> d_test
-    ## we also need to add one to the prior variance to account for the fact that we are
-    ## predicting a noisy variable : observedZ ~ N(trueZ, 1)
+             se = sqrt(preds_test$se.fit^2 + c(extra.variance))) -> d_test
+
     
     d_test %>%
       bind_rows(all.priors, .data$.) -> all.priors
