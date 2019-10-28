@@ -1,6 +1,6 @@
 
 [![](https://travis-ci.org/n-mounier/bGWAS.svg?branch=master)](https://travis-ci.org/n-mounier/bGWAS)
-[![](https://img.shields.io/badge/version-1.0.0-informational.svg)](https://github.com/n-mounier/bGWAS)
+[![](https://img.shields.io/badge/version-1.0.1-informational.svg)](https://github.com/n-mounier/bGWAS)
 [![](https://img.shields.io/badge/lifecycle-maturing-9cf.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![](https://img.shields.io/github/last-commit/n-mounier/bGWAS.svg)](https://github.com/n-mounier/bGWAS/commits/master)
 [![](https://img.shields.io/badge/license-GPL--2.0-lightgrey.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
@@ -343,8 +343,8 @@ print(A)
     ## 
     ## -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
     ##  
-    ## 11 significant SNPs identified : 
-    ##  rs429358, rs11633958, rs7857118, rs9457925, rs12828640, rs56179563, rs9379844, rs3794695, rs1573644, rs4762753, rs59613878
+    ## 13 significant SNPs identified : 
+    ##  rs429358, rs56219465, rs7857118, rs12828640, rs56179563, rs9457925, rs1573644, rs3794695, rs9636202, rs4845625, rs9379844, rs59613878, rs34348584
     ## 
     ## -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 
@@ -573,25 +573,25 @@ print_log_bGWAS(A)
     ## Identification based on BFs 
     ##    Starting with 286,807 SNPs 
     ## # Selecting significant SNPs according to p-values... 
-    ## 31 SNPs left 
+    ## 29 SNPs left 
     ## Done! 
     ## # Pruning significant SNPs... 
     ##    distance : 500Kb 
-    ## 11 SNPs left 
+    ## 13 SNPs left 
     ## Done! 
     ## Identification based on posterior effects 
     ##    Starting with 286,807 SNPs 
     ## # Selecting significant SNPs according to p-values... 
-    ## 11 SNPs left 
+    ## 50 SNPs left 
     ## Done! 
     ## # Pruning significant SNPs... 
     ##    distance : 500Kb 
-    ## 6 SNPs left 
+    ## 19 SNPs left 
     ## Done! 
     ## Identification based on direct effects 
     ##    Starting with 286,807 SNPs 
     ## # Selecting significant SNPs according to p-values... 
-    ## 3 SNPs left 
+    ## 5 SNPs left 
     ## Done! 
     ## # Pruning significant SNPs... 
     ##    distance : 500Kb 
@@ -600,7 +600,7 @@ print_log_bGWAS(A)
     ## 
     ## 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 1 minute(s) and 57 second(s).
+    ## Time of the analysis: 2 minute(s) and 6 second(s).
     ```
 
 </details>
@@ -615,33 +615,37 @@ hits = extract_results_bGWAS(A, SNPs = "significant")
 hits
 ```
 
-    ## # A tibble: 11 x 10
-    ##    rsid       chrm_UK10K pos_UK10K alt   ref    z_obs mu_prior_estimate
-    ##    <chr>           <dbl>     <dbl> <chr> <chr>  <dbl>             <dbl>
-    ##  1 rs429358           19  45411941 T     C      19.3             -0.351
-    ##  2 rs11633958         15  78862064 T     C     -10.2             -0.190
-    ##  3 rs7857118           9  22124140 A     T       6.20             2.61 
-    ##  4 rs9457925           6 160848743 A     G      -6.03            -1.72 
-    ##  5 rs12828640         12 111361298 A     G      -5.74            -2.34 
-    ##  6 rs56179563          7 129685597 A     G       5.19             3.37 
-    ##  7 rs9379844           6  26291527 A     G       5.50             1.43 
-    ##  8 rs3794695          16  72097827 T     C      -5.30            -1.69 
-    ##  9 rs1573644          15  91421283 T     C       4.88             2.43 
-    ## 10 rs4762753          12  20579969 T     G       5.31             1.16 
-    ## 11 rs59613878          4   3139152 T     C       4.90             1.78 
+    ## # A tibble: 13 x 10
+    ##    rsid       chrm_UK10K pos_UK10K alt   ref   z_obs mu_prior_estimate
+    ##    <chr>           <dbl>     <dbl> <chr> <chr> <dbl>             <dbl>
+    ##  1 rs429358           19  45411941 T     C     19.3             -0.351
+    ##  2 rs56219465         15  78742579 A     G      9.27             0.790
+    ##  3 rs7857118           9  22124140 A     T      6.20             2.61 
+    ##  4 rs12828640         12 111361298 A     G     -5.74            -2.34 
+    ##  5 rs56179563          7 129685597 A     G      5.19             3.37 
+    ##  6 rs9457925           6 160848743 A     G     -6.03            -1.72 
+    ##  7 rs1573644          15  91421283 T     C      4.88             2.43 
+    ##  8 rs3794695          16  72097827 T     C     -5.30            -1.69 
+    ##  9 rs9636202          19  18449238 A     G      4.40             3.12 
+    ## 10 rs4845625           1 154422067 T     C     -4.63            -2.29 
+    ## 11 rs9379844           6  26291527 A     G      5.50             1.43 
+    ## 12 rs59613878          4   3139152 T     C      4.90             1.78 
+    ## 13 rs34348584          3  27532704 T     C      4.46             2.11 
     ##    mu_prior_std_error      BF     BF_p
     ##                 <dbl>   <dbl>    <dbl>
-    ##  1               1.16 1.24e45 6.01e-68
-    ##  2               1.16 1.30e13 1.85e-21
-    ##  3               1.32 1.26e 7 9.21e-13
-    ##  4               1.17 1.00e 6 4.19e-11
-    ##  5               1.20 8.51e 5 5.36e-11
-    ##  6               1.23 2.31e 5 3.93e-10
-    ##  7               1.14 6.57e 4 2.71e- 9
-    ##  8               1.16 5.16e 4 3.94e- 9
-    ##  9               1.21 2.76e 4 1.04e- 8
-    ## 10               1.16 2.20e 4 1.47e- 8
-    ## 11               1.16 1.36e 4 3.11e- 8
+    ##  1              0.588 3.86e18 7.77e-35
+    ##  2              0.598 1.22e 7 3.22e-14
+    ##  3              0.859 4.09e 6 1.77e-13
+    ##  4              0.658 2.12e 5 1.83e-11
+    ##  5              0.718 1.92e 5 2.13e-11
+    ##  6              0.608 7.62e 4 9.40e-11
+    ##  7              0.675 1.55e 4 1.30e- 9
+    ##  8              0.584 8.53e 3 3.58e- 9
+    ##  9              0.607 7.58e 3 4.38e- 9
+    ## 10              0.645 5.49e 3 7.66e- 9
+    ## 11              0.538 5.33e 3 8.05e- 9
+    ## 12              0.584 3.82e 3 1.44e- 8
+    ## 13              0.675 2.64e 3 2.77e- 8
 
 ``` r
 all_results = extract_results_bGWAS(A, SNPs = "all")
@@ -662,8 +666,8 @@ extract_results_bGWAS(A, SNPs = "significant", results = "direct")
     ## 2 rs11633958         15  78862064 T     C     -10.2              -9.99
     ##   mu_direct_std_error z_direct p_direct
     ##                 <dbl>    <dbl>    <dbl>
-    ## 1                1.53    12.8  8.90e-38
-    ## 2                1.53    -6.51 7.28e-11
+    ## 1                1.16    17.0  1.60e-64
+    ## 2                1.16    -8.59 8.58e-18
 
 ``` r
 extract_MRcoeffs_bGWAS(A)[,1:12]
