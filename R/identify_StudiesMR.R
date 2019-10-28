@@ -349,6 +349,12 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
       
     } 
     
+    
+    if(length(studies_to_test)==0){
+      tmp = paste0("All studies included \n")
+      Log = update_log(Log, tmp, verbose)
+      Convergence=T
+    }
 
     
     if(no_change){
