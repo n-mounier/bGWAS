@@ -463,7 +463,7 @@ if(save_file) grDevices::dev.off()
 #' \code{CRR} : corrected to raw ratio (ratio between direct effect and observed effect) \cr
 #' 
 #' Alternatively, if \code{results = "everything"} all the results described above will be 
-#' returned (possible only if \code{SNPs = "all"}. \cr
+#' returned (possible only if \code{SNPs = "all"}). \cr
 #' 
 #' 
 #' @return a \code{tibble} containing the results for all / significant SNPs

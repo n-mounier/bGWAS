@@ -60,5 +60,5 @@ Alternatively, if \code{results = "direct"} the following information will be re
 \code{CRR} : corrected to raw ratio (ratio between direct effect and observed effect) \cr
 
 Alternatively, if \code{results = "everything"} all the results described above will be 
-returned (possible only if \code{SNPs = "all"}. \cr
+returned (possible only if \code{SNPs = "all"}). \cr
 }
