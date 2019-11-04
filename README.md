@@ -216,14 +216,22 @@ AllStudies[AllStudies$ID %in% MyStudies, ]
 ```
 
     ## # A tibble: 6 x 10
-    ##   File   Name      ID Trait  Consortium Reference Download  Remarks  N_SNPs
-    ##   <chr>  <chr>  <dbl> <chr>  <chr>      <chr>     <chr>     <chr>     <dbl>
-    ## 1 All_a… Body …     1 Body … GIANT      https://… https://… <NA>     6.81e6
-    ## 2 META_… Heart…    23 Heart… HRgene     https://… http://w… <NA>     6.81e6
-    ## 3 tag.c… Smoki…    35 Smoki… TAG        https://… https://… Other G… 6.63e6
-    ## 4 tag.e… Smoki…    36 Smoki… TAG        https://… https://… Other G… 6.78e6
-    ## 5 tag.f… Smoki…    37 Smoki… TAG        https://… https://… Other G… 6.78e6
-    ## 6 tag.l… Smoki…    38 Smoki… TAG        https://… https://… Other G… 6.77e6
+    ##   File                                             
+    ##   <chr>                                            
+    ## 1 All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq.gz
+    ## 2 META_STAGE1_GWASHR_SUMSTATS.txt                  
+    ## 3 tag.cpd.tbl.gz                                   
+    ## 4 tag.evrsmk.tbl.gz                                
+    ## 5 tag.former.tbl.gz                                
+    ## 6 tag.logonset.tbl.gz                              
+    ##   Name       ID Trait  Consortium Reference   Download    Remarks    N_SNPs
+    ##   <chr>   <dbl> <chr>  <chr>      <chr>       <chr>       <chr>       <dbl>
+    ## 1 Body M…     1 Body … GIANT      https://ww… https://po… <NA>       6.81e6
+    ## 2 Heart …    23 Heart… HRgene     https://ww… http://wal… <NA>       6.81e6
+    ## 3 Smokin…    35 Smoki… TAG        https://ww… https://ww… Other GWA… 6.63e6
+    ## 4 Smokin…    36 Smoki… TAG        https://ww… https://ww… Other GWA… 6.78e6
+    ## 5 Smokin…    37 Smoki… TAG        https://ww… https://ww… Other GWA… 6.78e6
+    ## 6 Smokin…    38 Smoki… TAG        https://ww… https://ww… Other GWA… 6.77e6
     ##   N_Instruments
     ##           <dbl>
     ## 1         10052
@@ -615,37 +623,52 @@ hits = extract_results_bGWAS(A, SNPs = "significant")
 hits
 ```
 
-    ## # A tibble: 13 x 10
-    ##    rsid       chrm_UK10K pos_UK10K alt   ref   z_obs mu_prior_estimate
-    ##    <chr>           <dbl>     <dbl> <chr> <chr> <dbl>             <dbl>
-    ##  1 rs429358           19  45411941 T     C     19.3             -0.351
-    ##  2 rs56219465         15  78742579 A     G      9.27             0.790
-    ##  3 rs7857118           9  22124140 A     T      6.20             2.61 
-    ##  4 rs12828640         12 111361298 A     G     -5.74            -2.34 
-    ##  5 rs56179563          7 129685597 A     G      5.19             3.37 
-    ##  6 rs9457925           6 160848743 A     G     -6.03            -1.72 
-    ##  7 rs1573644          15  91421283 T     C      4.88             2.43 
-    ##  8 rs3794695          16  72097827 T     C     -5.30            -1.69 
-    ##  9 rs9636202          19  18449238 A     G      4.40             3.12 
-    ## 10 rs4845625           1 154422067 T     C     -4.63            -2.29 
-    ## 11 rs9379844           6  26291527 A     G      5.50             1.43 
-    ## 12 rs59613878          4   3139152 T     C      4.90             1.78 
-    ## 13 rs34348584          3  27532704 T     C      4.46             2.11 
-    ##    mu_prior_std_error      BF     BF_p
-    ##                 <dbl>   <dbl>    <dbl>
-    ##  1              0.588 3.86e18 7.77e-35
-    ##  2              0.598 1.22e 7 3.22e-14
-    ##  3              0.859 4.09e 6 1.77e-13
-    ##  4              0.658 2.12e 5 1.83e-11
-    ##  5              0.718 1.92e 5 2.13e-11
-    ##  6              0.608 7.62e 4 9.40e-11
-    ##  7              0.675 1.55e 4 1.30e- 9
-    ##  8              0.584 8.53e 3 3.58e- 9
-    ##  9              0.607 7.58e 3 4.38e- 9
-    ## 10              0.645 5.49e 3 7.66e- 9
-    ## 11              0.538 5.33e 3 8.05e- 9
-    ## 12              0.584 3.82e 3 1.44e- 8
-    ## 13              0.675 2.64e 3 2.77e- 8
+    ## # A tibble: 13 x 14
+    ##    rsid       chrm_UK10K pos_UK10K alt   ref      beta      se z_obs
+    ##    <chr>           <dbl>     <dbl> <chr> <chr>   <dbl>   <dbl> <dbl>
+    ##  1 rs429358           19  45411941 T     C      0.106  0.00546 19.3 
+    ##  2 rs56219465         15  78742579 A     G      0.0380 0.00410  9.27
+    ##  3 rs7857118           9  22124140 A     T      0.0240 0.00387  6.20
+    ##  4 rs12828640         12 111361298 A     G     -0.0229 0.00399 -5.74
+    ##  5 rs56179563          7 129685597 A     G      0.0211 0.00406  5.19
+    ##  6 rs9457925           6 160848743 A     G     -0.0875 0.0145  -6.03
+    ##  7 rs1573644          15  91421283 T     C      0.0201 0.00412  4.88
+    ##  8 rs3794695          16  72097827 T     C     -0.0260 0.00491 -5.30
+    ##  9 rs9636202          19  18449238 A     G      0.0194 0.00441  4.40
+    ## 10 rs4845625           1 154422067 T     C     -0.0180 0.00389 -4.63
+    ## 11 rs9379844           6  26291527 A     G      0.0219 0.00399  5.50
+    ## 12 rs59613878          4   3139152 T     C      0.0206 0.00420  4.90
+    ## 13 rs34348584          3  27532704 T     C      0.0201 0.00450  4.46
+    ##    mu_prior_estimate mu_prior_std_error beta_prior_estimate
+    ##                <dbl>              <dbl>               <dbl>
+    ##  1            -0.351              0.588            -0.00192
+    ##  2             0.790              0.598             0.00324
+    ##  3             2.61               0.859             0.0101 
+    ##  4            -2.34               0.658            -0.00934
+    ##  5             3.37               0.718             0.0137 
+    ##  6            -1.72               0.608            -0.0250 
+    ##  7             2.43               0.675             0.0100 
+    ##  8            -1.69               0.584            -0.00831
+    ##  9             3.12               0.607             0.0137 
+    ## 10            -2.29               0.645            -0.00891
+    ## 11             1.43               0.538             0.00571
+    ## 12             1.78               0.584             0.00750
+    ## 13             2.11               0.675             0.00950
+    ##    beta_prior_std_error      BF     BF_p
+    ##                   <dbl>   <dbl>    <dbl>
+    ##  1              0.00321 3.86e18 7.77e-35
+    ##  2              0.00245 1.22e 7 3.22e-14
+    ##  3              0.00332 4.09e 6 1.77e-13
+    ##  4              0.00262 2.12e 5 1.83e-11
+    ##  5              0.00291 1.92e 5 2.13e-11
+    ##  6              0.00883 7.62e 4 9.40e-11
+    ##  7              0.00278 1.55e 4 1.30e- 9
+    ##  8              0.00287 8.53e 3 3.58e- 9
+    ##  9              0.00268 7.58e 3 4.38e- 9
+    ## 10              0.00251 5.49e 3 7.66e- 9
+    ## 11              0.00215 5.33e 3 8.05e- 9
+    ## 12              0.00245 3.82e 3 1.44e- 8
+    ## 13              0.00303 2.64e 3 2.77e- 8
 
 ``` r
 all_results = extract_results_bGWAS(A, SNPs = "all")
@@ -659,33 +682,43 @@ nrow(all_results)
 extract_results_bGWAS(A, SNPs = "significant", results = "direct")
 ```
 
-    ## # A tibble: 2 x 10
-    ##   rsid       chrm_UK10K pos_UK10K alt   ref   z_obs mu_direct_estimate
-    ##   <chr>           <dbl>     <dbl> <chr> <chr> <dbl>              <dbl>
-    ## 1 rs429358           19  45411941 T     C      19.3              19.7 
-    ## 2 rs11633958         15  78862064 T     C     -10.2              -9.99
-    ##   mu_direct_std_error z_direct p_direct
-    ##                 <dbl>    <dbl>    <dbl>
-    ## 1                1.16    17.0  1.60e-64
-    ## 2                1.16    -8.59 8.58e-18
+    ## # A tibble: 2 x 14
+    ##   rsid       chrm_UK10K pos_UK10K alt   ref      beta      se z_obs
+    ##   <chr>           <dbl>     <dbl> <chr> <chr>   <dbl>   <dbl> <dbl>
+    ## 1 rs429358           19  45411941 T     C      0.106  0.00546  19.3
+    ## 2 rs11633958         15  78862064 T     C     -0.0418 0.00410 -10.2
+    ##   mu_direct_estimate mu_direct_std_error beta_direct_estimate
+    ##                <dbl>               <dbl>                <dbl>
+    ## 1              19.7                 1.16               0.108 
+    ## 2              -9.99                1.16              -0.0410
+    ##   beta_direct_std_error z_direct p_direct
+    ##                   <dbl>    <dbl>    <dbl>
+    ## 1               0.00634    17.0  1.60e-64
+    ## 2               0.00477    -8.59 8.58e-18
 
 ``` r
 extract_MRcoeffs_bGWAS(A)[,1:12]
 ```
 
     ## # A tibble: 4 x 12
-    ##   name        study        estimate std_error Tstat        P chrm1_estimate
-    ##   <chr>       <chr>           <dbl>     <dbl> <dbl>    <dbl>          <dbl>
-    ## 1 Years of S… EDUyears_20…    0.187    0.0255  7.33 1.32e-11          0.187
-    ## 2 Body Mass … All_ancestr…   -0.122    0.0248 -4.93 2.12e- 6         -0.108
-    ## 3 Coronary A… cardiogram_…   -0.439    0.0623 -7.05 6.18e-11         -0.469
-    ## 4 Diastolic … DBP            -0.248    0.0623 -3.98 1.07e- 4         -0.264
-    ##   chrm1_std_error  chrm1_P chrm2_estimate chrm2_std_error  chrm2_P
-    ##             <dbl>    <dbl>          <dbl>           <dbl>    <dbl>
-    ## 1          0.0258 2.93e-11          0.186          0.0273 3.01e-10
-    ## 2          0.0259 5.55e- 5         -0.124          0.0268 8.72e- 6
-    ## 3          0.0616 4.27e-12         -0.439          0.0685 2.24e- 9
-    ## 4          0.0619 3.78e- 5         -0.250          0.0653 1.93e- 4
+    ##   name                                
+    ##   <chr>                               
+    ## 1 Years of Schooling (SSGAC)          
+    ## 2 Body Mass Index (GIANT)             
+    ## 3 Coronary Artery Disease (CARDIoGRAM)
+    ## 4 Diastolic Blood Pressure (ICBP)     
+    ##   study    estimate std_error Tstat        P chrm1_estimate chrm1_std_error
+    ##   <chr>       <dbl>     <dbl> <dbl>    <dbl>          <dbl>           <dbl>
+    ## 1 EDUyear…    0.187    0.0255  7.33 1.32e-11          0.187          0.0258
+    ## 2 All_anc…   -0.122    0.0248 -4.93 2.12e- 6         -0.108          0.0259
+    ## 3 cardiog…   -0.439    0.0623 -7.05 6.18e-11         -0.469          0.0616
+    ## 4 DBP        -0.248    0.0623 -3.98 1.07e- 4         -0.264          0.0619
+    ##    chrm1_P chrm2_estimate chrm2_std_error  chrm2_P
+    ##      <dbl>          <dbl>           <dbl>    <dbl>
+    ## 1 2.93e-11          0.186          0.0273 3.01e-10
+    ## 2 5.55e- 5         -0.124          0.0268 8.72e- 6
+    ## 3 4.27e-12         -0.439          0.0685 2.24e- 9
+    ## 4 3.78e- 5         -0.250          0.0653 1.93e- 4
 
   - Functions for graphic representations:
 
@@ -747,9 +780,12 @@ Pro (Early 2015) - Processor : 2.9 GHz Intel Core i5 - Memory : 8 GB
 This method has been applied to Lifespan analysis in [McDaid et
 al](https://www.ncbi.nlm.nih.gov/pubmed/28748955) and [Timmers et
 al](https://www.ncbi.nlm.nih.gov/pubmed/30642433).  
-The most recent results (obtained using `bGWAS` version 1.0.0) are
-available [here](doc/Lifespan_Analysis.md) and summarised in [this
-poster](https://doi.org/10.5281/zenodo.3403093).
+<!-- The most recent results (obtained using `bGWAS` version 1.0.0) are available [here](doc/Lifespan_Analysis.md) and summarised in [this poster](https://doi.org/10.5281/zenodo.3403093). -->
+
+<!--- ## Application to food choices
+[//]:*******
+
+The corrected to raw ratios (CRRs) derived from this approach have been used to study the relationship between food choices and health status in [Pirastu et al](...) --->
 
 ## Citation
 

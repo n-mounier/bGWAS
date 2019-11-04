@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE,
 # for tibbles...
 options(pillar.neg=F, # do no print neg number in red
         pillar.subtle=F, # turn off highliting of significant digits
-        tibble.width = 130) # default=95, increase it to make it readable
+        tibble.width = 170) # default=95, increase it to make it readable
 A = readRDS("inst/Data/A.RDS")
 # automatically updates manual
 devtools::build_manual()
@@ -325,7 +325,13 @@ Analysis using 6 prior GWASs, for a conventional GWAS containing ~ 300,000 SNPs 
 [//]:*******
 
 This method has been applied to Lifespan analysis in [McDaid et al](https://www.ncbi.nlm.nih.gov/pubmed/28748955) and [Timmers et al](https://www.ncbi.nlm.nih.gov/pubmed/30642433).     
-The most recent results (obtained using `bGWAS` version 1.0.0) are available [here](doc/Lifespan_Analysis.md) and summarised in [this poster](https://doi.org/10.5281/zenodo.3403093).
+<!-- The most recent results (obtained using `bGWAS` version 1.0.0) are available [here](doc/Lifespan_Analysis.md) and summarised in [this poster](https://doi.org/10.5281/zenodo.3403093). -->
+
+
+<!--- ## Application to food choices
+[//]:*******
+
+The corrected to raw ratios (CRRs) derived from this approach have been used to study the relationship between food choices and health status in [Pirastu et al](...) --->
 
 
 ## Citation
