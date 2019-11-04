@@ -61,6 +61,8 @@ The output files created are:
         BF_p/BF_fdr : Bayes Factor p-value / fdr  <br/>  
         p_posterior : posterior effect p-value / fdr  <br/> 
         p_direct : direct effect p-value / fdr  <br/></ul>
+        CRR : corrected to raw ratio (ratio between direct effect and observed effect)  <br/></ul>
+
 
 -   **SignificantSNPs.csv** : contains BF and p-values, prior, posterior and direct effects estimates for a subset of significant SNPs (subset of **PriorBFp.csv**)  
 

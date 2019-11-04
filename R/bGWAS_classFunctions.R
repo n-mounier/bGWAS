@@ -421,7 +421,7 @@ if(save_file) grDevices::dev.off()
 #'
 #' @param obj an object of class bGWAS created using \code{\link{bGWAS}()}
 #' @param SNPs, "all" / "significant", \code{default="significant"}
-#' @param results, "BF" / "posterior" / "direct", \code{default="BF"}
+#' @param results, "BF" / "posterior" / "direct" / "everything", \code{default="BF"}
 #' 
 #' @details
 #' For all value of \code{results}, basic informations about the SNPs will be returned: \cr
@@ -430,11 +430,15 @@ if(save_file) grDevices::dev.off()
 #' \code{pos_UK10K} : position (obtained from UK10K data) \cr
 #' \code{alt} : alternative (effect) allele \cr
 #' \code{ref} : reference allele \cr
+#' \code{beta} : observed effect size (if possible) \cr
+#' \code{se} : observed effect size (if possible) \cr
 #' \code{z_obs} : observed Z-score \cr
 #' 
 #' In addition, if \code{results = "BF"} the following information will be returned: \cr
 #' \code{mu_prior_estimate} : prior effect estimate (z-score scale) \cr
 #' \code{mu_prior_std_error} : prior effect standard error (z-score scale) \cr
+#' \code{beta_prior_estimate} : prior effect estimate (beta scale, if possible) \cr
+#' \code{beta_prior_std_error} : prior effect standard error (beta scale, if possible) \cr
 #' \code{BF} : Bayes Factor\cr
 #' \code{BF_p} : Bayes Factor p-value  \cr
 #' \code{BF_fdr} : Bayes Factor FDR (only if FDR used to identify significant SNPs) \cr
@@ -442,6 +446,8 @@ if(save_file) grDevices::dev.off()
 #' Alternatively, if \code{results = "posterior"} the following information will be returned: \cr
 #' \code{mu_posterior_estimate} : posterior effect estimate (z-score scale)  \cr
 #' \code{mu_posterior_std_error} : posterior effect standard error (z-score scale) \cr
+#' \code{beta_posterior_estimate} : posterior effect estimate (beta scale, if possible) \cr
+#' \code{beta_posterior_std_error} : posterior effect standard error (beta scale, if possible) \cr
 #' \code{z_posterior} : posterior Z-score \cr
 #' \code{p_posterior} : posterior effect p-value \cr
 #' \code{fdr_posterior} :  posterior effect FDR (only if FDR used to identify significant SNPs) \cr
@@ -449,9 +455,15 @@ if(save_file) grDevices::dev.off()
 #' Alternatively, if \code{results = "direct"} the following information will be returned: \cr
 #' \code{mu_direct_estimate} : direct effect estimate (z-score scale)\cr
 #' \code{mu_direct_std_error} : direct effect standard error (z-score scale) \cr
+#' \code{beta_direct_estimate} : direct effect estimate (beta scale, if possible) \cr
+#' \code{beta_direct_std_error} : direct effect standard error (beta scale, if possible) \cr
 #' \code{z_direct} : direct Z-score\cr
 #' \code{p_direct} : direct effect p-value \cr
 #' \code{fdr_direct} : direct effect FDR (only if FDR used to identify significant SNPs) \cr
+#' \code{CRR} : corrected to raw ratio (ratio between direct effect and observed effect) \cr
+#' 
+#' Alternatively, if \code{results = "everything"} all the results described above will be returned 
+#' (possible only if \code{results . \cr
 #'
 #' @return a \code{tibble} containing the results for all / significant SNPs
 #' @export
@@ -465,7 +477,15 @@ extract_results_bGWAS <- function(obj, SNPs="significant", results="BF"){
   
   
   if(!SNPs %in% c("all", "significant")) stop("SNPs : should be \"all\" or \"significant\".")
-  if(!results %in% c("BF", "posterior", "direct")) stop("results : should be \"BF\", \"posterior\" or \"direct\".")
+  if(!results %in% c("BF", "posterior", "direct", "everything")) stop("results : should be \"BF\", \"posterior\", \"direct\" or \"everything\".")
+  if(SNPs=="significant" && results == "everything") stop("Not possible to return \"everything\" only for \"significant\" SNPs.")
+  
+  
+  
+  if(SNPs=="all" && results == "everything"){
+    return(obj$all_BFs)
+  }
+  
   
   if(SNPs=="all"){
     Res = obj$all_BFs
@@ -490,19 +510,32 @@ extract_results_bGWAS <- function(obj, SNPs="significant", results="BF"){
   
   if(results=="BF"){
     Res %>%
-      select(.data$rsid, .data$chrm_UK10K, .data$pos_UK10K, .data$alt, .data$ref, .data$z_obs,
-             .data$mu_prior_estimate, .data$mu_prior_std_error, .data$BF, .data$BF_p, 
-             if("BF_fdr" %in% names(.data$.)) .data$BF_fdr else NULL) -> Res
+      select(.data$rsid, .data$chrm_UK10K, .data$pos_UK10K, .data$alt, .data$ref, 
+             ends_with("beta"), ends_with("se"),
+             .data$z_obs,
+             .data$mu_prior_estimate, .data$mu_prior_std_error, 
+             matches("beta_prior_estimate"),  matches("beta_prior_std_error"),
+             .data$BF, .data$BF_p, 
+             matches("BF_fdr")) -> Res
   } else if(results=="posterior"){
     Res %>%
-      select(.data$rsid, .data$chrm_UK10K, .data$pos_UK10K, .data$alt, .data$ref, .data$z_obs,
-             .data$mu_posterior_estimate, .data$mu_posterior_std_error, .data$z_posterior, .data$p_posterior, 
-             if("fdr_posterior" %in% names(.data$.)) .data$fdr_posterior else NULL) -> Res
+      select(.data$rsid, .data$chrm_UK10K, .data$pos_UK10K, .data$alt, .data$ref,
+             ends_with("beta"), ends_with("se"),
+             .data$z_obs,
+             .data$mu_posterior_estimate, .data$mu_posterior_std_error, 
+             matches("beta_posterior_estimate"),  matches("beta_posterior_std_error"),
+             .data$z_posterior, .data$p_posterior, 
+             matches("fdr_posterior")) -> Res
   } else if(results=="direct"){
     Res %>%
-      select(.data$rsid, .data$chrm_UK10K, .data$pos_UK10K, .data$alt, .data$ref, .data$z_obs,
-             .data$mu_direct_estimate, .data$mu_direct_std_error, .data$z_direct, .data$p_direct, 
-             if("fdr_direct" %in% names(.data$.)) .data$fdr_direct else NULL) -> Res
+      select(.data$rsid, .data$chrm_UK10K, .data$pos_UK10K, .data$alt, .data$ref,
+             ends_with("beta"), ends_with("se"),
+             .data$z_obs,
+             .data$mu_direct_estimate, .data$mu_direct_std_error, 
+             matches("beta_direct_estimate"),  matches("beta_direct_std_error"),
+             .data$z_direct, .data$p_direct, 
+             matches("fdr_direct"),
+             matches("CRR")) -> Res
   }
   
   

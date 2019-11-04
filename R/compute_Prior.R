@@ -216,6 +216,14 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, GWASData, r
     Results %>%
       mutate(beta_direct_estimate = .data$se * .data$mu_direct_estimate,
              beta_direct_std_error = .data$se * .data$mu_direct_std_error) -> Results
+      
+    # CRR
+    Results %>%
+      mutate(CRR = .data$beta_direct_estimate / .data$beta) -> Results
+    
+  } else {
+    Results %>%
+      mutate(CRR = .data$mu_direct_estimate / .data$z_obs) -> Results
     
   }
   

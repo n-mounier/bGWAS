@@ -1,4 +1,4 @@
- bGWAS 1.0.1 (2019-10-28)
+# bGWAS 1.0.1 (2019-11-04)
     
 
 ## Changes
@@ -6,6 +6,9 @@
 
 The variance of the prior effect was wrongly estimated (+1 unnecessarily added). The correct standard errors are now returned. This may affect BFs and p-values, but also posterior and direct effect estimates / standard errors.
 
+- Corrected to raw ratio (CRR)    
+
+The ratio between direct effect and observed effect (also named corrected to raw ratio or CRR) has been added to the output files.
 
 # bGWAS 1.0.0 (2019-08-26)
     
