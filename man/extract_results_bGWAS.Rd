@@ -20,3 +20,45 @@ a \code{tibble} containing the results for all / significant SNPs
 Extracts SNPs results from bGWAS results (BFs, p-value, prior, posterior and 
 direct effects, depending on the value of the parameter \code{results})
 }
+\details{
+For all value of \code{results}, basic informations about the SNPs will be returned: \cr
+\code{rsid} : rs number \cr
+\code{chrm_UK10K} : chromosome (obtained from UK10K data)\cr
+\code{pos_UK10K} : position (obtained from UK10K data) \cr
+\code{alt} : alternative (effect) allele \cr
+\code{ref} : reference allele \cr
+\code{beta} : observed effect size (if possible) \cr
+\code{se} : observed effect size (if possible) \cr
+\code{z_obs} : observed Z-score \cr
+
+In addition, if \code{results = "BF"} the following information will be returned: \cr
+\code{mu_prior_estimate} : prior effect estimate (z-score scale) \cr
+\code{mu_prior_std_error} : prior effect standard error (z-score scale) \cr
+\code{beta_prior_estimate} : prior effect estimate (beta scale, if possible) \cr
+\code{beta_prior_std_error} : prior effect standard error (beta scale, if possible) \cr
+\code{BF} : Bayes Factor\cr
+\code{BF_p} : Bayes Factor p-value  \cr
+\code{BF_fdr} : Bayes Factor FDR (only if FDR used to identify significant SNPs) \cr
+
+Alternatively, if \code{results = "posterior"} the following information will be returned: \cr
+\code{mu_posterior_estimate} : posterior effect estimate (z-score scale)  \cr
+\code{mu_posterior_std_error} : posterior effect standard error (z-score scale) \cr
+\code{beta_posterior_estimate} : posterior effect estimate (beta scale, if possible) \cr
+\code{beta_posterior_std_error} : posterior effect standard error (beta scale, if possible) \cr
+\code{z_posterior} : posterior Z-score \cr
+\code{p_posterior} : posterior effect p-value \cr
+\code{fdr_posterior} :  posterior effect FDR (only if FDR used to identify significant SNPs) \cr
+
+Alternatively, if \code{results = "direct"} the following information will be returned: \cr
+\code{mu_direct_estimate} : direct effect estimate (z-score scale)\cr
+\code{mu_direct_std_error} : direct effect standard error (z-score scale) \cr
+\code{beta_direct_estimate} : direct effect estimate (beta scale, if possible) \cr
+\code{beta_direct_std_error} : direct effect standard error (beta scale, if possible) \cr
+\code{z_direct} : direct Z-score\cr
+\code{p_direct} : direct effect p-value \cr
+\code{fdr_direct} : direct effect FDR (only if FDR used to identify significant SNPs) \cr
+\code{CRR} : corrected to raw ratio (ratio between direct effect and observed effect) \cr
+
+Alternatively, if \code{results = "everything"} all the results described above will be 
+returned (possible only if \code{SNPs = "all"}. \cr
+}

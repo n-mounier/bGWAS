@@ -462,9 +462,10 @@ if(save_file) grDevices::dev.off()
 #' \code{fdr_direct} : direct effect FDR (only if FDR used to identify significant SNPs) \cr
 #' \code{CRR} : corrected to raw ratio (ratio between direct effect and observed effect) \cr
 #' 
-#' Alternatively, if \code{results = "everything"} all the results described above will be returned 
-#' (possible only if \code{results . \cr
-#'
+#' Alternatively, if \code{results = "everything"} all the results described above will be 
+#' returned (possible only if \code{SNPs = "all"}. \cr
+#' 
+#' 
 #' @return a \code{tibble} containing the results for all / significant SNPs
 #' @export
 
