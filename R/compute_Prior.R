@@ -121,7 +121,7 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, GWASData, r
     
     #A few lines to compute the extra.variance if we allow that the z's are random too
     cv <- stats::vcov(fit_masked)
-    extra.variance.1 <- sum(diag(cv)) 
+    extra.variance.1 <- sum(diag(cv)) * length(selected_studies)
     
     summary(fit_masked) %>%
       stats::coef() %>%
