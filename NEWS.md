@@ -1,10 +1,16 @@
-# bGWAS 1.0.1 (2019-11-04)
-    
+# bGWAS 1.0.2 (2019-11-04)
 
 ## Changes
 - Variance of the prior effect    
 
-The variance of the prior effect was wrongly estimated (+1 unnecessarily added). The correct standard errors are now returned. This may affect BFs and p-values, but also posterior and direct effect estimates / standard errors.
+The variance of the prior effects is defined as : Gamma' * var(b)* Gamma + b' * var(Gamma) * b + tr(var(b)) * tr(var(Gamma)), with b the causal effect estimates and Gamma the effects of the SNPs on the RFs used to create the prior. The first term (Gamma' * var(b)* Gamma) is estimated correctly in R. The second term (b' * var(Gamma) * b ) is calculated assuming than var(Gamma) is the identity matrix (matrix of Z-score, assuming that the covariance between RF is low). So far, the third term (tr(var(b)) * tr(var(Gamma))) was only accounting for tr(var(b)) and ignoring tr(var(Gamma)) (considering it was equal to 1) . Now, we use the number of RFs (assuming  var(Gamma) is the identity matrix) in the formula.
+
+# bGWAS 1.0.1 (2019-11-04)
+
+## Changes
+- Variance of the prior effect    
+
+The variance of the prior effects was wrongly estimated (+1 unnecessarily added). The correct standard errors are now returned. This may affect BFs and p-values, but also posterior and direct effect estimates / standard errors.
 
 - Corrected to raw ratio (CRR)    
 
