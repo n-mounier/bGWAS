@@ -1,6 +1,6 @@
 
 [![](https://travis-ci.org/n-mounier/bGWAS.svg?branch=master)](https://travis-ci.org/n-mounier/bGWAS)
-[![](https://img.shields.io/badge/version-1.0.1-informational.svg)](https://github.com/n-mounier/bGWAS)
+[![](https://img.shields.io/badge/version-1.0.2-informational.svg)](https://github.com/n-mounier/bGWAS)
 [![](https://img.shields.io/badge/lifecycle-maturing-9cf.svg)](https://www.tidyverse.org/lifecycle/#maturing)
 [![](https://img.shields.io/github/last-commit/n-mounier/bGWAS.svg)](https://github.com/n-mounier/bGWAS/commits/master)
 [![](https://img.shields.io/badge/license-GPL--2.0-lightgrey.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
@@ -351,8 +351,8 @@ print(A)
     ## 
     ## -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
     ##  
-    ## 13 significant SNPs identified : 
-    ##  rs429358, rs56219465, rs7857118, rs12828640, rs56179563, rs9457925, rs1573644, rs3794695, rs9636202, rs4845625, rs9379844, rs59613878, rs34348584
+    ## 14 significant SNPs identified : 
+    ##  rs429358, rs56219465, rs7857118, rs12828640, rs56179563, rs9457925, rs1573644, rs3794695, rs9636202, rs9379844, rs4845625, rs59613878, rs34348584, rs4762753
     ## 
     ## -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_
 
@@ -374,7 +374,7 @@ print_log_bGWAS(A)
     ## The conventional GWAS used as input the object: "GWAS".  
     ##    SNPID column, ok - ALT column, ok - REF column, ok - BETA column, ok - SE column, ok
     ## Posterior effects will be rescaled using BETA and SE.
-    ## The analysis will be run in the folder: "/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS".  
+    ## The analysis will be run in the folder: "/Users/nmounier/bin/annovar".  
     ## The p-value threshold used for selecting MR instruments is: 1e-06.  
     ## The minimum number instruments required for each trait is: 3.  
     ## The distance used for pruning MR instruments is: 500Kb.  
@@ -581,25 +581,25 @@ print_log_bGWAS(A)
     ## Identification based on BFs 
     ##    Starting with 286,807 SNPs 
     ## # Selecting significant SNPs according to p-values... 
-    ## 29 SNPs left 
+    ## 30 SNPs left 
     ## Done! 
     ## # Pruning significant SNPs... 
     ##    distance : 500Kb 
-    ## 13 SNPs left 
+    ## 14 SNPs left 
     ## Done! 
     ## Identification based on posterior effects 
     ##    Starting with 286,807 SNPs 
     ## # Selecting significant SNPs according to p-values... 
-    ## 50 SNPs left 
+    ## 44 SNPs left 
     ## Done! 
     ## # Pruning significant SNPs... 
     ##    distance : 500Kb 
-    ## 19 SNPs left 
+    ## 17 SNPs left 
     ## Done! 
     ## Identification based on direct effects 
     ##    Starting with 286,807 SNPs 
     ## # Selecting significant SNPs according to p-values... 
-    ## 5 SNPs left 
+    ## 4 SNPs left 
     ## Done! 
     ## # Pruning significant SNPs... 
     ##    distance : 500Kb 
@@ -608,7 +608,7 @@ print_log_bGWAS(A)
     ## 
     ## 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 2 minute(s) and 6 second(s).
+    ## Time of the analysis: 2 minute(s) and 18 second(s).
     ```
 
 </details>
@@ -623,7 +623,7 @@ hits = extract_results_bGWAS(A, SNPs = "significant")
 hits
 ```
 
-    ## # A tibble: 13 x 14
+    ## # A tibble: 14 x 14
     ##    rsid       chrm_UK10K pos_UK10K alt   ref      beta      se z_obs
     ##    <chr>           <dbl>     <dbl> <chr> <chr>   <dbl>   <dbl> <dbl>
     ##  1 rs429358           19  45411941 T     C      0.106  0.00546 19.3 
@@ -635,40 +635,43 @@ hits
     ##  7 rs1573644          15  91421283 T     C      0.0201 0.00412  4.88
     ##  8 rs3794695          16  72097827 T     C     -0.0260 0.00491 -5.30
     ##  9 rs9636202          19  18449238 A     G      0.0194 0.00441  4.40
-    ## 10 rs4845625           1 154422067 T     C     -0.0180 0.00389 -4.63
-    ## 11 rs9379844           6  26291527 A     G      0.0219 0.00399  5.50
+    ## 10 rs9379844           6  26291527 A     G      0.0219 0.00399  5.50
+    ## 11 rs4845625           1 154422067 T     C     -0.0180 0.00389 -4.63
     ## 12 rs59613878          4   3139152 T     C      0.0206 0.00420  4.90
     ## 13 rs34348584          3  27532704 T     C      0.0201 0.00450  4.46
+    ## 14 rs4762753          12  20579969 T     G      0.0259 0.00487  5.31
     ##    mu_prior_estimate mu_prior_std_error beta_prior_estimate
     ##                <dbl>              <dbl>               <dbl>
-    ##  1            -0.351              0.588            -0.00192
-    ##  2             0.790              0.598             0.00324
-    ##  3             2.61               0.859             0.0101 
-    ##  4            -2.34               0.658            -0.00934
-    ##  5             3.37               0.718             0.0137 
-    ##  6            -1.72               0.608            -0.0250 
-    ##  7             2.43               0.675             0.0100 
-    ##  8            -1.69               0.584            -0.00831
-    ##  9             3.12               0.607             0.0137 
-    ## 10            -2.29               0.645            -0.00891
-    ## 11             1.43               0.538             0.00571
-    ## 12             1.78               0.584             0.00750
-    ## 13             2.11               0.675             0.00950
+    ##  1            -0.351              0.611            -0.00192
+    ##  2             0.790              0.622             0.00324
+    ##  3             2.61               0.876             0.0101 
+    ##  4            -2.34               0.680            -0.00934
+    ##  5             3.37               0.737             0.0137 
+    ##  6            -1.72               0.631            -0.0250 
+    ##  7             2.43               0.696             0.0100 
+    ##  8            -1.69               0.608            -0.00831
+    ##  9             3.12               0.630             0.0137 
+    ## 10             1.43               0.564             0.00571
+    ## 11            -2.29               0.665            -0.00891
+    ## 12             1.78               0.607             0.00750
+    ## 13             2.11               0.698             0.00950
+    ## 14             1.16               0.611             0.00564
     ##    beta_prior_std_error      BF     BF_p
     ##                   <dbl>   <dbl>    <dbl>
-    ##  1              0.00321 3.86e18 7.77e-35
-    ##  2              0.00245 1.22e 7 3.22e-14
-    ##  3              0.00332 4.09e 6 1.77e-13
-    ##  4              0.00262 2.12e 5 1.83e-11
-    ##  5              0.00291 1.92e 5 2.13e-11
-    ##  6              0.00883 7.62e 4 9.40e-11
-    ##  7              0.00278 1.55e 4 1.30e- 9
-    ##  8              0.00287 8.53e 3 3.58e- 9
-    ##  9              0.00268 7.58e 3 4.38e- 9
-    ## 10              0.00251 5.49e 3 7.66e- 9
-    ## 11              0.00215 5.33e 3 8.05e- 9
-    ## 12              0.00245 3.82e 3 1.44e- 8
-    ## 13              0.00303 2.64e 3 2.77e- 8
+    ##  1              0.00334 7.00e19 5.90e-37
+    ##  2              0.00255 2.11e 7 1.51e-14
+    ##  3              0.00339 4.32e 6 1.77e-13
+    ##  4              0.00271 2.27e 5 1.78e-11
+    ##  5              0.00299 1.95e 5 2.28e-11
+    ##  6              0.00915 8.63e 4 8.38e-11
+    ##  7              0.00287 1.60e 4 1.35e- 9
+    ##  8              0.00298 9.34e 3 3.36e- 9
+    ##  9              0.00278 7.60e 3 4.79e- 9
+    ## 10              0.00225 6.04e 3 7.12e- 9
+    ## 11              0.00259 5.64e 3 8.03e- 9
+    ## 12              0.00255 4.07e 3 1.42e- 8
+    ## 13              0.00314 2.72e 3 2.89e- 8
+    ## 14              0.00298 2.14e 3 4.43e- 8
 
 ``` r
 all_results = extract_results_bGWAS(A, SNPs = "all")
@@ -682,19 +685,19 @@ nrow(all_results)
 extract_results_bGWAS(A, SNPs = "significant", results = "direct")
 ```
 
-    ## # A tibble: 2 x 14
+    ## # A tibble: 2 x 15
     ##   rsid       chrm_UK10K pos_UK10K alt   ref      beta      se z_obs
     ##   <chr>           <dbl>     <dbl> <chr> <chr>   <dbl>   <dbl> <dbl>
     ## 1 rs429358           19  45411941 T     C      0.106  0.00546  19.3
     ## 2 rs11633958         15  78862064 T     C     -0.0418 0.00410 -10.2
     ##   mu_direct_estimate mu_direct_std_error beta_direct_estimate
     ##                <dbl>               <dbl>                <dbl>
-    ## 1              19.7                 1.16               0.108 
-    ## 2              -9.99                1.16              -0.0410
-    ##   beta_direct_std_error z_direct p_direct
-    ##                   <dbl>    <dbl>    <dbl>
-    ## 1               0.00634    17.0  1.60e-64
-    ## 2               0.00477    -8.59 8.58e-18
+    ## 1              19.7                 1.17               0.108 
+    ## 2              -9.99                1.18              -0.0410
+    ##   beta_direct_std_error z_direct p_direct   CRR
+    ##                   <dbl>    <dbl>    <dbl> <dbl>
+    ## 1               0.00640    16.8  2.96e-63 1.02 
+    ## 2               0.00482    -8.50 1.90e-17 0.981
 
 ``` r
 extract_MRcoeffs_bGWAS(A)[,1:12]
