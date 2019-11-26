@@ -20,7 +20,7 @@ sticker(imgurl,
 :information\_source: `bGWAS` has been updated to version 1.0.1.  
 :warning: 28/10/2019 : The variance of the prior effects has been
 modified. If you used a previous version of the package, please re-run
-yout analys using this new version to get correct results.  
+yout analysis using this new version to get more accurate results.  
 Check the [NEWS](NEWS.md) to learn more about what has been modified\!
 
 :warning: If you downloaded the Z-Matrix files before 20/08/2019, they
@@ -783,7 +783,9 @@ Pro (Early 2015) - Processor : 2.9 GHz Intel Core i5 - Memory : 8 GB
 This method has been applied to Lifespan analysis in [McDaid et
 al](https://www.ncbi.nlm.nih.gov/pubmed/28748955) and [Timmers et
 al](https://www.ncbi.nlm.nih.gov/pubmed/30642433).  
-<!-- The most recent results (obtained using `bGWAS` version 1.0.0) are available [here](doc/Lifespan_Analysis.md) and summarised in [this poster](https://doi.org/10.5281/zenodo.3403093). -->
+The most recent results (obtained using `bGWAS` version 1.0.2) are
+available [here](doc/Lifespan_Analysis.md).
+<!-- and summarised in [this poster](https://doi.org/10.5281/zenodo.3403093). -->
 
 <!--- ## Application to food choices
 [//]:*******

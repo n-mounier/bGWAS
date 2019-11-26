@@ -1,15 +1,16 @@
 
 # Lifespan Analysis
 
-In this example, we will use the data from Timmers et al to apply our
-Bayesian GWAS approach to study lifespan.  
+In this example, we will use the data from [Timmers *et
+al*](https://doi.org/10.7554/eLife.39856) to apply our Bayesian GWAS
+approach to study lifespan.  
 Here, we assume that the `bGWAS` package is already installed, that the
 Z-matrix files have already been downloaded and stored in
 `"~/ZMatrices"`. If that is not the case, please follow the steps
 described [here](../README.md).
 
 ``` r
-library(bGWAS) # bGWAS github version:
+library(bGWAS) # bGWAS github version: v.1.0.2
 
 # Download data to working directory (~460 MB) if not already here
 if(!file.exists("lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")) download.file(url = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3209/lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz?sequence=1&isAllowed=y", destfile = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")
@@ -25,12 +26,7 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
 
     ## <<< Preparation of analysis >>> 
     ## > Checking parameters 
-    ## The name of your analysis is: "Lifespan_Timmers2019".
-
-    ## Registered S3 method overwritten by 'R.oo':
-    ##   method        from       
-    ##   throw.default R.methodsS3
-
+    ## The name of your analysis is: "Lifespan_Timmers2019". 
     ## The Z-Matrix files are stored in "/Users/nmounier/ZMatrices".  
     ## # Preparation of the data... 
     ## The conventional GWAS used as input is: "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz".  
@@ -273,7 +269,7 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ##    using a distribution approach: 
     ## ... getting approximated p-values using non-linear quantiles  
     ## ... checking p-values near significance threshold  
-    ##     everything is ok!  
+    ##    9 p-values have been re-estimated using the exact formula.  
     ## # Estimating p-values for posterior effects... 
     ## Done! 
     ## # Estimating p-values for direct effects... 
@@ -282,48 +278,48 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ## Identification based on BFs 
     ##    Starting with 6,513,704 SNPs 
     ## # Selecting significant SNPs according to p-values... 
-    ## 782 SNPs left 
+    ## 871 SNPs left 
     ## Done! 
     ## # Pruning significant SNPs... 
     ##    distance : 500Kb 
-    ## 25 SNPs left 
+    ## 28 SNPs left 
     ## Done! 
     ## Identification based on posterior effects 
     ##    Starting with 6,513,704 SNPs 
     ## # Selecting significant SNPs according to p-values... 
-    ## 318 SNPs left 
+    ## 975 SNPs left 
     ## Done! 
     ## # Pruning significant SNPs... 
     ##    distance : 500Kb 
-    ## 11 SNPs left 
+    ## 28 SNPs left 
     ## Done! 
     ## Identification based on direct effects 
     ##    Starting with 6,513,704 SNPs 
     ## # Selecting significant SNPs according to p-values... 
-    ## 87 SNPs left 
+    ## 166 SNPs left 
     ## Done! 
     ## # Pruning significant SNPs... 
     ##    distance : 500Kb 
-    ## 2 SNPs left 
+    ## 4 SNPs left 
     ## Done! 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 29 minute(s) and 22 second(s).
+    ## Time of the analysis: 94 minute(s) and 15 second(s).
 
 We can now look at the results more in details.
 
-## Prior GWASs used
+## Risk factors (Prior GWASs) used
 
 ``` r
 coefficients_plot_bGWAS(Lifespan_bGWAS)
 ```
 
-<img src="Figures/Lifespan_v1.0.0-results1-1.png" width="100%" />
+<img src="Figures/Lifespan_v1.0.2-results_PriorGWASs-1.png" width="100%" />
 
-5 prior GWASs (risk factors) are used to create the prior, the
-multivariate causal effect estimates are consistent with what we would
-expect. On this figure, the multivariate causal effect estimate and the
-95% interval from the multivariate MR model using all chromosomes (black
-dot and bars) as well as the 22 per-chromosome estimates (grey bars) are
+5 risk factors are used to create the prior, the multivariate causal
+effect estimates are consistent with what we would expect. On this
+figure, the multivariate causal effect estimate and the 95% interval
+from the multivariate MR model using all chromosomes (black dot and
+bars) as well as the 22 per-chromosome estimates (grey bars) are
 represented for each prior GWASs. Coronary Artery Disease (CAD) has the
 strongest negative effect on lifespan. High Diastolic Blood Pressure
 (DBP) and Body Mass Index (BMI) also decreases lifespan. We can also see
@@ -337,84 +333,151 @@ Using the previous version (Timmers et al), squared correlation was
 around 0.003 when considering all SNPs and around 0.082 for SNPs having
 a moderate effect.
 
-## Results - BF
+## Results - BF (all)
 
-With this approach, we identified 25 SNPs affecting lifespan through the
-identified risk factors:
+With this approach, we identified 28 SNPs affecting lifespan through the
+selected risk factors:
 
 ``` r
 # all hits
-knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))) %>% arrange(chrm_UK10K), digits=3)
+extract_results_bGWAS(Lifespan_bGWAS) %>% 
+  mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))) %>%
+  arrange(chrm_UK10K, pos_UK10K) -> Hits
+knitr::kable(Hits, digits=3)
 ```
 
-| rsid        | chrm\_UK10K | pos\_UK10K | alt | ref |  z\_obs | mu\_prior\_estimate | mu\_prior\_std\_error | BF       | BF\_p    |
-| :---------- | ----------: | ---------: | :-- | :-- | ------: | ------------------: | --------------------: | :------- | :------- |
-| rs1230666   |           1 |  114173410 | A   | G   | \-5.805 |             \-1.433 |                 1.116 | 1.96e+05 | 2.01e-10 |
-| rs646776    |           1 |  109818530 | T   | C   | \-4.908 |             \-4.822 |                 1.236 | 1.07e+05 | 5.36e-10 |
-| rs6719980   |           2 |     651507 | T   | C   | \-5.407 |             \-1.906 |                 1.143 | 1.03e+05 | 5.66e-10 |
-| rs1275922   |           2 |   26932887 | A   | G   | \-5.817 |             \-0.850 |                 1.111 | 5.95e+04 | 1.37e-09 |
-| rs7599488   |           2 |   60718347 | T   | C   | \-4.663 |             \-1.956 |                 1.114 | 6.86e+03 | 4.60e-08 |
-| rs61348208  |           4 |    3089564 | T   | C   |   5.823 |               1.479 |                 1.106 | 2.22e+05 | 1.66e-10 |
-| rs10455872  |           6 |  161010118 | A   | G   |  10.282 |               2.150 |                 1.157 | 4.25e+16 | 1.27e-26 |
-| rs9393691   |           6 |   26272829 | T   | C   | \-5.570 |             \-1.565 |                 1.107 | 9.97e+04 | 5.98e-10 |
-| rs7742789   |           6 |   43345803 | T   | C   | \-5.299 |             \-0.984 |                 1.110 | 1.30e+04 | 1.63e-08 |
-| rs56179563  |           7 |  129685597 | A   | G   |   5.190 |               2.881 |                 1.165 | 1.49e+05 | 3.14e-10 |
-| rs62477737  |           7 |   75162278 | A   | G   | \-5.269 |             \-1.088 |                 1.110 | 1.43e+04 | 1.39e-08 |
-| rs6558008   |           8 |   27438306 | A   | C   | \-5.424 |             \-0.890 |                 1.106 | 1.61e+04 | 1.14e-08 |
-| rs2891168   |           9 |   22098619 | A   | G   |   6.601 |               2.327 |                 1.241 | 4.99e+07 | 3.52e-14 |
-| rs59234174  |           9 |   16730258 | T   | C   | \-5.127 |             \-1.492 |                 1.107 | 1.76e+04 | 9.90e-09 |
-| rs10465231  |           9 |   92183413 | T   | C   | \-5.156 |             \-0.985 |                 1.109 | 8.00e+03 | 3.58e-08 |
-| rs11065979  |          12 |  112059557 | T   | C   | \-7.128 |             \-2.227 |                 1.220 | 5.48e+08 | 9.74e-16 |
-| rs11066188  |          12 |  112610714 | A   | G   | \-6.524 |             \-1.846 |                 1.215 | 1.34e+07 | 2.64e-13 |
-| rs12302980  |          12 |  111360290 | A   | G   | \-5.750 |             \-1.390 |                 1.138 | 1.59e+05 | 2.82e-10 |
-| rs66720652  |          12 |   20582640 | A   | T   | \-5.347 |             \-0.937 |                 1.110 | 1.38e+04 | 1.46e-08 |
-| rs8042849   |          15 |   78817929 | T   | C   |  10.659 |               0.265 |                 1.105 | 8.57e+13 | 5.24e-23 |
-| rs8039305   |          15 |   91422543 | T   | C   |   6.414 |               1.473 |                 1.129 | 2.65e+06 | 3.27e-12 |
-| rs12924886  |          16 |   72075593 | A   | T   |   5.679 |               2.455 |                 1.116 | 6.65e+05 | 2.88e-11 |
-| rs429358    |          19 |   45411941 | T   | C   |  19.328 |               1.854 |                 1.217 | 1.59e+54 | 7.52e-80 |
-| rs138175288 |          19 |   11189980 | A   | C   |   5.733 |               3.305 |                 1.189 | 2.60e+06 | 3.36e-12 |
-| rs12459965  |          19 |   18452195 | T   | C   |   4.426 |               2.781 |                 1.121 | 6.55e+03 | 4.96e-08 |
+| rsid       | chrm\_UK10K | pos\_UK10K | alt | ref |    beta |    se |  z\_obs | mu\_prior\_estimate | mu\_prior\_std\_error | beta\_prior\_estimate | beta\_prior\_std\_error | BF       | BF\_p    |
+| :--------- | ----------: | ---------: | :-- | :-- | ------: | ----: | ------: | ------------------: | --------------------: | --------------------: | ----------------------: | :------- | :------- |
+| rs646776   |           1 |  109818530 | T   | C   | \-0.023 | 0.005 | \-4.908 |             \-4.822 |                 0.748 |               \-0.022 |                   0.003 | 1.36e+05 | 1.21e-11 |
+| rs1230666  |           1 |  114173410 | A   | G   | \-0.032 | 0.006 | \-5.805 |             \-1.433 |                 0.527 |               \-0.008 |                   0.003 | 1.03e+04 | 6.99e-10 |
+| rs7536152  |           1 |  154423909 | A   | G   | \-0.018 | 0.004 | \-4.627 |             \-1.636 |                 0.544 |               \-0.006 |                   0.002 | 1.24e+03 | 2.86e-08 |
+| rs6719980  |           2 |     651507 | T   | C   | \-0.028 | 0.005 | \-5.407 |             \-1.906 |                 0.581 |               \-0.010 |                   0.003 | 1.97e+04 | 2.45e-10 |
+| rs1275922  |           2 |   26932887 | A   | G   | \-0.026 | 0.004 | \-5.817 |             \-0.850 |                 0.515 |               \-0.004 |                   0.002 | 1.15e+03 | 3.31e-08 |
+| rs7599488  |           2 |   60718347 | T   | C   | \-0.018 | 0.004 | \-4.663 |             \-1.956 |                 0.521 |               \-0.008 |                   0.002 | 2.62e+03 | 7.32e-09 |
+| rs13082711 |           3 |   27537909 | T   | C   |   0.020 | 0.005 |   4.428 |               1.954 |                 0.616 |                 0.009 |                   0.003 | 1.67e+03 | 1.65e-08 |
+| rs2271961  |           3 |   49878113 | T   | C   |   0.015 | 0.004 |   3.824 |               3.085 |                 0.572 |                 0.012 |                   0.002 | 1.06e+03 | 3.87e-08 |
+| rs61348208 |           4 |    3089564 | T   | C   |   0.023 | 0.004 |   5.823 |               1.479 |                 0.502 |                 0.006 |                   0.002 | 1.10e+04 | 6.32e-10 |
+| rs9393691  |           6 |   26272829 | T   | C   | \-0.022 | 0.004 | \-5.570 |             \-1.565 |                 0.505 |               \-0.006 |                   0.002 | 8.18e+03 | 1.03e-09 |
+| rs4580876  |           6 |   98322872 | A   | G   |   0.016 | 0.004 |   4.112 |               2.915 |                 0.526 |                 0.011 |                   0.002 | 2.37e+03 | 8.76e-09 |
+| rs10455872 |           6 |  161010118 | A   | G   |   0.076 | 0.007 |  10.282 |               2.150 |                 0.606 |                 0.016 |                   0.005 | 2.42e+12 | 2.85e-22 |
+| rs11556924 |           7 |  129663496 | T   | C   |   0.020 | 0.004 |   5.062 |               3.276 |                 0.648 |                 0.013 |                   0.003 | 1.00e+05 | 1.93e-11 |
+| rs10104032 |           8 |    9616664 | A   | C   | \-0.017 | 0.004 | \-4.232 |             \-2.169 |                 0.533 |               \-0.009 |                   0.002 | 1.31e+03 | 2.61e-08 |
+| rs11986845 |           8 |   10691318 | T   | C   | \-0.017 | 0.004 | \-4.237 |             \-2.428 |                 0.544 |               \-0.010 |                   0.002 | 1.96e+03 | 1.23e-08 |
+| rs59234174 |           9 |   16730258 | T   | C   | \-0.028 | 0.005 | \-5.127 |             \-1.492 |                 0.508 |               \-0.008 |                   0.003 | 2.38e+03 | 8.70e-09 |
+| rs1333045  |           9 |   22119195 | T   | C   |   0.024 | 0.004 |   6.256 |               2.981 |                 0.844 |                 0.012 |                   0.003 | 1.05e+07 | 1.62e-14 |
+| rs2519093  |           9 |  136141870 | T   | C   | \-0.022 | 0.005 | \-4.517 |             \-2.275 |                 0.596 |               \-0.011 |                   0.003 | 3.62e+03 | 4.13e-09 |
+| rs10841520 |          12 |   20586395 | T   | C   |   0.024 | 0.005 |   4.944 |               1.334 |                 0.522 |                 0.006 |                   0.003 | 1.08e+03 | 3.75e-08 |
+| rs10849925 |          12 |  111495518 | A   | G   |   0.021 | 0.004 |   5.193 |               1.881 |                 0.605 |                 0.008 |                   0.002 | 1.11e+04 | 6.24e-10 |
+| rs11065979 |          12 |  112059557 | T   | C   | \-0.028 | 0.004 | \-7.128 |             \-2.227 |                 0.719 |               \-0.009 |                   0.003 | 3.19e+07 | 3.06e-15 |
+| rs17630235 |          12 |  112591686 | A   | G   | \-0.026 | 0.004 | \-6.503 |             \-1.884 |                 0.713 |               \-0.007 |                   0.003 | 1.06e+06 | 5.27e-13 |
+| rs8042849  |          15 |   78817929 | T   | C   |   0.044 | 0.004 |  10.659 |               0.265 |                 0.499 |                 0.001 |                   0.002 | 6.99e+05 | 9.90e-13 |
+| rs8039305  |          15 |   91422543 | T   | C   |   0.025 | 0.004 |   6.414 |               1.473 |                 0.550 |                 0.006 |                   0.002 | 6.40e+04 | 3.86e-11 |
+| rs12924886 |          16 |   72075593 | A   | T   |   0.028 | 0.005 |   5.679 |               2.455 |                 0.522 |                 0.012 |                   0.003 | 1.51e+05 | 1.03e-11 |
+| rs6511720  |          19 |   11202306 | T   | G   |   0.034 | 0.006 |   5.631 |               3.787 |                 0.754 |                 0.023 |                   0.005 | 2.07e+06 | 1.89e-13 |
+| rs12459965 |          19 |   18452195 | T   | C   |   0.020 | 0.004 |   4.426 |               2.781 |                 0.533 |                 0.012 |                   0.002 | 5.51e+03 | 2.00e-09 |
+| rs429358   |          19 |   45411941 | T   | C   |   0.106 | 0.005 |  19.328 |               1.854 |                 0.712 |                 0.010 |                   0.004 | 1.11e+37 | 7.06e-70 |
+
+## Results - BF (new hits)
 
 ``` r
 # new hits (compared to conventional GWAS)
-extract_results_bGWAS(Lifespan_bGWAS) %>%
-  mutate(obs_p = 2*pnorm(-abs(z_obs))) %>%
-  filter(obs_p>5e-8) %>% 
-  arrange(chrm_UK10K) -> New_Hits
-knitr::kable(New_Hits %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))), digits=3)
+# look at SNPs in a 100kb window around (to assess significance in conventional GWAS)
+Hits$NewHits = NA
+dist=100000
+for(snp in 1:nrow(Hits)){
+  Hits %>% dplyr::slice(snp) %>% pull(chrm_UK10K) -> chr
+  Hits %>% dplyr::slice(snp) %>% pull(pos_UK10K) -> pos
+  extract_results_bGWAS(Lifespan_bGWAS, SNPs = "all") %>%
+    filter(chrm_UK10K  == chr,
+           pos_UK10K > pos - dist,
+           pos_UK10K < pos + dist) %>%
+    mutate(p_obs =  2*pnorm(-abs(z_obs))) %>%
+    pull(p_obs) %>% min() -> minP_region
+  Hits$NewHits[snp] = ifelse(minP_region<5e-8,FALSE,TRUE)
+}
+Hits %>%
+  filter(NewHits == TRUE) %>%
+  mutate(NewHits = NULL)-> New_Hits
+# also add gene names using annovar
+suppressWarnings(suppressMessages(source(system.file("Scripts/Get_GenesAndTraits.R", package="bGWAS"))))
+Gene_Info <- do.call(rbind.data.frame, 
+                     apply(New_Hits, 1, function(x) get_geneInfo(as.numeric(x[2]), as.numeric(x[3]), x[4], x[5])))
+# clean some names for intergenic regions
+knitr::kable(Gene_Info)
 ```
 
-| rsid       | chrm\_UK10K | pos\_UK10K | alt | ref |  z\_obs | mu\_prior\_estimate | mu\_prior\_std\_error | BF       | BF\_p    | obs\_p |
-| :--------- | ----------: | ---------: | :-- | :-- | ------: | ------------------: | --------------------: | :------- | :------- | -----: |
-| rs646776   |           1 |  109818530 | T   | C   | \-4.908 |             \-4.822 |                 1.236 | 1.07e+05 | 5.36e-10 |      0 |
-| rs6719980  |           2 |     651507 | T   | C   | \-5.407 |             \-1.906 |                 1.143 | 1.03e+05 | 5.66e-10 |      0 |
-| rs7599488  |           2 |   60718347 | T   | C   | \-4.663 |             \-1.956 |                 1.114 | 6.86e+03 | 4.60e-08 |      0 |
-| rs7742789  |           6 |   43345803 | T   | C   | \-5.299 |             \-0.984 |                 1.110 | 1.30e+04 | 1.63e-08 |      0 |
-| rs56179563 |           7 |  129685597 | A   | G   |   5.190 |               2.881 |                 1.165 | 1.49e+05 | 3.14e-10 |      0 |
-| rs62477737 |           7 |   75162278 | A   | G   | \-5.269 |             \-1.088 |                 1.110 | 1.43e+04 | 1.39e-08 |      0 |
-| rs6558008  |           8 |   27438306 | A   | C   | \-5.424 |             \-0.890 |                 1.106 | 1.61e+04 | 1.14e-08 |      0 |
-| rs59234174 |           9 |   16730258 | T   | C   | \-5.127 |             \-1.492 |                 1.107 | 1.76e+04 | 9.90e-09 |      0 |
-| rs10465231 |           9 |   92183413 | T   | C   | \-5.156 |             \-0.985 |                 1.109 | 8.00e+03 | 3.58e-08 |      0 |
-| rs66720652 |          12 |   20582640 | A   | T   | \-5.347 |             \-0.937 |                 1.110 | 1.38e+04 | 1.46e-08 |      0 |
-| rs12459965 |          19 |   18452195 | T   | C   |   4.426 |               2.781 |                 1.121 | 6.55e+03 | 4.96e-08 |      0 |
+| Function   | Gene                 | Distance      |
+| :--------- | :------------------- | :------------ |
+| downstream | CELSR2               | 157           |
+| intronic   | IL6R                 | 0             |
+| intergenic | LOC105373352/TMEM18  | 89415/12371   |
+| intronic   | BCL11A               | 0             |
+| intergenic | SLC4A7/EOMES         | 12034/219531  |
+| intronic   | TRAIP                | 0             |
+| intergenic | LOC101927314/MIR2113 | 166079/149535 |
+| exonic     | ZC3HC1               | 0             |
+| intronic   | TNKS                 | 0             |
+| intronic   | PINX1                | 0             |
+| intronic   | BNC2                 | 0             |
+| intronic   | ABO                  | 0             |
+| intronic   | PDE3A                | 0             |
+| intronic   | CUX2                 | 0             |
+| intronic   | PGPEP1               | 0             |
 
-11 of them are missed by the conventional GWAS (using same p-value
-threshold of 5e-8 to call significance).  
-Using the previous version (Timmers et al), we identified 7 new variants
-(using a threshold of 2.5e-8 for both GWAS and bGWAS results). Using a
-threshold of 5e-8 would have resulted
+``` r
+# intergenic    LOC105373352/TMEM18 89415/12371 -> TMEM18
+Gene_Info[3,2:3] = c("TMEM18", "12371")
+# intergenic    SLC4A7/EOMES    12034/219531
+Gene_Info[5,2:3] = c("SLC4A7", "12034")
+# intergenic    LOC101927314/MIR2113    166079/149535 -> MIR2113
+Gene_Info[7,2:3] = c("MIR2113", "149535")
+
+Gene_Info %>%
+  bind_cols(New_Hits) -> New_Hits
+
+knitr::kable(New_Hits, digits=3)
+```
+
+| Function   | Gene    | Distance | rsid       | chrm\_UK10K | pos\_UK10K | alt | ref |    beta |    se |  z\_obs | mu\_prior\_estimate | mu\_prior\_std\_error | beta\_prior\_estimate | beta\_prior\_std\_error | BF       | BF\_p    |
+| :--------- | :------ | :------- | :--------- | ----------: | ---------: | :-- | :-- | ------: | ----: | ------: | ------------------: | --------------------: | --------------------: | ----------------------: | :------- | :------- |
+| downstream | CELSR2  | 157      | rs646776   |           1 |  109818530 | T   | C   | \-0.023 | 0.005 | \-4.908 |             \-4.822 |                 0.748 |               \-0.022 |                   0.003 | 1.36e+05 | 1.21e-11 |
+| intronic   | IL6R    | 0        | rs7536152  |           1 |  154423909 | A   | G   | \-0.018 | 0.004 | \-4.627 |             \-1.636 |                 0.544 |               \-0.006 |                   0.002 | 1.24e+03 | 2.86e-08 |
+| intergenic | TMEM18  | 12371    | rs6719980  |           2 |     651507 | T   | C   | \-0.028 | 0.005 | \-5.407 |             \-1.906 |                 0.581 |               \-0.010 |                   0.003 | 1.97e+04 | 2.45e-10 |
+| intronic   | BCL11A  | 0        | rs7599488  |           2 |   60718347 | T   | C   | \-0.018 | 0.004 | \-4.663 |             \-1.956 |                 0.521 |               \-0.008 |                   0.002 | 2.62e+03 | 7.32e-09 |
+| intergenic | SLC4A7  | 12034    | rs13082711 |           3 |   27537909 | T   | C   |   0.020 | 0.005 |   4.428 |               1.954 |                 0.616 |                 0.009 |                   0.003 | 1.67e+03 | 1.65e-08 |
+| intronic   | TRAIP   | 0        | rs2271961  |           3 |   49878113 | T   | C   |   0.015 | 0.004 |   3.824 |               3.085 |                 0.572 |                 0.012 |                   0.002 | 1.06e+03 | 3.87e-08 |
+| intergenic | MIR2113 | 149535   | rs4580876  |           6 |   98322872 | A   | G   |   0.016 | 0.004 |   4.112 |               2.915 |                 0.526 |                 0.011 |                   0.002 | 2.37e+03 | 8.76e-09 |
+| exonic     | ZC3HC1  | 0        | rs11556924 |           7 |  129663496 | T   | C   |   0.020 | 0.004 |   5.062 |               3.276 |                 0.648 |                 0.013 |                   0.003 | 1.00e+05 | 1.93e-11 |
+| intronic   | TNKS    | 0        | rs10104032 |           8 |    9616664 | A   | C   | \-0.017 | 0.004 | \-4.232 |             \-2.169 |                 0.533 |               \-0.009 |                   0.002 | 1.31e+03 | 2.61e-08 |
+| intronic   | PINX1   | 0        | rs11986845 |           8 |   10691318 | T   | C   | \-0.017 | 0.004 | \-4.237 |             \-2.428 |                 0.544 |               \-0.010 |                   0.002 | 1.96e+03 | 1.23e-08 |
+| intronic   | BNC2    | 0        | rs59234174 |           9 |   16730258 | T   | C   | \-0.028 | 0.005 | \-5.127 |             \-1.492 |                 0.508 |               \-0.008 |                   0.003 | 2.38e+03 | 8.70e-09 |
+| intronic   | ABO     | 0        | rs2519093  |           9 |  136141870 | T   | C   | \-0.022 | 0.005 | \-4.517 |             \-2.275 |                 0.596 |               \-0.011 |                   0.003 | 3.62e+03 | 4.13e-09 |
+| intronic   | PDE3A   | 0        | rs10841520 |          12 |   20586395 | T   | C   |   0.024 | 0.005 |   4.944 |               1.334 |                 0.522 |                 0.006 |                   0.003 | 1.08e+03 | 3.75e-08 |
+| intronic   | CUX2    | 0        | rs10849925 |          12 |  111495518 | A   | G   |   0.021 | 0.004 |   5.193 |               1.881 |                 0.605 |                 0.008 |                   0.002 | 1.11e+04 | 6.24e-10 |
+| intronic   | PGPEP1  | 0        | rs12459965 |          19 |   18452195 | T   | C   |   0.020 | 0.004 |   4.426 |               2.781 |                 0.533 |                 0.012 |                   0.002 | 5.51e+03 | 2.00e-09 |
+
+15 of the 28 genome-wide significant loci are missed by the conventional
+GWAS (using same p-value threshold of 5e-8 to call significance).  
+Using the previous version (Timmers et al), we identified 7 new loci
+(using a threshold of 2.5e-8 for both GWAS and bGWAS results), 4 of them
+are also significant in this analysis (near CELSR2, TMEM18, ZC3HC1 and
+ABO). The 11 other variants identified in this analysis (near IL6R,
+BCL11A, SLC4A7, TRAIP, SLC4A7, PINX1, TNKS, BNC2, CUX2, PDE3A and
+PGPEP1) are reported to be associated with lifespan for the first time.
 
 ``` r
 # For the plots, we will use only the new hits
 New_Hits %>% 
   transmute(rs=rsid,
-        gene = c("CELSR2/PSRC1", "TMEM18", "BCL11A", "ZNF318/ABCC10", "ZC3HC1", "POM21C", "EPHX2/CLU", "BNC2", "GADD45G", "PDE3A", "LSM4/PGPEP1"),
+        gene = Gene,
         color="#932735") -> my_SNPs
 
 manhattan_plot_bGWAS(Lifespan_bGWAS, SNPs=my_SNPs)
 ```
 
-<img src="Figures/Lifespan_v1.0.0-results3-1.png" width="100%" />
+<img src="Figures/Lifespan_v1.0.2-results_ManhattanPlots-1.png" width="100%" />
+
+## Results - BF (new hits), association with risk factors
 
 ``` r
 my_SNPs %>%
@@ -422,36 +485,37 @@ my_SNPs %>%
 heatmap_bGWAS(Lifespan_bGWAS, SNPs = my_SNPs)
 ```
 
-<img src="Figures/Lifespan_v1.0.0-results4-1.png" width="100%" />
+<img src="Figures/Lifespan_v1.0.2-results_Heatmap-1.png" width="100%" />
 
 On this figure, the contribution of each risk factor to the prior
 effects of new hits (alleles aligned to be life-lengthening) is
 represented as a heatmap. Overall, we observe a lot of red, as expected
 since alleles are aligned to be life-lengthening.  
-Among these 11 new variants, 4 were known to be associated with at least
+Among these 15 new variants, 8 were known to be associated with at least
 one of the RFs (indicated with a star on the heatmap - variant near
-CELSR2/PSRC1 associated with LDL cholesterol, variants near TMEM18 and
-LSM4/PGPEP1 associated with Body Mass Index, variant near BCL11A
-associated with Years of Schooling). 7 variants (near ZNF318, ZC3HC1,
-POM21C, EPHX2/CLU, BNC2, GADD45G and PDE3A) are not associated with any
-of the RFs (at least not in the summary statistics used to create the
-prior), suggesting that they could be acting on lifespan through smaller
+CELSR2 associated with LDL cholesterol, variants near TMEM18 and PGPEP1
+associated with Body Mass Index, variants near BCL11A, TRAIP and MIR2113
+associated with Years of Schooling, variant near ZC3HC1 associated with
+Coronary Artery Disease and variant near ABO associated with both LDL
+cholesterol and Coronary Artery Disease). 7 variants (near IL6R, SLC4A7,
+PINX1, TNKS, BNC2, CUX2 and PDE3A) are not associated with any of the
+RFs (at least not in the summary statistics used to create the prior),
+suggesting that they could be acting on lifespan through smaller
 pleiotropic effects on several RFs.  
 These variants (and the ones in a 100kb window) can be further
 investigated using the [GWAS Catalog](https://www.ebi.ac.uk/gwas/). R2
 estimates in EUR population from [LDlink](https://ldlink.nci.nih.gov/)
 are used to keep only SNPs in LD (R2\>0.1) with the variant identified.
-SNP-trait associations p-values below 5e-8 are reported below (for SNPs
-in LD, p-values adjusted for correlation are used).
+SNP-trait associations p-values below 5e-8 are reported below (when
+LD-friends are used, p-values adjusted for the correlation between the
+variants).
 
 ``` r
-suppressWarnings(suppressMessages(source(system.file("Scripts/Get_GenesAndTraits.R", package="bGWAS"))))
 New_Hits %>% 
-  mutate(gene = c("CELSR2/PSRC1", "TMEM18", "BCL11A", "ZNF318/ABCC10", "ZC3HC1", "POM21C", "EPHX2/CLU", "BNC2", "GADD45G", "PDE3A", "LSM4/PGPEP1")) %>%
-  filter(!rsid %in% c("rs646776", "rs6719980", "rs7599488", "rs12459965")) -> SNPs_lookup 
+  filter(Gene %in% c("IL6R", "SLC4A7", "PINX1", "TNKS", "BNC2", "CUX2", "PDE3A")) -> SNPs_lookup 
 for(i in 1:nrow(SNPs_lookup)){
   Hit = SNPs_lookup[i,]
-  print(paste0("SNP - ", Hit$rsid, " (",Hit$gene,"):"))
+  cat(crayon::bold(paste0("\n* SNP - ", Hit$rsid, " (",Hit$Gene,"):\n")))
   
   Info = get_associatedTraits(Hit$rsid, Hit$chrm_UK10K, Hit$pos_UK10K,
                                     LD=0.1, distance=100000, P=5e-8,
@@ -462,94 +526,84 @@ for(i in 1:nrow(SNPs_lookup)){
       mutate(p=as.character(format(p, scientific=T, digits=3))) -> Info
     print(knitr::kable(Info, digits=3))
   } else {
-    print("No association reported")
+    cat("\n   No association reported")
   }
   cat("\n")
 }
 ```
 
-\[1\] “SNP - rs7742789 (ZNF318/ABCC10):”
+  - SNP - rs7536152 (IL6R):
 
-    ## Loading required package: LDlinkR
+| snp           | chrm |    posh19 | LD\_R2 | LD\_alleles                 | trait                                                                                                                                                                      | p     | adjusted\_p | effect                        | gene | url                                  |
+| :------------ | :--- | --------: | -----: | :-------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---- | ----------: | :---------------------------- | :--- | :----------------------------------- |
+| rs6689306-A   | 1    | 154395946 |  0.902 | rs6689306(G)/rs7536152(G)   | Atrial fibrillation                                                                                                                                                        | 1e-18 |           0 | \[1.05-1.08\]                 | IL6R | www.ncbi.nlm.nih.gov/pubmed/30061737 |
+| rs146402667-G | 1    | 154398553 |  0.616 | rs34280647(AC)/rs7536152(G) | Blood protein levels                                                                                                                                                       | 0e+00 |           0 | \[0.91-0.99\] unit increase   | IL6R | www.ncbi.nlm.nih.gov/pubmed/29875488 |
+| rs4129267-C   | 1    | 154426264 |  0.462 | rs4129267(T)/rs7536152(G)   | C-reactive protein levels                                                                                                                                                  | 2e-48 |           0 | \[0.07-0.09\] unit increase   | IL6R | www.ncbi.nlm.nih.gov/pubmed/21300955 |
+| rs2228145-C   | 1    | 154426970 |  0.462 | rs2228145(C)/rs7536152(G)   | Cerebrospinal fluid biomarker levels                                                                                                                                       | 7e-29 |           0 |                               | IL6R | www.ncbi.nlm.nih.gov/pubmed/28031287 |
+| rs61812598-G  | 1    | 154420087 |  0.464 | rs61812598(G)/rs7536152(A)  | Cerebrospinal fluid levels of Alzheimer’s disease-related proteins                                                                                                         | 6e-63 |           0 |                               | IL6R | www.ncbi.nlm.nih.gov/pubmed/25340798 |
+| rs4129267-?   | 1    | 154426264 |  0.462 | rs4129267(T)/rs7536152(G)   | Chronic inflammatory diseases (ankylosing spondylitis, Crohn’s disease, psoriasis, primary sclerosing cholangitis, ulcerative colitis) (pleiotropy)                        | 9e-18 |           0 |                               | IL6R | www.ncbi.nlm.nih.gov/pubmed/26974007 |
+| rs4845625-T   | 1    | 154422067 |  1.000 | rs4845625(T)/rs7536152(A)   | Coronary artery disease                                                                                                                                                    | 6e-16 |           0 | \[0.034-0.056\] unit increase | IL6R | www.ncbi.nlm.nih.gov/pubmed/29212778 |
+| rs6689306-A   | 1    | 154395946 |  0.902 | rs6689306(G)/rs7536152(G)   | Coronary artery disease (myocardial infarction, percutaneous transluminal coronary angioplasty, coronary artery bypass grafting, angina or chromic ischemic heart disease) | 2e-09 |           0 | \[1.03-1.07\]                 | IL6R | www.ncbi.nlm.nih.gov/pubmed/28714975 |
+| rs4129267-T   | 1    | 154426264 |  0.462 | rs4129267(T)/rs7536152(G)   | Fibrinogen                                                                                                                                                                 | 6e-27 |           0 | \[0.009-0.013\] unit decrease | IL6R | www.ncbi.nlm.nih.gov/pubmed/23969696 |
+| rs61812598-A  | 1    | 154420087 |  0.464 | rs61812598(G)/rs7536152(A)  | Fibrinogen levels                                                                                                                                                          | 3e-36 |           0 | NR unit decrease              | IL6R | www.ncbi.nlm.nih.gov/pubmed/26561523 |
+| rs4129267-?   | 1    | 154426264 |  0.462 | rs4129267(T)/rs7536152(G)   | Protein quantitative trait loci                                                                                                                                            | 2e-57 |           0 |                               | IL6R | www.ncbi.nlm.nih.gov/pubmed/18464913 |
 
-| snp         | chrm |   posh19 | LD\_R2 | LD\_alleles               | trait                                                                | p     | adjusted\_p | effect                       | gene            | url                                  |
-| :---------- | :--- | -------: | -----: | :------------------------ | :------------------------------------------------------------------- | :---- | ----------: | :--------------------------- | :-------------- | :----------------------------------- |
-| rs7763350-? | 6    | 43349308 |  0.909 | rs7763350(C)/rs7742789(T) | Cardiovascular disease                                               | 4e-16 |           0 |                              | ZNF318 - ABCC10 | www.ncbi.nlm.nih.gov/pubmed/30595370 |
-| rs2270860-? | 6    | 43270151 |  0.840 | rs2270860(T)/rs7742789(T) | Diastolic blood pressure (cigarette smoking interaction)             | 4e-11 |           0 |                              | SLC22A7, CRIP3  | www.ncbi.nlm.nih.gov/pubmed/29455858 |
-| rs4714678-A | 6    | 43342591 |  0.675 | rs4714678(G)/rs7742789(C) | Mean arterial pressure                                               | 9e-16 |           0 | \[0.28-0.47\] unit increase  | ZNF318 - ABCC10 | www.ncbi.nlm.nih.gov/pubmed/30487518 |
-| rs7763558-A | 6    | 43349215 |  0.909 | rs7763558(G)/rs7742789(C) | Pulse pressure                                                       | 4e-14 |           0 | \[0.15-0.25\] mmHg increase  | ZNF318 - ABCC10 | www.ncbi.nlm.nih.gov/pubmed/30578418 |
-| rs7763558-A | 6    | 43349215 |  0.909 | rs7763558(G)/rs7742789(C) | Pulse pressure x alcohol consumption interaction (2df test)          | 2e-16 |           0 |                              | ZNF318 - ABCC10 | www.ncbi.nlm.nih.gov/pubmed/29912962 |
-| rs9394948-A | 6    | 43334755 |  0.614 | rs9394948(C)/rs7742789(C) | Serum uric acid levels                                               | 2e-13 |           0 | \[0.024-0.04\] unit increase | ZNF318          | www.ncbi.nlm.nih.gov/pubmed/30993211 |
-| rs7763558-A | 6    | 43349215 |  0.909 | rs7763558(G)/rs7742789(C) | Systolic blood pressure                                              | 3e-24 |           0 | \[0.28-0.42\] mmHg increase  | ZNF318 - ABCC10 | www.ncbi.nlm.nih.gov/pubmed/30578418 |
-| rs2270860-? | 6    | 43270151 |  0.840 | rs2270860(T)/rs7742789(T) | Systolic blood pressure (cigarette smoking interaction)              | 8e-23 |           0 |                              | SLC22A7, CRIP3  | www.ncbi.nlm.nih.gov/pubmed/29455858 |
-| rs1214759-A | 6    | 43352980 |  0.905 | rs1214759(G)/rs7742789(C) | Systolic blood pressure x alcohol consumption interaction (2df test) | 2e-22 |           0 |                              | ZNF318 - ABCC10 | www.ncbi.nlm.nih.gov/pubmed/29912962 |
+  - SNP - rs13082711 (SLC4A7):
 
-\[1\] “SNP - rs56179563 (ZC3HC1):”
+| snp          | chrm |   posh19 | LD\_R2 | LD\_alleles                 | trait                                                                                     | p     | adjusted\_p | effect                      | gene                  | url                                  |
+| :----------- | :--- | -------: | -----: | :-------------------------- | :---------------------------------------------------------------------------------------- | :---- | ----------: | :-------------------------- | :-------------------- | :----------------------------------- |
+| rs13082711-T | 3    | 27537909 |     NA | NA                          | Blood pressure                                                                            | 5e-09 |          NA | \[0.22-0.45\] mmHg decrease | AC099535.1 - RNU1-96P | www.ncbi.nlm.nih.gov/pubmed/21909110 |
+| rs13082711-C | 3    | 27537909 |     NA | NA                          | Diastolic blood pressure                                                                  | 3e-10 |          NA | \[0.23-0.43\] unit increase | AC099535.1 - RNU1-96P | www.ncbi.nlm.nih.gov/pubmed/28739976 |
+| rs13082711-? | 3    | 27537909 |     NA | NA                          | Diastolic blood pressure (cigarette smoking interaction)                                  | 7e-12 |          NA |                             | AC099535.1 - RNU1-96P | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| rs13082711-? | 3    | 27537909 |     NA | NA                          | Systolic blood pressure (cigarette smoking interaction)                                   | 3e-11 |          NA |                             | AC099535.1 - RNU1-96P | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| rs13063291-? | 3    | 27446285 |  0.775 | rs13063291(T)/rs13082711(T) | Diastolic blood pressure x smoking status (current vs non-current) interaction (2df test) | 4e-11 |           0 |                             | SLC4A7                | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| rs13063291-? | 3    | 27446285 |  0.775 | rs13063291(T)/rs13082711(T) | Diastolic blood pressure x smoking status (ever vs never) interaction (2df test)          | 2e-11 |           0 |                             | SLC4A7                | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| rs2643826-T  | 3    | 27562988 |  0.309 | rs2643826(T)/rs13082711(T)  | Systolic blood pressure x alcohol consumption interaction (2df test)                      | 6e-32 |           0 |                             | RNU1-96P - AC137675.1 | www.ncbi.nlm.nih.gov/pubmed/29912962 |
+| rs13063291-? | 3    | 27446285 |  0.775 | rs13063291(T)/rs13082711(T) | Systolic blood pressure x smoking status (current vs non-current) interaction (2df test)  | 5e-10 |           0 |                             | SLC4A7                | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| rs13063291-? | 3    | 27446285 |  0.775 | rs13063291(T)/rs13082711(T) | Systolic blood pressure x smoking status (ever vs never) interaction (2df test)           | 1e-10 |           0 |                             | SLC4A7                | www.ncbi.nlm.nih.gov/pubmed/29455858 |
 
-| snp          | chrm |    posh19 | LD\_R2 | LD\_alleles                 | trait                                                                                                                                                                      | p     | adjusted\_p | effect                        | gene               | url                                  |
-| :----------- | :--- | --------: | -----: | :-------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---- | ----------: | :---------------------------- | :----------------- | :----------------------------------- |
-| rs11556924-? | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Cardiovascular disease                                                                                                                                                     | 2e-13 |           0 |                               | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/30595370 |
-| rs11556924-T | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Coronary artery disease                                                                                                                                                    | 1e-24 |           0 | \[0.05-0.074\] unit decrease  | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/29212778 |
-| rs11556924-C | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Coronary artery disease (myocardial infarction, percutaneous transluminal coronary angioplasty, coronary artery bypass grafting, angina or chromic ischemic heart disease) | 6e-13 |           0 | \[1.05-1.09\]                 | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/28714975 |
-| rs11556924-? | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Coronary artery disease or ischemic stroke                                                                                                                                 | 9e-10 |           0 |                               | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/24262325 |
-| rs11556924-? | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Coronary artery disease or large artery stroke                                                                                                                             | 8e-10 |           0 |                               | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/24262325 |
-| rs11556924-C | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Coronary heart disease                                                                                                                                                     | 9e-18 |           0 | \[1.07-1.12\]                 | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/21378990 |
-| rs11556924-T | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Diastolic blood pressure                                                                                                                                                   | 8e-15 |           0 | \[0.16-0.27\] mm Hg decrease  | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/27618452 |
-| rs11556924-? | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Height                                                                                                                                                                     | 1e-19 |           0 |                               | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/30595370 |
-| rs11556924-T | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Platelet count                                                                                                                                                             | 2e-12 |           0 | \[0.019-0.034\] unit increase | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/27863252 |
-| rs11556924-T | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | Plateletcrit                                                                                                                                                               | 4e-09 |           0 | \[0.015-0.029\] unit increase | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/27863252 |
-| rs11556924-T | 7    | 129663496 |  0.866 | rs11556924(T)/rs56179563(A) | White blood cell count (basophil)                                                                                                                                          | 1e-11 |           0 | \[0.017-0.031\] unit increase | ZC3HC1, AC073320.1 | www.ncbi.nlm.nih.gov/pubmed/27863252 |
+  - SNP - rs10104032 (TNKS):
 
-\[1\] “SNP - rs62477737 (POM21C):” \[1\] “No association reported”
+| snp         | chrm |  posh19 | LD\_R2 | LD\_alleles                | trait                                                                                    | p     | adjusted\_p | effect                        | gene             | url                                  |
+| :---------- | :--- | ------: | -----: | :------------------------- | :--------------------------------------------------------------------------------------- | :---- | ----------: | :---------------------------- | :--------------- | :----------------------------------- |
+| rs9286060-A | 8    | 9653145 |  0.702 | rs9286060(C)/rs10104032(C) | Diastolic blood pressure x alcohol consumption interaction (2df test)                    | 2e-13 |           0 |                               | TNKS - LINC00599 | www.ncbi.nlm.nih.gov/pubmed/29912962 |
+| rs4383974-? | 8    | 9619348 |  0.704 | rs4383974(G)/rs10104032(A) | Heel bone mineral density                                                                | 2e-17 |           0 | \[0.014-0.023\] unit decrease | TNKS             | www.ncbi.nlm.nih.gov/pubmed/30048462 |
+| rs1976671-A | 8    | 9679634 |  0.642 | rs1976671(G)/rs10104032(C) | Systolic blood pressure x alcohol consumption interaction (2df test)                     | 7e-18 |           0 |                               | TNKS - LINC00599 | www.ncbi.nlm.nih.gov/pubmed/29912962 |
+| rs4841235-? | 8    | 9683358 |  0.538 | rs4841235(G)/rs10104032(C) | Systolic blood pressure x smoking status (current vs non-current) interaction (2df test) | 5e-15 |           0 |                               | TNKS - LINC00599 | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| rs4841235-? | 8    | 9683358 |  0.538 | rs4841235(G)/rs10104032(C) | Systolic blood pressure x smoking status (ever vs never) interaction (2df test)          | 4e-14 |           0 |                               | TNKS - LINC00599 | www.ncbi.nlm.nih.gov/pubmed/29455858 |
 
-\[1\] “SNP - rs6558008 (EPHX2/CLU):”
+  - SNP - rs11986845 (PINX1):
 
-| snp          | chrm |   posh19 | LD\_R2 | LD\_alleles                | trait                                                     | p     | adjusted\_p | effect                        | gene  | url                                  |
-| :----------- | :--- | -------: | -----: | :------------------------- | :-------------------------------------------------------- | :---- | ----------: | :---------------------------- | :---- | :----------------------------------- |
-| rs11783093-T | 8    | 27425349 |  0.588 | rs11783093(T)/rs6558008(C) | Age of smoking initiation (MTAG)                          | 1e-31 |           0 | \[0.02-0.028\] unit increase  | GULOP | www.ncbi.nlm.nih.gov/pubmed/30643251 |
-| rs1565735-A  | 8    | 27426077 |  0.417 | rs1565735(T)/rs6558008(A)  | Smoking cessation (MTAG)                                  | 3e-18 |           0 | \[0.013-0.021\] unit decrease | GULOP | www.ncbi.nlm.nih.gov/pubmed/30643251 |
-| rs11783093-T | 8    | 27425349 |  0.588 | rs11783093(T)/rs6558008(C) | Smoking initiation (ever regular vs never regular)        | 2e-41 |           0 | \[0.04-0.054\] unit decrease  | GULOP | www.ncbi.nlm.nih.gov/pubmed/30643251 |
-| rs11783093-T | 8    | 27425349 |  0.588 | rs11783093(T)/rs6558008(C) | Smoking initiation (ever regular vs never regular) (MTAG) | 1e-56 |           0 | \[0.021-0.026\] unit decrease | GULOP | www.ncbi.nlm.nih.gov/pubmed/30643251 |
+| snp         | chrm |   posh19 | LD\_R2 | LD\_alleles                | trait                                                                 | p     | adjusted\_p | effect                      | gene                     | url                                  |
+| :---------- | :--- | -------: | -----: | :------------------------- | :-------------------------------------------------------------------- | :---- | ----------: | :-------------------------- | :----------------------- | :----------------------------------- |
+| rs4551304-A | 8    | 10665069 |  0.723 | rs4551304(G)/rs11986845(T) | Diastolic blood pressure x alcohol consumption interaction (2df test) | 2e-14 |           0 |                             | PINX1, PINX1             | www.ncbi.nlm.nih.gov/pubmed/29912962 |
+| rs9650657-T | 8    | 10607400 |  0.586 | rs9650657(T)/rs11986845(T) | Neuroticism                                                           | 2e-23 |           0 | z score increase            | PINX1, PINX1, AC105001.1 | www.ncbi.nlm.nih.gov/pubmed/29255261 |
+| rs1821002-G | 8    | 10640065 |  0.660 | rs1821002(G)/rs11986845(T) | Systolic blood pressure                                               | 4e-19 |           0 | \[0.33-0.52\] unit decrease | PINX1, PINX1             | www.ncbi.nlm.nih.gov/pubmed/28135244 |
+| rs7814757-T | 8    | 10675188 |  0.716 | rs7814757(T)/rs11986845(T) | Systolic blood pressure x alcohol consumption interaction (2df test)  | 3e-22 |           0 |                             | PINX1, PINX1             | www.ncbi.nlm.nih.gov/pubmed/29912962 |
 
-\[1\] “SNP - rs59234174 (BNC2):” \[1\] “No association reported”
+  - SNP - rs59234174 (BNC2):
+    
+    No association reported
 
-\[1\] “SNP - rs10465231 (GADD45G):”
+  - SNP - rs10841520 (PDE3A):
+    
+    No association reported
 
-| snp          | chrm |   posh19 | LD\_R2 | LD\_alleles                 | trait                             | p     | adjusted\_p | effect                          | gene       | url                                  |
-| :----------- | :--- | -------: | -----: | :-------------------------- | :-------------------------------- | :---- | ----------: | :------------------------------ | :--------- | :----------------------------------- |
-| rs11265835-A | 9    | 92216360 |  0.697 | rs11265835(C)/rs10465231(T) | Cognitive performance (MTAG)      | 8e-12 |           0 | \[0.011-0.02\] unit increase    | AL161910.1 | www.ncbi.nlm.nih.gov/pubmed/30038396 |
-| rs7040995-C  | 9    | 92226172 |  0.543 | rs7040995(G)/rs10465231(T)  | Educational attainment (MTAG)     | 9e-16 |           0 | \[0.008-0.013\] unit increase   | AL606807.1 | www.ncbi.nlm.nih.gov/pubmed/30038396 |
-| rs1007966-G  | 9    | 92213967 |  0.720 | rs1007966(G)/rs10465231(C)  | Highest math class taken          | 5e-11 |           0 | \[0.01-0.019\] unit increase    | AL161910.1 | www.ncbi.nlm.nih.gov/pubmed/30038396 |
-| rs3763669-C  | 9    | 92217645 |  0.704 | rs3763669(G)/rs10465231(C)  | Highest math class taken (MTAG)   | 2e-17 |           0 | \[0.011-0.017\] unit decrease   | AL161910.1 | www.ncbi.nlm.nih.gov/pubmed/30038396 |
-| rs1007966-A  | 9    | 92213967 |  0.720 | rs1007966(G)/rs10465231(C)  | Self-reported math ability (MTAG) | 4e-13 |           0 | \[0.0095-0.0165\] unit decrease | AL161910.1 | www.ncbi.nlm.nih.gov/pubmed/30038396 |
-
-\[1\] “SNP - rs66720652 (PDE3A):” \[1\] “No association reported”
+  - SNP - rs10849925 (CUX2):
+    
+    No association reported
 
 Interestingly, we can see that a few loci identified have been
 associated with some of the risk factors used to create the prior in
-more recent studies. Variants in LD with the variants identified near
-ZNF318 and ZC3HC1 have been associated with CAD and blood pressure, and
-a variant in LD with the variant identified near GADD45G has been
-associated with educational attainment. The other loci have not been
-associated with any of the risk factors.
+more recent studies. Variants in LD with the variant identified near
+IL6R have been associated with Coronary Artery Disease. Variants in LD
+with the variants identified near SLC4A7, PINX1 and TNKS have been
+associated with Diastolic Blood Pressure. The other loci have not been
+associated with any of the risk factors, and are likely acting on
+lifespan through moderate effects on several risk factors (pleiotropic
+effects).
 
-## Results - Direct Effects
-
-We can use direct effects to identify SNPs significantly acting on
-lifespan independently from the prior GWASs used to create the prior:
-
-``` r
-knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, results="direct")  %>% mutate(p_direct=as.character(format(p_direct, scientific=T, digits=3))), digits=3)
-```
-
-| rsid      | chrm\_UK10K | pos\_UK10K | alt | ref | z\_obs | mu\_direct\_estimate | mu\_direct\_std\_error | z\_direct | p\_direct |
-| :-------- | ----------: | ---------: | :-- | :-- | -----: | -------------------: | ---------------------: | --------: | :-------- |
-| rs429358  |          19 |   45411941 | T   | C   | 19.328 |               17.473 |                  1.575 |    11.093 | 1.36e-28  |
-| rs8042849 |          15 |   78817929 | T   | C   | 10.659 |               10.395 |                  1.490 |     6.976 | 3.04e-12  |
-
-Here, two variants (rs429358 near APOE and rs8042849 near HYKK/CHRNA3/5)
-have a significant corrected effect. This is expected since APOE is
-known to be highly pleiotropic and to notably have an affect on
-Alzheimer disease, not used to create the prior. The second variant is
-not associated with any of the risk factor, and therefore its prior
-effect (0.265) is very small compared to its observed effect (10.659).
+<!---
+\newpage
+\Large \textbf{References}
+\scriptsize --->

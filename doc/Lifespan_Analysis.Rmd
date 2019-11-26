@@ -5,7 +5,7 @@ output: github_document
 
 ```{r setup, include=FALSE, cache=FALSE}
 knitr::opts_chunk$set(echo = TRUE,
-                      fig.path = "Figures/Lifespan_v1.0.0-",
+                      fig.path = "Figures/Lifespan_v1.0.2-",
                       out.width = "100%",
                       cache = TRUE,
                       cache.lazy = FALSE)
@@ -18,11 +18,11 @@ options(pillar.neg=F, # do no print neg number in red
 
 # Lifespan Analysis
 
-In this example, we will use the data from Timmers et al to apply our Bayesian GWAS approach to study lifespan.    
+In this example, we will use the data from [Timmers *et al*](https://doi.org/10.7554/eLife.39856) to apply our Bayesian GWAS approach to study lifespan.    
 Here, we assume that the `bGWAS` package is already installed, that the Z-matrix files have already been downloaded and stored in `"~/ZMatrices"`. If that is not the case, please follow the steps described [here](../README.md). 
 
 ```{r download-data, echo=TRUE, message=FALSE, results='hide', cache=F}
-library(bGWAS) # bGWAS github version:
+library(bGWAS) # bGWAS github version: v.1.0.2
 
 # Download data to working directory (~460 MB) if not already here
 if(!file.exists("lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")) download.file(url = "https://datashare.is.ed.ac.uk/bitstream/handle/10283/3209/lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz?sequence=1&isAllowed=y", destfile = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")
@@ -36,51 +36,90 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
 ```
 
 
-
 We can now look at the results more in details.
 
-## Prior GWASs used
+## Risk factors (Prior GWASs) used
 
-```{r results1, dpi=300}
+```{r results_PriorGWASs, dpi=300}
 coefficients_plot_bGWAS(Lifespan_bGWAS)
 ```
 
-`r nrow(extract_MRcoeffs_bGWAS(Lifespan_bGWAS))` prior GWASs (risk factors) are used to create the prior, the multivariate causal effect estimates are consistent with what we would expect. On this figure, the multivariate causal effect estimate and the 95\% interval from the multivariate MR model using all chromosomes (black dot and bars) as well as the 22 per-chromosome estimates (grey bars) are represented for each prior GWASs. Coronary Artery Disease (CAD) has the strongest negative effect on lifespan. High Diastolic Blood Pressure (DBP) and Body Mass Index (BMI) also decreases lifespan. We can also see that education, in this case the number of years of schooling, has a positive effect on lifespan.
+`r nrow(extract_MRcoeffs_bGWAS(Lifespan_bGWAS))` risk factors are used to create the prior, the multivariate causal effect estimates are consistent with what we would expect. On this figure, the multivariate causal effect estimate and the 95\% interval from the multivariate MR model using all chromosomes (black dot and bars) as well as the 22 per-chromosome estimates (grey bars) are represented for each prior GWASs. Coronary Artery Disease (CAD) has the strongest negative effect on lifespan. High Diastolic Blood Pressure (DBP) and Body Mass Index (BMI) also decreases lifespan. We can also see that education, in this case the number of years of schooling, has a positive effect on lifespan.
 
 Overall, the squared correlation between prior and observed effects is about `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "all"), 3)` and goes up to `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "moderate"), 3)` when we consider only SNPs having at least a moderate effect on lifespan (observed p-value < 0.001).     
 Using the previous version (Timmers et al), squared correlation was around 0.003 when considering all SNPs and around 0.082 for SNPs having a moderate effect.    
 
-## Results - BF
+## Results - BF (all)
 
-With this approach, we identified `r nrow(extract_results_bGWAS(Lifespan_bGWAS))` SNPs affecting lifespan through the identified risk factors:
+With this approach, we identified `r nrow(extract_results_bGWAS(Lifespan_bGWAS))` SNPs affecting lifespan through the selected risk factors:
 
-```{r results2, echo=TRUE}
+```{r results_Hits, echo=TRUE}
 # all hits
-knitr::kable(extract_results_bGWAS(Lifespan_bGWAS) %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))) %>% arrange(chrm_UK10K), digits=3)
-
-# new hits (compared to conventional GWAS)
-extract_results_bGWAS(Lifespan_bGWAS) %>%
-  mutate(obs_p = 2*pnorm(-abs(z_obs))) %>%
-  filter(obs_p>5e-8) %>% 
-  arrange(chrm_UK10K) -> New_Hits
-knitr::kable(New_Hits %>% mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))), digits=3)
+extract_results_bGWAS(Lifespan_bGWAS) %>% 
+  mutate(BF = as.character(format(BF, scientific=T, digits=3)), BF_p = as.character(format(BF_p, scientific=T, digits=3))) %>%
+  arrange(chrm_UK10K, pos_UK10K) -> Hits
+knitr::kable(Hits, digits=3)
 ```
 
-`r nrow(New_Hits)` of them are missed by the conventional GWAS (using same p-value threshold of 5e-8 to call significance).    
-Using the previous version (Timmers et al), we identified 7 new variants (using a threshold of 2.5e-8 for both GWAS and bGWAS results). Using a threshold of 5e-8 would have resulted 
+## Results - BF (new hits)
 
-```{r results3, dpi=300}
+```{r results_NewHits, echo=TRUE}
+# new hits (compared to conventional GWAS)
+# look at SNPs in a 100kb window around (to assess significance in conventional GWAS)
+Hits$NewHits = NA
+dist=100000
+for(snp in 1:nrow(Hits)){
+  Hits %>% dplyr::slice(snp) %>% pull(chrm_UK10K) -> chr
+  Hits %>% dplyr::slice(snp) %>% pull(pos_UK10K) -> pos
+  extract_results_bGWAS(Lifespan_bGWAS, SNPs = "all") %>%
+    filter(chrm_UK10K  == chr,
+           pos_UK10K > pos - dist,
+           pos_UK10K < pos + dist) %>%
+    mutate(p_obs =  2*pnorm(-abs(z_obs))) %>%
+    pull(p_obs) %>% min() -> minP_region
+  Hits$NewHits[snp] = ifelse(minP_region<5e-8,FALSE,TRUE)
+}
+Hits %>%
+  filter(NewHits == TRUE) %>%
+  mutate(NewHits = NULL)-> New_Hits
+# also add gene names using annovar
+suppressWarnings(suppressMessages(source(system.file("Scripts/Get_GenesAndTraits.R", package="bGWAS"))))
+Gene_Info <- do.call(rbind.data.frame, 
+                     apply(New_Hits, 1, function(x) get_geneInfo(as.numeric(x[2]), as.numeric(x[3]), x[4], x[5])))
+# clean some names for intergenic regions
+knitr::kable(Gene_Info)
+# intergenic	LOC105373352/TMEM18	89415/12371 -> TMEM18
+Gene_Info[3,2:3] = c("TMEM18", "12371")
+# intergenic	SLC4A7/EOMES	12034/219531
+Gene_Info[5,2:3] = c("SLC4A7", "12034")
+# intergenic	LOC101927314/MIR2113	166079/149535 -> MIR2113
+Gene_Info[7,2:3] = c("MIR2113", "149535")
+
+Gene_Info %>%
+  bind_cols(New_Hits) -> New_Hits
+
+knitr::kable(New_Hits, digits=3)
+
+```
+
+`r nrow(New_Hits)` of the `r nrow(Hits)` genome-wide significant loci are missed by the conventional GWAS (using same p-value threshold of 5e-8 to call significance).    
+Using the previous version (Timmers et al), we identified 7 new loci (using a threshold of 2.5e-8 for both GWAS and bGWAS results), 4 of them are also significant in this analysis (near CELSR2, TMEM18, ZC3HC1 and ABO). The 11 other variants identified in this analysis (near IL6R, BCL11A, SLC4A7, TRAIP, SLC4A7, PINX1, TNKS, BNC2, CUX2, PDE3A and PGPEP1) are reported to be associated with lifespan for the first time.
+
+```{r results_ManhattanPlots, dpi=300}
 # For the plots, we will use only the new hits
 New_Hits %>% 
   transmute(rs=rsid,
-		gene = c("CELSR2/PSRC1", "TMEM18", "BCL11A", "ZNF318/ABCC10", "ZC3HC1", "POM21C", "EPHX2/CLU", "BNC2", "GADD45G", "PDE3A", "LSM4/PGPEP1"),
+		gene = Gene,
 		color="#932735") -> my_SNPs
 
 manhattan_plot_bGWAS(Lifespan_bGWAS, SNPs=my_SNPs)
 ```
 
 
-```{r results4, dpi=300}
+## Results - BF (new hits), association with risk factors
+
+
+```{r results_Heatmap, dpi=300}
 my_SNPs %>%
   mutate(color=NULL) -> my_SNPs
 heatmap_bGWAS(Lifespan_bGWAS, SNPs = my_SNPs)
@@ -89,19 +128,18 @@ heatmap_bGWAS(Lifespan_bGWAS, SNPs = my_SNPs)
     
 
 On this figure, the contribution of each risk factor to the prior effects of new hits (alleles aligned to be life-lengthening) is represented as a heatmap. Overall, we observe a lot of red, as expected since alleles are aligned to be life-lengthening.    
-Among these 11 new variants, 4 were known to be associated with at least one of the RFs (indicated with a star on the heatmap - variant near CELSR2/PSRC1 associated with LDL cholesterol, variants near TMEM18 and LSM4/PGPEP1 associated with Body Mass Index, variant near BCL11A associated with Years of Schooling). 
-7 variants (near ZNF318, ZC3HC1, POM21C, EPHX2/CLU, BNC2, GADD45G and PDE3A) are not associated with any of the RFs (at least not in the summary statistics used to create the prior), suggesting that they could be acting on lifespan through smaller pleiotropic effects on several RFs.    
-These variants (and the ones in a 100kb window) can be further investigated using the [GWAS Catalog](https://www.ebi.ac.uk/gwas/). R2 estimates in EUR population from [LDlink](https://ldlink.nci.nih.gov/) are used to keep only SNPs in LD (R2>0.1) with the variant identified. SNP-trait associations p-values below 5e-8 are reported below (for SNPs in LD, p-values adjusted for correlation are used).
+Among these 15 new variants, 8 were known to be associated with at least one of the RFs (indicated with a star on the heatmap - variant near CELSR2 associated with LDL cholesterol, variants near TMEM18 and PGPEP1 associated with Body Mass Index, variants near BCL11A, TRAIP and MIR2113 associated with Years of Schooling, variant near ZC3HC1 associated with Coronary Artery Disease and variant near ABO associated with both LDL cholesterol and Coronary Artery Disease). 
+7 variants (near IL6R, SLC4A7, PINX1, TNKS, BNC2, CUX2 and PDE3A) are not associated with any of the RFs (at least not in the summary statistics used to create the prior), suggesting that they could be acting on lifespan through smaller pleiotropic effects on several RFs.    
+These variants (and the ones in a 100kb window) can be further investigated using the [GWAS Catalog](https://www.ebi.ac.uk/gwas/). R2 estimates in EUR population from [LDlink](https://ldlink.nci.nih.gov/) are used to keep only SNPs in LD (R2>0.1) with the variant identified. SNP-trait associations p-values below 5e-8 are reported below (when LD-friends are used, p-values adjusted for the correlation between the variants).
 
 
-```{r auto_newhits, echo=T, results='asis'}
-suppressWarnings(suppressMessages(source(system.file("Scripts/Get_GenesAndTraits.R", package="bGWAS"))))
+```{r auto_newhits, echo=T, results='asis', message=F, warning=F}
+
 New_Hits %>% 
-  mutate(gene = c("CELSR2/PSRC1", "TMEM18", "BCL11A", "ZNF318/ABCC10", "ZC3HC1", "POM21C", "EPHX2/CLU", "BNC2", "GADD45G", "PDE3A", "LSM4/PGPEP1")) %>%
-  filter(!rsid %in% c("rs646776", "rs6719980", "rs7599488", "rs12459965")) -> SNPs_lookup 
+  filter(Gene %in% c("IL6R", "SLC4A7", "PINX1", "TNKS", "BNC2", "CUX2", "PDE3A")) -> SNPs_lookup 
 for(i in 1:nrow(SNPs_lookup)){
   Hit = SNPs_lookup[i,]
-  print(paste0("SNP - ", Hit$rsid, " (",Hit$gene,"):"))
+  cat(crayon::bold(paste0("\n* SNP - ", Hit$rsid, " (",Hit$Gene,"):\n")))
   
   Info = get_associatedTraits(Hit$rsid, Hit$chrm_UK10K, Hit$pos_UK10K,
                                     LD=0.1, distance=100000, P=5e-8,
@@ -112,27 +150,16 @@ for(i in 1:nrow(SNPs_lookup)){
       mutate(p=as.character(format(p, scientific=T, digits=3))) -> Info
     print(knitr::kable(Info, digits=3))
   } else {
-    print("No association reported")
+    cat("\n   No association reported")
   }
   cat("\n")
 }
 ```
 
-Interestingly, we can see that a few loci identified have been associated with some of the risk factors used to create the prior in more recent studies. Variants in LD with the variants identified near ZNF318 and ZC3HC1 have been associated with CAD and blood pressure, and a variant in LD with the variant identified near GADD45G has been associated with educational attainment. The other loci have not been associated with any of the risk factors.
-
-## Results - Direct Effects
+Interestingly, we can see that a few loci identified have been associated with some of the risk factors used to create the prior in more recent studies. Variants in LD with the variant identified near IL6R have been associated with Coronary Artery Disease. Variants in LD with the variants identified near SLC4A7, PINX1 and TNKS have been associated with Diastolic Blood Pressure. The other loci have not been associated with any of the risk factors, and are likely acting on lifespan through moderate effects on several risk factors (pleiotropic effects).
 
 
-We can use direct effects to identify SNPs significantly acting on lifespan independently from the prior GWASs used to create the prior:
-
-```{r results5, echo=TRUE}
-knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, results="direct")  %>% mutate(p_direct=as.character(format(p_direct, scientific=T, digits=3))), digits=3)
-```
-
-Here, two variants (rs429358 near APOE and rs8042849 near HYKK/CHRNA3/5) have a significant corrected effect. This is expected since APOE is known to be highly pleiotropic and to notably have an affect on Alzheimer disease, not used to create the prior. The second variant is not associated with any of the risk factor, and therefore its prior effect (0.265) is very small compared to its observed effect (10.659).
-
-
-
+<!---
 \newpage
 \Large \textbf{References}
-\scriptsize
+\scriptsize --->
