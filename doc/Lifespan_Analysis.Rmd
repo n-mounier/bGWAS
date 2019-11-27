@@ -136,7 +136,12 @@ Among these 15 new variants, 8 were known to be associated with at least one of 
 These variants (and the ones in a 100kb window) can be further investigated using the [GWAS Catalog](https://www.ebi.ac.uk/gwas/). R2 estimates in EUR population from [LDlink](https://ldlink.nci.nih.gov/) are used to keep only SNPs in LD (R2>0.1) with the variant identified. SNP-trait associations p-values below 5e-8 are reported below (when LD-friends are used, p-values adjusted for the correlation between the variants).
 
 
-```{r auto_newhits, echo=T, results='asis', message=F, warning=F}
+<details>
+
+<summary> Reported Associations </summary>
+
+
+```{r auto_newhits, echo=F, message=F, warning=F, echo=FALSE, eval=TRUE}
 
 New_Hits %>% 
   filter(Gene %in% c("IL6R", "SLC4A7", "PINX1", "TNKS", "BNC2", "CUX2", "PDE3A")) -> SNPs_lookup 
@@ -159,7 +164,10 @@ for(i in 1:nrow(SNPs_lookup)){
   cat("\n")
 }
 ```
+</details> 
 
+     
+     
 Interestingly, we can see that a few loci identified have been associated with some of the risk factors used to create the prior in more recent studies. Variants in LD with the variant identified near IL6R have been associated with Coronary Artery Disease. Variants in LD with the variants identified near SLC4A7, PINX1 and TNKS have been associated with Diastolic Blood Pressure. The other loci have not been associated with any of the risk factors, and are likely acting on lifespan through moderate effects on several risk factors (pleiotropic effects).
 
 
