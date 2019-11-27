@@ -19,6 +19,10 @@ if(!file.exists("lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")) download.file(
 Now that we have the data in our working directory, we can launch the
 analysis (with default parameters):
 
+<details>
+
+<summary> See log </summary>
+
 ``` r
 Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
                        GWAS = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")
@@ -305,6 +309,8 @@ Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
     ## Time of the analysis: 94 minute(s) and 15 second(s).
 
+</details>
+
 We can now look at the results more in details.
 
 ## Risk factors (Prior GWASs) used
@@ -523,7 +529,8 @@ for(i in 1:nrow(SNPs_lookup)){
   # format for nice kable output
   if(nrow(Info)>0){
     Info %>%
-      mutate(p=as.character(format(p, scientific=T, digits=3))) -> Info
+      mutate(p=as.character(format(p, scientific=T, digits=3)),
+             adjusted_p = as.character(format(adjusted_p, scientific=T, digits=3))) -> Info
     print(knitr::kable(Info, digits=3))
   } else {
     cat("\n   No association reported")
@@ -535,51 +542,51 @@ for(i in 1:nrow(SNPs_lookup)){
   - SNP - rs7536152 (IL6R):
 
 | snp           | chrm |    posh19 | LD\_R2 | LD\_alleles                 | trait                                                                                                                                                                      | p     | adjusted\_p | effect                        | gene | url                                  |
-| :------------ | :--- | --------: | -----: | :-------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---- | ----------: | :---------------------------- | :--- | :----------------------------------- |
-| rs6689306-A   | 1    | 154395946 |  0.902 | rs6689306(G)/rs7536152(G)   | Atrial fibrillation                                                                                                                                                        | 1e-18 |           0 | \[1.05-1.08\]                 | IL6R | www.ncbi.nlm.nih.gov/pubmed/30061737 |
-| rs146402667-G | 1    | 154398553 |  0.616 | rs34280647(AC)/rs7536152(G) | Blood protein levels                                                                                                                                                       | 0e+00 |           0 | \[0.91-0.99\] unit increase   | IL6R | www.ncbi.nlm.nih.gov/pubmed/29875488 |
-| rs4129267-C   | 1    | 154426264 |  0.462 | rs4129267(T)/rs7536152(G)   | C-reactive protein levels                                                                                                                                                  | 2e-48 |           0 | \[0.07-0.09\] unit increase   | IL6R | www.ncbi.nlm.nih.gov/pubmed/21300955 |
-| rs2228145-C   | 1    | 154426970 |  0.462 | rs2228145(C)/rs7536152(G)   | Cerebrospinal fluid biomarker levels                                                                                                                                       | 7e-29 |           0 |                               | IL6R | www.ncbi.nlm.nih.gov/pubmed/28031287 |
-| rs61812598-G  | 1    | 154420087 |  0.464 | rs61812598(G)/rs7536152(A)  | Cerebrospinal fluid levels of Alzheimer’s disease-related proteins                                                                                                         | 6e-63 |           0 |                               | IL6R | www.ncbi.nlm.nih.gov/pubmed/25340798 |
-| rs4129267-?   | 1    | 154426264 |  0.462 | rs4129267(T)/rs7536152(G)   | Chronic inflammatory diseases (ankylosing spondylitis, Crohn’s disease, psoriasis, primary sclerosing cholangitis, ulcerative colitis) (pleiotropy)                        | 9e-18 |           0 |                               | IL6R | www.ncbi.nlm.nih.gov/pubmed/26974007 |
-| rs4845625-T   | 1    | 154422067 |  1.000 | rs4845625(T)/rs7536152(A)   | Coronary artery disease                                                                                                                                                    | 6e-16 |           0 | \[0.034-0.056\] unit increase | IL6R | www.ncbi.nlm.nih.gov/pubmed/29212778 |
-| rs6689306-A   | 1    | 154395946 |  0.902 | rs6689306(G)/rs7536152(G)   | Coronary artery disease (myocardial infarction, percutaneous transluminal coronary angioplasty, coronary artery bypass grafting, angina or chromic ischemic heart disease) | 2e-09 |           0 | \[1.03-1.07\]                 | IL6R | www.ncbi.nlm.nih.gov/pubmed/28714975 |
-| rs4129267-T   | 1    | 154426264 |  0.462 | rs4129267(T)/rs7536152(G)   | Fibrinogen                                                                                                                                                                 | 6e-27 |           0 | \[0.009-0.013\] unit decrease | IL6R | www.ncbi.nlm.nih.gov/pubmed/23969696 |
-| rs61812598-A  | 1    | 154420087 |  0.464 | rs61812598(G)/rs7536152(A)  | Fibrinogen levels                                                                                                                                                          | 3e-36 |           0 | NR unit decrease              | IL6R | www.ncbi.nlm.nih.gov/pubmed/26561523 |
-| rs4129267-?   | 1    | 154426264 |  0.462 | rs4129267(T)/rs7536152(G)   | Protein quantitative trait loci                                                                                                                                            | 2e-57 |           0 |                               | IL6R | www.ncbi.nlm.nih.gov/pubmed/18464913 |
+| :------------ | :--- | --------: | -----: | :-------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---- | :---------- | :---------------------------- | :--- | :----------------------------------- |
+| rs6689306-A   | 1    | 154395946 |  0.902 | rs6689306(G)/rs7536152(G)   | Atrial fibrillation                                                                                                                                                        | 1e-18 | 4.76e-17    | \[1.05-1.08\]                 | IL6R | www.ncbi.nlm.nih.gov/pubmed/30061737 |
+| rs146402667-G | 1    | 154398553 |  0.616 | rs34280647(AC)/rs7536152(G) | Blood protein levels                                                                                                                                                       | 0e+00 | 0.00e+00    | \[0.91-0.99\] unit increase   | IL6R | www.ncbi.nlm.nih.gov/pubmed/29875488 |
+| rs4129267-C   | 1    | 154426264 |  0.462 | rs4129267(T)/rs7536152(G)   | C-reactive protein levels                                                                                                                                                  | 2e-48 | 2.72e-23    | \[0.07-0.09\] unit increase   | IL6R | www.ncbi.nlm.nih.gov/pubmed/21300955 |
+| rs2228145-C   | 1    | 154426970 |  0.462 | rs2228145(C)/rs7536152(G)   | Cerebrospinal fluid biomarker levels                                                                                                                                       | 7e-29 | 3.39e-14    |                               | IL6R | www.ncbi.nlm.nih.gov/pubmed/28031287 |
+| rs61812598-G  | 1    | 154420087 |  0.464 | rs61812598(G)/rs7536152(A)  | Cerebrospinal fluid levels of Alzheimer’s disease-related proteins                                                                                                         | 6e-63 | 3.68e-30    |                               | IL6R | www.ncbi.nlm.nih.gov/pubmed/25340798 |
+| rs4129267-?   | 1    | 154426264 |  0.462 | rs4129267(T)/rs7536152(G)   | Chronic inflammatory diseases (ankylosing spondylitis, Crohn’s disease, psoriasis, primary sclerosing cholangitis, ulcerative colitis) (pleiotropy)                        | 9e-18 | 5.29e-09    |                               | IL6R | www.ncbi.nlm.nih.gov/pubmed/26974007 |
+| rs4845625-T   | 1    | 154422067 |  1.000 | rs4845625(T)/rs7536152(A)   | Coronary artery disease                                                                                                                                                    | 6e-16 | 6.00e-16    | \[0.034-0.056\] unit increase | IL6R | www.ncbi.nlm.nih.gov/pubmed/29212778 |
+| rs6689306-A   | 1    | 154395946 |  0.902 | rs6689306(G)/rs7536152(G)   | Coronary artery disease (myocardial infarction, percutaneous transluminal coronary angioplasty, coronary artery bypass grafting, angina or chromic ischemic heart disease) | 2e-09 | 1.22e-08    | \[1.03-1.07\]                 | IL6R | www.ncbi.nlm.nih.gov/pubmed/28714975 |
+| rs4129267-T   | 1    | 154426264 |  0.462 | rs4129267(T)/rs7536152(G)   | Fibrinogen                                                                                                                                                                 | 6e-27 | 2.70e-13    | \[0.009-0.013\] unit decrease | IL6R | www.ncbi.nlm.nih.gov/pubmed/23969696 |
+| rs61812598-A  | 1    | 154420087 |  0.464 | rs61812598(G)/rs7536152(A)  | Fibrinogen levels                                                                                                                                                          | 3e-36 | 1.07e-17    | NR unit decrease              | IL6R | www.ncbi.nlm.nih.gov/pubmed/26561523 |
+| rs4129267-?   | 1    | 154426264 |  0.462 | rs4129267(T)/rs7536152(G)   | Protein quantitative trait loci                                                                                                                                            | 2e-57 | 1.79e-27    |                               | IL6R | www.ncbi.nlm.nih.gov/pubmed/18464913 |
 
   - SNP - rs13082711 (SLC4A7):
 
 | snp          | chrm |   posh19 | LD\_R2 | LD\_alleles                 | trait                                                                                     | p     | adjusted\_p | effect                      | gene                  | url                                  |
-| :----------- | :--- | -------: | -----: | :-------------------------- | :---------------------------------------------------------------------------------------- | :---- | ----------: | :-------------------------- | :-------------------- | :----------------------------------- |
-| rs13082711-T | 3    | 27537909 |     NA | NA                          | Blood pressure                                                                            | 5e-09 |          NA | \[0.22-0.45\] mmHg decrease | AC099535.1 - RNU1-96P | www.ncbi.nlm.nih.gov/pubmed/21909110 |
-| rs13082711-C | 3    | 27537909 |     NA | NA                          | Diastolic blood pressure                                                                  | 3e-10 |          NA | \[0.23-0.43\] unit increase | AC099535.1 - RNU1-96P | www.ncbi.nlm.nih.gov/pubmed/28739976 |
-| rs13082711-? | 3    | 27537909 |     NA | NA                          | Diastolic blood pressure (cigarette smoking interaction)                                  | 7e-12 |          NA |                             | AC099535.1 - RNU1-96P | www.ncbi.nlm.nih.gov/pubmed/29455858 |
-| rs13082711-? | 3    | 27537909 |     NA | NA                          | Systolic blood pressure (cigarette smoking interaction)                                   | 3e-11 |          NA |                             | AC099535.1 - RNU1-96P | www.ncbi.nlm.nih.gov/pubmed/29455858 |
-| rs13063291-? | 3    | 27446285 |  0.775 | rs13063291(T)/rs13082711(T) | Diastolic blood pressure x smoking status (current vs non-current) interaction (2df test) | 4e-11 |           0 |                             | SLC4A7                | www.ncbi.nlm.nih.gov/pubmed/29455858 |
-| rs13063291-? | 3    | 27446285 |  0.775 | rs13063291(T)/rs13082711(T) | Diastolic blood pressure x smoking status (ever vs never) interaction (2df test)          | 2e-11 |           0 |                             | SLC4A7                | www.ncbi.nlm.nih.gov/pubmed/29455858 |
-| rs2643826-T  | 3    | 27562988 |  0.309 | rs2643826(T)/rs13082711(T)  | Systolic blood pressure x alcohol consumption interaction (2df test)                      | 6e-32 |           0 |                             | RNU1-96P - AC137675.1 | www.ncbi.nlm.nih.gov/pubmed/29912962 |
-| rs13063291-? | 3    | 27446285 |  0.775 | rs13063291(T)/rs13082711(T) | Systolic blood pressure x smoking status (current vs non-current) interaction (2df test)  | 5e-10 |           0 |                             | SLC4A7                | www.ncbi.nlm.nih.gov/pubmed/29455858 |
-| rs13063291-? | 3    | 27446285 |  0.775 | rs13063291(T)/rs13082711(T) | Systolic blood pressure x smoking status (ever vs never) interaction (2df test)           | 1e-10 |           0 |                             | SLC4A7                | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| :----------- | :--- | -------: | -----: | :-------------------------- | :---------------------------------------------------------------------------------------- | :---- | :---------- | :-------------------------- | :-------------------- | :----------------------------------- |
+| rs13082711-T | 3    | 27537909 |     NA | NA                          | Blood pressure                                                                            | 5e-09 | NA          | \[0.22-0.45\] mmHg decrease | AC099535.1 - RNU1-96P | www.ncbi.nlm.nih.gov/pubmed/21909110 |
+| rs13082711-C | 3    | 27537909 |     NA | NA                          | Diastolic blood pressure                                                                  | 3e-10 | NA          | \[0.23-0.43\] unit increase | AC099535.1 - RNU1-96P | www.ncbi.nlm.nih.gov/pubmed/28739976 |
+| rs13082711-? | 3    | 27537909 |     NA | NA                          | Diastolic blood pressure (cigarette smoking interaction)                                  | 7e-12 | NA          |                             | AC099535.1 - RNU1-96P | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| rs13082711-? | 3    | 27537909 |     NA | NA                          | Systolic blood pressure (cigarette smoking interaction)                                   | 3e-11 | NA          |                             | AC099535.1 - RNU1-96P | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| rs13063291-? | 3    | 27446285 |  0.775 | rs13063291(T)/rs13082711(T) | Diastolic blood pressure x smoking status (current vs non-current) interaction (2df test) | 4e-11 | 6.08e-09    |                             | SLC4A7                | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| rs13063291-? | 3    | 27446285 |  0.775 | rs13063291(T)/rs13082711(T) | Diastolic blood pressure x smoking status (ever vs never) interaction (2df test)          | 2e-11 | 3.54e-09    |                             | SLC4A7                | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| rs2643826-T  | 3    | 27562988 |  0.309 | rs2643826(T)/rs13082711(T)  | Systolic blood pressure x alcohol consumption interaction (2df test)                      | 6e-32 | 6.14e-11    |                             | RNU1-96P - AC137675.1 | www.ncbi.nlm.nih.gov/pubmed/29912962 |
+| rs13063291-? | 3    | 27446285 |  0.775 | rs13063291(T)/rs13082711(T) | Systolic blood pressure x smoking status (current vs non-current) interaction (2df test)  | 5e-10 | 4.36e-08    |                             | SLC4A7                | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| rs13063291-? | 3    | 27446285 |  0.775 | rs13063291(T)/rs13082711(T) | Systolic blood pressure x smoking status (ever vs never) interaction (2df test)           | 1e-10 | 1.24e-08    |                             | SLC4A7                | www.ncbi.nlm.nih.gov/pubmed/29455858 |
 
   - SNP - rs10104032 (TNKS):
 
 | snp         | chrm |  posh19 | LD\_R2 | LD\_alleles                | trait                                                                                    | p     | adjusted\_p | effect                        | gene             | url                                  |
-| :---------- | :--- | ------: | -----: | :------------------------- | :--------------------------------------------------------------------------------------- | :---- | ----------: | :---------------------------- | :--------------- | :----------------------------------- |
-| rs9286060-A | 8    | 9653145 |  0.702 | rs9286060(C)/rs10104032(C) | Diastolic blood pressure x alcohol consumption interaction (2df test)                    | 2e-13 |           0 |                               | TNKS - LINC00599 | www.ncbi.nlm.nih.gov/pubmed/29912962 |
-| rs4383974-? | 8    | 9619348 |  0.704 | rs4383974(G)/rs10104032(A) | Heel bone mineral density                                                                | 2e-17 |           0 | \[0.014-0.023\] unit decrease | TNKS             | www.ncbi.nlm.nih.gov/pubmed/30048462 |
-| rs1976671-A | 8    | 9679634 |  0.642 | rs1976671(G)/rs10104032(C) | Systolic blood pressure x alcohol consumption interaction (2df test)                     | 7e-18 |           0 |                               | TNKS - LINC00599 | www.ncbi.nlm.nih.gov/pubmed/29912962 |
-| rs4841235-? | 8    | 9683358 |  0.538 | rs4841235(G)/rs10104032(C) | Systolic blood pressure x smoking status (current vs non-current) interaction (2df test) | 5e-15 |           0 |                               | TNKS - LINC00599 | www.ncbi.nlm.nih.gov/pubmed/29455858 |
-| rs4841235-? | 8    | 9683358 |  0.538 | rs4841235(G)/rs10104032(C) | Systolic blood pressure x smoking status (ever vs never) interaction (2df test)          | 4e-14 |           0 |                               | TNKS - LINC00599 | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| :---------- | :--- | ------: | -----: | :------------------------- | :--------------------------------------------------------------------------------------- | :---- | :---------- | :---------------------------- | :--------------- | :----------------------------------- |
+| rs9286060-A | 8    | 9653145 |  0.702 | rs9286060(C)/rs10104032(C) | Diastolic blood pressure x alcohol consumption interaction (2df test)                    | 2e-13 | 7.46e-10    |                               | TNKS - LINC00599 | www.ncbi.nlm.nih.gov/pubmed/29912962 |
+| rs4383974-? | 8    | 9619348 |  0.704 | rs4383974(G)/rs10104032(A) | Heel bone mineral density                                                                | 2e-17 | 1.02e-12    | \[0.014-0.023\] unit decrease | TNKS             | www.ncbi.nlm.nih.gov/pubmed/30048462 |
+| rs1976671-A | 8    | 9679634 |  0.642 | rs1976671(G)/rs10104032(C) | Systolic blood pressure x alcohol consumption interaction (2df test)                     | 7e-18 | 5.14e-12    |                               | TNKS - LINC00599 | www.ncbi.nlm.nih.gov/pubmed/29912962 |
+| rs4841235-? | 8    | 9683358 |  0.538 | rs4841235(G)/rs10104032(C) | Systolic blood pressure x smoking status (current vs non-current) interaction (2df test) | 5e-15 | 9.54e-09    |                               | TNKS - LINC00599 | www.ncbi.nlm.nih.gov/pubmed/29455858 |
+| rs4841235-? | 8    | 9683358 |  0.538 | rs4841235(G)/rs10104032(C) | Systolic blood pressure x smoking status (ever vs never) interaction (2df test)          | 4e-14 | 2.96e-08    |                               | TNKS - LINC00599 | www.ncbi.nlm.nih.gov/pubmed/29455858 |
 
   - SNP - rs11986845 (PINX1):
 
 | snp         | chrm |   posh19 | LD\_R2 | LD\_alleles                | trait                                                                 | p     | adjusted\_p | effect                      | gene                     | url                                  |
-| :---------- | :--- | -------: | -----: | :------------------------- | :-------------------------------------------------------------------- | :---- | ----------: | :-------------------------- | :----------------------- | :----------------------------------- |
-| rs4551304-A | 8    | 10665069 |  0.723 | rs4551304(G)/rs11986845(T) | Diastolic blood pressure x alcohol consumption interaction (2df test) | 2e-14 |           0 |                             | PINX1, PINX1             | www.ncbi.nlm.nih.gov/pubmed/29912962 |
-| rs9650657-T | 8    | 10607400 |  0.586 | rs9650657(T)/rs11986845(T) | Neuroticism                                                           | 2e-23 |           0 | z score increase            | PINX1, PINX1, AC105001.1 | www.ncbi.nlm.nih.gov/pubmed/29255261 |
-| rs1821002-G | 8    | 10640065 |  0.660 | rs1821002(G)/rs11986845(T) | Systolic blood pressure                                               | 4e-19 |           0 | \[0.33-0.52\] unit decrease | PINX1, PINX1             | www.ncbi.nlm.nih.gov/pubmed/28135244 |
-| rs7814757-T | 8    | 10675188 |  0.716 | rs7814757(T)/rs11986845(T) | Systolic blood pressure x alcohol consumption interaction (2df test)  | 3e-22 |           0 |                             | PINX1, PINX1             | www.ncbi.nlm.nih.gov/pubmed/29912962 |
+| :---------- | :--- | -------: | -----: | :------------------------- | :-------------------------------------------------------------------- | :---- | :---------- | :-------------------------- | :----------------------- | :----------------------------------- |
+| rs4551304-A | 8    | 10665069 |  0.723 | rs4551304(G)/rs11986845(T) | Diastolic blood pressure x alcohol consumption interaction (2df test) | 2e-14 | 7.82e-11    |                             | PINX1, PINX1             | www.ncbi.nlm.nih.gov/pubmed/29912962 |
+| rs9650657-T | 8    | 10607400 |  0.586 | rs9650657(T)/rs11986845(T) | Neuroticism                                                           | 2e-23 | 2.27e-14    | z score increase            | PINX1, PINX1, AC105001.1 | www.ncbi.nlm.nih.gov/pubmed/29255261 |
+| rs1821002-G | 8    | 10640065 |  0.660 | rs1821002(G)/rs11986845(T) | Systolic blood pressure                                               | 4e-19 | 3.83e-13    | \[0.33-0.52\] unit decrease | PINX1, PINX1             | www.ncbi.nlm.nih.gov/pubmed/28135244 |
+| rs7814757-T | 8    | 10675188 |  0.716 | rs7814757(T)/rs11986845(T) | Systolic blood pressure x alcohol consumption interaction (2df test)  | 3e-22 | 2.28e-16    |                             | PINX1, PINX1             | www.ncbi.nlm.nih.gov/pubmed/29912962 |
 
   - SNP - rs59234174 (BNC2):
     

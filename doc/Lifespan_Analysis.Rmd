@@ -29,11 +29,14 @@ if(!file.exists("lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")) download.file(
 ```
 
 Now that we have the data in our working directory, we can launch the analysis (with default parameters):
+<details>
 
+<summary> See log </summary>
 ```{r bGWAS, echo=TRUE}
 Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
                        GWAS = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")
 ```
+</details>
 
 
 We can now look at the results more in details.
@@ -147,7 +150,8 @@ for(i in 1:nrow(SNPs_lookup)){
   # format for nice kable output
   if(nrow(Info)>0){
     Info %>%
-      mutate(p=as.character(format(p, scientific=T, digits=3))) -> Info
+      mutate(p=as.character(format(p, scientific=T, digits=3)),
+             adjusted_p = as.character(format(adjusted_p, scientific=T, digits=3))) -> Info
     print(knitr::kable(Info, digits=3))
   } else {
     cat("\n   No association reported")
