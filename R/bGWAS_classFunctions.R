@@ -254,7 +254,7 @@ manhattan_plot_bGWAS <- function(obj, save_file=F, file_name=NULL,
         use_color = T
         SNPs %>%
           slice(match(SNPs_to_plot$rsid, .data$rs)) %>%
-          pull(3) -> my_colors
+          pull(3) %>% as.character() -> my_colors
       }
     } else {
     # extract them
