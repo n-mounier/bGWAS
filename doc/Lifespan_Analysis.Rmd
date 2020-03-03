@@ -1,6 +1,8 @@
 ---
-output: github_document
-
+title: Lifespan Analysis
+output:
+  github_document:
+    toc: true
 ---
 
 ```{r setup, include=FALSE, cache=FALSE}
@@ -13,10 +15,20 @@ knitr::opts_chunk$set(echo = TRUE,
 options(pillar.neg=F, # do no print neg number in red
         pillar.subtle=F, # turn off highliting of significant digits
         tibble.width = 130) # default=95, increase it to make it readable
+
+library(ggplot2)
+apatheme= theme_bw()+
+    theme(panel.grid.major=element_blank(),
+                 panel.grid.minor=element_blank(),
+                 panel.border=element_blank(),
+                 axis.line=element_line(),
+                 axis.title.y = element_text(size=12),
+                 axis.title.x = element_text(size = 12),
+                 plot.subtitle = element_text(size=12),
+                 plot.title = element_text(hjust = 0.5))
 ```
 
-
-# Lifespan Analysis
+## Description
 
 In this example, we will use the data from [Timmers *et al*](https://doi.org/10.7554/eLife.39856) to apply our Bayesian GWAS approach to study lifespan.    
 Here, we assume that the `bGWAS` package is already installed, that the Z-matrix files have already been downloaded and stored in `"~/ZMatrices"`. If that is not the case, please follow the steps described [here](../README.md). 
@@ -29,6 +41,11 @@ if(!file.exists("lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")) download.file(
 ```
 
 Now that we have the data in our working directory, we can launch the analysis (with default parameters):
+```{r bGWASFake, eval=F}
+Lifespan_bGWAS = bGWAS(name = "Lifespan_Timmers2019",
+                       GWAS = "lifegen_phase2_bothpl_alldr_2017_09_18.tsv.gz")
+```
+
 <details>
 
 <summary> See log </summary>
@@ -52,7 +69,9 @@ coefficients_plot_bGWAS(Lifespan_bGWAS)
 Overall, the squared correlation between prior and observed effects is about `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "all"), 3)` and goes up to `r round(get_RSquared_bGWAS(Lifespan_bGWAS, "moderate"), 3)` when we consider only SNPs having at least a moderate effect on lifespan (observed p-value < 0.001).     
 Using the previous version (Timmers et al), squared correlation was around 0.003 when considering all SNPs and around 0.082 for SNPs having a moderate effect.    
 
-## Results - BF (all)
+## Results - BF
+
+### All significant hits
 
 With this approach, we identified `r nrow(extract_results_bGWAS(Lifespan_bGWAS))` SNPs affecting lifespan through the selected risk factors:
 
@@ -64,7 +83,7 @@ extract_results_bGWAS(Lifespan_bGWAS) %>%
 knitr::kable(Hits, digits=3)
 ```
 
-## Results - BF (new hits)
+### New hits
 
 ```{r results_NewHits, echo=TRUE}
 # new hits (compared to conventional GWAS)
@@ -105,8 +124,8 @@ knitr::kable(New_Hits, digits=3)
 
 ```
 
-`r nrow(New_Hits)` of the `r nrow(Hits)` genome-wide significant loci are missed by the conventional GWAS (using same p-value threshold of 5e-8 to call significance).    
-Using the previous version (Timmers et al), we identified 7 new loci (using a threshold of 2.5e-8 for both GWAS and bGWAS results), 4 of them are also significant in this analysis (near CELSR2, TMEM18, ZC3HC1 and ABO). The 11 other variants identified in this analysis (near IL6R, BCL11A, SLC4A7, TRAIP, SLC4A7, PINX1, TNKS, BNC2, CUX2, PDE3A and PGPEP1) are reported to be associated with lifespan for the first time.
+`r nrow(New_Hits)` of the `r nrow(Hits)` genome-wide significant loci are missed by the conventional GWAS (using same p-value threshold of 5e-8 to assess significance).    
+Using the previous version (Timmers et al), we identified 7 new loci (using a threshold of 2.5e-8 for both GWAS and bGWAS results), 4 of them are also significant in this analysis (near CELSR2, TMEM18, ZC3HC1 and ABO). The 11 other variants identified in this analysis (near IL6R, BCL11A, SLC4A7, TRAIP, MIR2113, PINX1, TNKS, BNC2, CUX2, PDE3A and PGPEP1) are reported to be associated with lifespan for the first time.
 
 ```{r results_ManhattanPlots, dpi=300}
 # For the plots, we will use only the new hits
@@ -119,7 +138,7 @@ manhattan_plot_bGWAS(Lifespan_bGWAS, SNPs=my_SNPs)
 ```
 
 
-## Results - BF (new hits), association with risk factors
+### New hits, association with risk factors
 
 
 ```{r results_Heatmap, dpi=300}
@@ -169,6 +188,459 @@ for(i in 1:nrow(SNPs_lookup)){
      
      
 Interestingly, we can see that a few loci identified have been associated with some of the risk factors used to create the prior in more recent studies. Variants in LD with the variant identified near IL6R have been associated with Coronary Artery Disease. Variants in LD with the variants identified near SLC4A7, PINX1 and TNKS have been associated with Diastolic Blood Pressure. The other loci have not been associated with any of the risk factors, and are likely acting on lifespan through moderate effects on several risk factors (pleiotropic effects).
+
+### Comparison with Timmers *et al* results
+
+```{r download-dataTimmers, echo=TRUE, message=FALSE, results='hide', cache=F}
+# Download data to working directory (~230 MB) if not already here
+if(!file.exists("bGWAS_Timmers2019/bGWAS_Timmers2019.csv.gz")){
+  download.file(url = "https://drive.switch.ch/index.php/s/zlNLUSCUyfgovcp/download", destfile = "bGWAS_Timmers2019.tar.gz")
+  system("tar -xzvf bGWAS_Timmers2019.tar.gz") }
+Data_Timmers = data.table::fread("bGWAS_Timmers2019/bGWAS_Timmers2019.csv.gz")
+```
+
+```{r combine, echo=TRUE}
+All_Results = extract_results_bGWAS(Lifespan_bGWAS, SNPs = "all")
+# combine results
+All_Results %>%
+  inner_join(Data_Timmers, by="rsid", suffix=c("", "_Timmers")) -> All_Results
+# keep SNPs significant in one of the two analyses 
+# (note that in Timmers et al paper a different threshold was used because of multiple analyses)
+All_Results %>%
+  filter(BF_p < 5e-8 | pvalue < 2.5e-8) -> Combined_Results
+# identify lead SNP in each region (distance pruning)
+prune_byDistance = getFromNamespace("prune_byDistance", "bGWAS")
+Combined_Results %>% 
+  transmute(SNP = rsid,
+            chr_name = chrm_UK10K,
+            chr_start = pos_UK10K,
+            pval.exposure = pmin(pvalue, BF_p)) -> ToPrune 
+SNPsToKeep = prune_byDistance(ToPrune, prune.dist=500, byP=T)
+
+Combined_Results %>%
+  filter(rsid %in% SNPsToKeep) %>%
+  transmute(rsid,
+            chr= chrm_UK10K,
+            pos = pos_UK10K,
+            obs = z_obs,
+            # align alleles to be able to compare directions
+            prior_new = mu_prior_estimate,
+            prior_Timmers = case_when(
+               a1 == alt ~ prior_estimate,
+               TRUE ~ -prior_estimate),
+            BF_new = BF,
+            BF_Timmers,
+            p_new = BF_p,
+            p_Timmers = pvalue,
+            Significance = case_when(
+              p_new > 5e-8 ~ "Timmers et al only",
+              p_Timmers > 2.5e-8 ~ "new signal",
+              TRUE ~ "significant in both analyses"
+            )) -> Combined_Results
+nrow(Combined_Results %>% filter(p_new<5e-8))
+# here we do have less new hits 
+Hits %>% filter(!rsid %in% Combined_Results$rsid) %>% pull(rsid) -> Missing_SNPs
+Missing_SNPs %in% Data_Timmers$rsid
+# this is because we are only looking at variants present in both analyses
+# these variants where not included in Timmers et al (i.e no prior effect could
+# be estimated) because when creating the Z-Matrices, variants with low imputation 
+# quality  for any RF were excluded instead of set to 0 as they are now
+knitr::kable(Combined_Results, digits=3)
+```
+
+There are `r nrow(Combined_Results %>% filter(Significance == "Timmers et al only"))` variants from Timmers *et al* that are not significant in the new analysis. Details about these variants and their association with the RFs used to create the prior in the Timmers *et al* analysis can be found [here](https://doi.org/10.7554/eLife.39856.015). The first (`r Combined_Results %>% filter(Significance == "Timmers et al only") %>% slice(1) %>% pull(rsid)`, near POM121C) and the second (`r Combined_Results %>% filter(Significance == "Timmers et al only") %>% slice(1) %>% pull(rsid)`, near GBX2/ASB18) variants were not significantly associated with any of the risk factors used to create the prior in Timmers *et al* and they were likely acting through small effects on various RFs. In our new analysis, a different set of RFs is used, leading to a much smaller prior effect. The third variant (`r Combined_Results %>% filter(Significance == "Timmers et al only") %>% slice(3) %>% pull(rsid)`, LPA/IGF2R) is known to be significantly associated with LDL, a RF that was selected to create the prior in both analyses. However, the multivariate causal effect estimate of HDL on lifespan is slighlty smaller in our new analysis (-0.09 vs -0.13), reducing the prior effect. Additionnaly, this variant was also having small effects on some additional RFs included in Timmers *et al* analyses, explaining why the prior effect estimated in our new analysis is smaller. 
+
+#### Prior Effects Estimates
+
+```{r compare-prior, dpi=300}
+# abs(prior effects):
+p=ggplot2::ggplot(Combined_Results, ggplot2::aes(x=prior_Timmers, y=prior_new, shape=Significance)) +
+  geom_abline(slope=1, intercept=0, col="darkgrey", lty=2) +
+  geom_hline(yintercept = 0, size=0.4) +
+  geom_vline(xintercept = 0, size=0.4) +
+  ggplot2::geom_point(size=2, alpha=0.6) +
+  labs(title = "Prior Effects Estimates") +
+  ylab("bGWAS v.1.0.2") + xlab("Timmers et al") + 
+  apatheme 
+p
+```
+The prior effects are quite consistent (all except 1 agree in sign). This variant (`r Combined_Results %>% filter(prior_new*prior_Timmers<0) %>% pull(rsid)`) is still identified as significantly associated with lifespan by both analyses because of its strong observed effect (z-score of `r Combined_Results %>% filter(prior_new*prior_Timmers<0) %>% pull(obs)`).     
+The differences that are observed likely come from the fact that different RFs are selected (update of the stepwise selection approach). It is also important to note that in the new analysis no shrinkage is applied before the prior estimation. This also creates some differences and this is why some of the prior effects from Timmers \it{et al} are exactly 0.
+
+#### Bayes Factors
+
+```{r compare-BF,  dpi=300}
+# abs(prior effects):
+p=ggplot2::ggplot(Combined_Results, ggplot2::aes(x=log(as.numeric(BF_Timmers)), y=log(as.numeric(BF_new)), shape=Significance)) +
+  geom_abline(slope=1, intercept=0, col="darkgrey", lty=2) +
+  ggplot2::geom_point(size=2, alpha=0.6) +
+  labs(title = "Bayes Factors (log scale)") +
+  ylab("bGWAS v.1.0.2") + xlab("Timmers et al") + 
+  apatheme 
+p
+```
+
+The BFs are also quite consistent. Differences in BFs are directly correlated to the differences in prior effects, since the observed effects are the same for both analyses.
+
+#### P-values
+
+```{r compare-p,  dpi=300}
+# abs(prior effects):
+p=ggplot2::ggplot(Combined_Results, ggplot2::aes(x=-log10(p_Timmers), y=-log10(p_new), shape=Significance)) +
+  geom_abline(slope=1, intercept=0, col="darkgrey", lty=2) +
+  ggplot2::geom_point(size=2, alpha=0.6) +
+  labs(title = "P-values (-log10 scale)") +
+  ylab("bGWAS v.1.0.2") + xlab("Timmers et al") + 
+  apatheme 
+p
+```
+The p-values are also quite similar. Differences in p-values can be explained by the differences in BFs (because each BF value might differ, but also because the distribution of BFs is different in each analysis, meaning that for a specific BF value, the respective p-value will differ). In addition, this is important to note that since the p-values from Timmers et al were estimated using a permutation approach, the minimal p-value that could be estimated (`r format(Data_Timmers %>% pull(pvalue) %>% min, scientific=T, digits=2)`) was dependent on the number of permutations performed.
+
+
+
+## Results - Posterior Effects 
+
+### All significant hits
+
+With this approach, we identified `r nrow(extract_results_bGWAS(Lifespan_bGWAS, results="posterior"))` SNPs having significant posterior effects:
+
+```{r results_Posterior, echo=TRUE}
+# all posterior hits
+extract_results_bGWAS(Lifespan_bGWAS, results="posterior") %>% 
+  mutate(p_posterior = as.character(format(p_posterior, scientific=T, digits=3))) %>%
+  arrange(chrm_UK10K, pos_UK10K) -> Posterior_Hits
+knitr::kable(Posterior_Hits, digits=3)
+```
+
+### New hits
+
+```{r results_NewHitsPosterior, echo=TRUE}
+# new hits (compared to conventional GWAS & BF p-values)
+# look at SNPs in a 100kb window around (to assess significance in conventional GWAS / bGWAS results)
+Posterior_Hits$NewHits = NA
+dist=100000
+for(snp in 1:nrow(Posterior_Hits)){
+  Posterior_Hits %>% dplyr::slice(snp) %>% pull(chrm_UK10K) -> chr
+  Posterior_Hits %>% dplyr::slice(snp) %>% pull(pos_UK10K) -> pos
+  extract_results_bGWAS(Lifespan_bGWAS, SNPs = "all") %>%
+    filter(chrm_UK10K  == chr,
+           pos_UK10K > pos - dist,
+           pos_UK10K < pos + dist) %>%
+    mutate(p_obs =  2*pnorm(-abs(z_obs))) %>%
+    dplyr::select(p_obs, BF_p) %>% min() -> minP_region
+  Posterior_Hits$NewHits[snp] = ifelse(minP_region<5e-8,FALSE,TRUE)
+}
+Posterior_Hits %>%
+  filter(NewHits == TRUE) %>%
+  mutate(NewHits = NULL)-> NewPosterior_Hits
+# also add gene names using annovar
+Gene_Info_Posterior <- do.call(rbind.data.frame, 
+                     apply(NewPosterior_Hits, 1, function(x) get_geneInfo(as.numeric(x[2]), as.numeric(x[3]), x[4], x[5])))
+# clean some names for intergenic regions
+knitr::kable(Gene_Info_Posterior)
+# intergenic	USP4/GPX1 7931/9187 -> USP4
+Gene_Info_Posterior[1,2:3] = c("USP4", "7931")
+# intergenic	GNPDA2/GABRG1	447040/862095 -> GNPDA2 (super far away though ... )
+Gene_Info_Posterior[2,2:3] = c("GNPDA2", "447040")
+# intergenic	RIOK3/RMC1 15612/4718 -> RMC1
+Gene_Info_Posterior[9,2:3] = c("RMC1", "4718")
+
+Gene_Info_Posterior %>%
+  bind_cols(NewPosterior_Hits) -> NewPosterior_Hits
+
+knitr::kable(NewPosterior_Hits, digits=3)
+
+```
+
+`r nrow(NewPosterior_Hits)` of the `r nrow(Posterior_Hits)` genome-wide significant loci are missed by the conventional GWAS and by the identification based on BFs (using same p-value threshold of 5e-8 to assess significance).    
+
+```{r results_ManhattanPlotsPosterior, dpi=300}
+# For the plots, we will use only the new posterior hits
+NewPosterior_Hits %>% 
+  transmute(rs=rsid,
+		gene = Gene,
+		color="#932735") -> my_SNPsPosterior
+
+manhattan_plot_bGWAS(Lifespan_bGWAS, SNPs=my_SNPsPosterior, results = "posterior")
+```
+
+### New hits, association with risk factors
+ 
+These variants (and the ones in a 100kb window) can be further investigated using the [GWAS Catalog](https://www.ebi.ac.uk/gwas/). R2 estimates in EUR population from [LDlink](https://ldlink.nci.nih.gov/) are used to keep only SNPs in LD (R2>0.1) with the variant identified. SNP-trait associations p-values below 5e-8 are reported below (when LD-friends are used, p-values adjusted for the correlation between the variants).
+
+<details>
+
+<summary> Reported Associations for posterior Hits </summary>
+
+
+```{r auto_newhitsPosterior, echo=F, message=F, warning=F, echo=FALSE, eval=TRUE}
+
+for(i in 1:nrow(NewPosterior_Hits)){
+  Hit = NewPosterior_Hits[i,]
+  cat(crayon::bold(paste0("\n* SNP - ", Hit$rsid, " (",Hit$Gene,"):\n")))
+  
+  Info = get_associatedTraits(Hit$rsid, Hit$chrm_UK10K, Hit$pos_UK10K,
+                                    LD=0.1, distance=100000, P=5e-8,
+                                    gwascatdata = my_ebicat37)
+  # format for nice kable output
+  if(nrow(Info)>0){
+    Info %>%
+      mutate(p=as.character(format(p, scientific=T, digits=3)),
+             adjusted_p = as.character(format(adjusted_p, scientific=T, digits=3))) -> Info
+    print(knitr::kable(Info, digits=3))
+  } else {
+    cat("\n   No association reported")
+  }
+  cat("\n")
+}
+```
+</details> 
+
+
+Interestingly, we can see that all these loci have been associated with some of the risk factors used to create the prior. The variants near USP4 and MAD1L1 have been associated with Educational Attainment. The variants near GNPDA2 and FTO have been associated with Body Mass Index. The variant near ZPR1 has been associated with Coronary Artery Disease and LDL Cholesterol. Variants in LD with the variant identified near HNF1A have been associated with Coronary Artery Disease and LDL cholesterol. The variant near ATXN2L has been associated with Educational Attainment, and variants in LD have been associated with Body Mass Index. A variant in LD with the variant identified near UBE2Z has been associated with Educational Attainment. Variants in LD with the variant identified near RMC1 have been associated with Body Mass Index and Educational Attainment. 
+
+
+
+## Results - Direct Effects
+
+With this approach, we identified `r nrow(extract_results_bGWAS(Lifespan_bGWAS, results="direct"))` SNPs having significant direct effects. Since there are only a small number of hits here, look at all of them in details:
+
+```{r results_Direct, echo=TRUE,dpi=300}
+# all direct hits
+extract_results_bGWAS(Lifespan_bGWAS, results="direct") %>% 
+  mutate(p_direct = as.character(format(p_direct, scientific=T, digits=3))) %>%
+  arrange(chrm_UK10K, pos_UK10K) -> Direct_Hits
+Gene_Info_Direct <- do.call(rbind.data.frame, 
+                     apply(Direct_Hits, 1, function(x) get_geneInfo(as.numeric(x[2]), as.numeric(x[3]), x[4], x[5])))
+
+Gene_Info_Direct %>%
+  bind_cols(Direct_Hits) -> Direct_Hits
+
+knitr::kable(Direct_Hits, digits=3)
+
+Direct_Hits %>% 
+  transmute(rs=rsid,
+		gene = Gene,
+		color="#932735") -> my_SNPsDirect
+
+manhattan_plot_bGWAS(Lifespan_bGWAS, SNPs=my_SNPsDirect, results = "direct")
+```
+
+### variant near LPA
+
+```{r LPA, echo=TRUE, results='asis', message=F, warning=F}
+# look if significant in conventional GWAS / using BF or posterior p-values)
+# look at SNPs in a 100kb window around (to assess significance in conventional GWAS / bGWAS results)
+dist=100000
+Direct_Hits %>% dplyr::slice(1) %>% pull(chrm_UK10K) -> chr_LPA
+Direct_Hits %>% dplyr::slice(1) %>% pull(pos_UK10K) -> pos_LPA
+extract_results_bGWAS(Lifespan_bGWAS, SNPs = "all", results="everything") %>%
+  filter(chrm_UK10K  == chr_LPA,
+         pos_UK10K > pos_LPA - dist,
+         pos_UK10K < pos_LPA + dist) %>%
+  mutate(p_obs =  2*pnorm(-abs(z_obs))) %>%
+  dplyr::select(p_obs, BF_p, p_posterior) -> res_LPA
+# significant in conventional GWAS
+any(res_LPA$p_obs<5e-8)
+# significant in bGWAS
+any(res_LPA$BF_p<5e-8)
+# significant using posterior effects
+any(res_LPA$p_posterior<5e-8)
+
+# Association with other traits
+LPA = Direct_Hits[1,]
+knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, SNPs = "all", results="everything") %>%
+               filter(rsid == LPA$rsid) %>% 
+               mutate(BF = as.character(format(BF, scientific=T, digits=3)), 
+                      BF_p = as.character(format(BF_p, scientific=T, digits=3)),
+                      p_direct = as.character(format(p_direct, scientific=T, digits=3)),
+                      p_posterior = as.character(format(p_posterior, scientific=T, digits=3))),
+             digits=3)
+
+Info_LPA = get_associatedTraits(LPA$rsid, LPA$chrm_UK10K, LPA$pos_UK10K,
+                            LD=0.1, distance=100000, P=5e-8,
+                            gwascatdata = my_ebicat37)
+# format for nice kable output
+Info_LPA %>%
+  mutate(p=as.character(format(p, scientific=T, digits=3)),
+         adjusted_p = as.character(format(adjusted_p, scientific=T, digits=3))) -> Info_LPA
+```
+
+
+<details>
+
+<summary> Reported Associations for variant near LPA </summary>
+
+```{r LPA_Assoc,echo=FALSE, eval=TRUE}
+print(knitr::kable(Info_LPA, digits=3))
+```
+
+</details>
+
+The variant near LPA is also significant in the conventional GWAS, and using BF and posterior effects. It has a quite strong effect in the conventional GWAS (z=-10.25) but only a part of its effect on lifespan is going through the risk factors  (Coronary Artery Disease and LDL cholesterol) used to create the prior (moderate prior effect, mu=-1.963). Some part of the observed effect is likely to be explained by some risk factors not included here (Lipoprotein levels, Response to statin therapy), or some direct effects.
+
+### variant near RAD52
+
+```{r RAD52, echo=TRUE, results='asis', message=F, warning=F}
+# look if significant in conventional GWAS / using BF or posterior p-values)
+# look at SNPs in a 100kb window around (to assess significance in conventional GWAS / bGWAS results)
+dist=100000
+Direct_Hits %>% dplyr::slice(2) %>% pull(chrm_UK10K) -> chr_RAD52
+Direct_Hits %>% dplyr::slice(2) %>% pull(pos_UK10K) -> pos_RAD52
+extract_results_bGWAS(Lifespan_bGWAS, SNPs = "all", results="everything") %>%
+  filter(chrm_UK10K  == chr_RAD52,
+         pos_UK10K > pos_RAD52 - dist,
+         pos_UK10K < pos_RAD52 + dist) %>%
+  mutate(p_obs =  2*pnorm(-abs(z_obs))) %>%
+  dplyr::select(p_obs, BF_p, p_posterior) -> res_RAD52
+# not significant in conventional GWAS
+any(res_RAD52$p_obs<5e-8)
+# not significant in bGWAS
+any(res_RAD52$BF_p<5e-8)
+# not significant using posterior effects
+any(res_RAD52$p_posterior<5e-8)
+
+# Association with other traits
+RAD52 = Direct_Hits[2,]
+knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, SNPs = "all", results="everything") %>%
+               filter(rsid == RAD52$rsid) %>% 
+               mutate(BF = as.character(format(BF, scientific=T, digits=3)), 
+                      BF_p = as.character(format(BF_p, scientific=T, digits=3)),
+                      p_direct = as.character(format(p_direct, scientific=T, digits=3)),
+                      p_posterior = as.character(format(p_posterior, scientific=T, digits=3))),
+             digits=3)
+
+
+Info_RAD52 = get_associatedTraits(RAD52$rsid, RAD52$chrm_UK10K, RAD52$pos_UK10K,
+                            LD=0.1, distance=100000, P=5e-8,
+                            gwascatdata = my_ebicat37)
+# format for nice kable output
+Info_RAD52 %>%
+  mutate(p=as.character(format(p, scientific=T, digits=3)),
+         adjusted_p = as.character(format(adjusted_p, scientific=T, digits=3))) -> Info_RAD52
+```
+
+
+<details>
+
+<summary> Reported Associations for variant near RAD52 </summary>
+
+```{r RAD52_Assoc,echo=FALSE, eval=TRUE}
+print(knitr::kable(Info_RAD52, digits=3))
+```
+
+</details>
+
+The variant near RAD52 is not significant in the conventional GWAS, using BF or posterior effects. It has a quite strong effect in the conventional GWAS (z=-5.28) but does not have an effect on lifespan through any of risk factors used to create the prior (small prior effect in the opposite direction, mu=0.909). The observed effect could be explained by some risk factors not included here (but no strong association reported in GWAS catalog for this region), or some direct effects.
+
+
+### variant near HYKK
+
+```{r HYKK, echo=TRUE, results='asis', message=F, warning=F}
+# look if significant in conventional GWAS / using BF or posterior p-values)
+# look at SNPs in a 100kb window around (to assess significance in conventional GWAS / bGWAS results)
+dist=100000
+Direct_Hits %>% dplyr::slice(3) %>% pull(chrm_UK10K) -> chr_HYKK
+Direct_Hits %>% dplyr::slice(3) %>% pull(pos_UK10K) -> pos_HYKK
+extract_results_bGWAS(Lifespan_bGWAS, SNPs = "all", results="everything") %>%
+  filter(chrm_UK10K  == chr_HYKK,
+         pos_UK10K > pos_HYKK - dist,
+         pos_UK10K < pos_HYKK + dist) %>%
+  mutate(p_obs =  2*pnorm(-abs(z_obs))) %>%
+  dplyr::select(p_obs, BF_p, p_posterior) -> res_HYKK
+# significant in conventional GWAS
+any(res_HYKK$p_obs<5e-8)
+# significant in bGWAS
+any(res_HYKK$BF_p<5e-8)
+# not significant using posterior effects
+any(res_HYKK$p_posterior<5e-8)
+
+# Association with other traits
+HYKK = Direct_Hits[3,]
+knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, SNPs = "all", results="everything") %>%
+               filter(rsid == HYKK$rsid) %>% 
+               mutate(BF = as.character(format(BF, scientific=T, digits=3)), 
+                      BF_p = as.character(format(BF_p, scientific=T, digits=3)),
+                      p_direct = as.character(format(p_direct, scientific=T, digits=3)),
+                      p_posterior = as.character(format(p_posterior, scientific=T, digits=3))),
+             digits=3)
+
+Info_HYKK = get_associatedTraits(HYKK$rsid, HYKK$chrm_UK10K, HYKK$pos_UK10K,
+                            LD=0.1, distance=100000, P=5e-8,
+                            gwascatdata = my_ebicat37)
+# format for nice kable output
+Info_HYKK %>%
+  mutate(p=as.character(format(p, scientific=T, digits=3)),
+         adjusted_p = as.character(format(adjusted_p, scientific=T, digits=3))) -> Info_HYKK
+
+```
+
+<details>
+
+<summary> Reported Associations variant near HYKK </summary>
+
+```{r HYKK_Assoc,echo=FALSE, eval=TRUE}
+print(knitr::kable(Info_HYKK, digits=3))
+```
+
+</details>
+
+The variant near HYKK is significant in the conventional GWAS and using BF but not posterior effects. It has a quite strong effect in the conventional GWAS (z=10.65) but does not have an effect on lifespan through any of risk factors used to create the prior (small prior effect in the same direction, mu=0.499). The strength of the observed effect is enough to make the BF significant, even if the prior is not very large. The observed effect is likely to be explained by some risk factors not included here (smoking, pulmonary diseases/cancers), or some direct effects.
+
+
+### variant near APOE
+
+```{r APOE, echo=TRUE, results='asis', message=F, warning=F}
+# look if significant in conventional GWAS / using BF or posterior p-values)
+# look at SNPs in a 100kb window around (to assess significance in conventional GWAS / bGWAS results)
+dist=100000
+Direct_Hits %>% dplyr::slice(4) %>% pull(chrm_UK10K) -> chr_APOE
+Direct_Hits %>% dplyr::slice(4) %>% pull(pos_UK10K) -> pos_APOE
+extract_results_bGWAS(Lifespan_bGWAS, SNPs = "all", results="everything") %>%
+  filter(chrm_UK10K  == chr_APOE,
+         pos_UK10K > pos_APOE - dist,
+         pos_UK10K < pos_APOE + dist) %>%
+  mutate(p_obs =  2*pnorm(-abs(z_obs))) %>%
+  dplyr::select(p_obs, BF_p, p_posterior) -> res_APOE
+# significant in conventional GWAS
+any(res_APOE$p_obs<5e-8)
+# significant in bGWAS
+any(res_APOE$BF_p<5e-8)
+# significant using posterior effects
+any(res_APOE$p_posterior<5e-8)
+
+# Association with other traits
+APOE = Direct_Hits[4,]
+knitr::kable(extract_results_bGWAS(Lifespan_bGWAS, SNPs = "all", results="everything") %>%
+               filter(rsid == APOE$rsid) %>% 
+               mutate(BF = as.character(format(BF, scientific=T, digits=3)), 
+                      BF_p = as.character(format(BF_p, scientific=T, digits=3)),
+                      p_direct = as.character(format(p_direct, scientific=T, digits=3)),
+                      p_posterior = as.character(format(p_posterior, scientific=T, digits=3))),
+             digits=3)
+
+Info_APOE = get_associatedTraits(APOE$rsid, APOE$chrm_UK10K, APOE$pos_UK10K,
+                            LD=0.1, distance=100000, P=5e-8,
+                            gwascatdata = my_ebicat37)
+  # format for nice kable output
+Info_APOE %>%
+  mutate(p=as.character(format(p, scientific=T, digits=3)),
+         adjusted_p = as.character(format(adjusted_p, scientific=T, digits=3))) -> Info_APOE
+
+```
+
+<details>
+
+<summary> Reported Associations for variant near APOE </summary>
+
+```{r APOE_Assoc,echo=FALSE, eval=TRUE}
+print(knitr::kable(Info_APOE, digits=3))
+```
+
+</details> 
+
+The variant near APOE is significant in the conventional GWAS and using BF but not posterior effects. It has a very strong effect in the conventional GWAS (z=19.32) but only a part of its effect on lifespan is going through the risk factors used to create the prior (moderate prior effect, mu=1.854). Some part of the observed effect is likely to be explained by some risk factors not included here (Alzheimer, dementia, cognitive decline, C-reactive protein...), or some direct effects.
+
 
 
 <!---
