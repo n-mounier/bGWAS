@@ -39,7 +39,7 @@ tar xzvf ZMatrices.tar.gz
 
 We do not provide scripts to modify these files, but the package can accept customized Z-Matrix as long as they use the same format. Please, make sure to:   
 1. Modify the **AvailableStudies.tsv** file, to include your own files. The "File" column must correspond to the column names of the other two files, and ID should match the order of the columns in these files. The "Name"" and	"Trait"	 columns are needed, but you could leave the other ones empty.    
-2. Create the largest Z-Matrix first, by merging all your summary statistics. The first 5 columns should be "rs", "chr", "pos", "A1" and "A2".    
+2. Create the largest Z-Matrix first, by merging all your summary statistics. The first 5 columns should be "rs", "chrm", "pos", "alt" and "ref".    
 3. Subset this big matrix file to keep only strong instruments (p<1e-5 for at least one prior GWAS).    
 
   
