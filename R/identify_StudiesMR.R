@@ -141,6 +141,78 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
     return(res)
   }
   
+  
+  # if only one study, no need for stepwise selection
+  if(sum(all_uni_coefs$P<=stepwise_threshold)==1){
+    tmp = "Only one study reaching significance, no need for stepwise selection. \n"
+    Log = update_log(Log, tmp, verbose)
+    
+    # add the study
+    all_uni_coefs %>%
+      filter(.data$P==min(.data$P)) %>%
+      pull(.data$study) -> significant_studies
+    all_uni_coefs %>%
+      filter(!.data$study %in% significant_studies) %>%
+      pull(.data$study) -> non_significant_studies
+    
+    
+    tmp = paste0("Adding the study :", get_names(significant_studies, Z_matrices) , " \n")
+    Log = update_log(Log, tmp, verbose)
+    
+    
+    ### UPDATE Z-MATRIX
+    ZMatrix %>% 
+      select(1:5, significant_studies, ncol(ZMatrix)) %>%
+      get_Instruments(., Zlimit) -> ZMatrix_final
+    myFormula_final = generate_Formula(my_outcome, significant_studies)
+    
+    stats::lm(data=ZMatrix_final, formula = myFormula_final)  %>%
+      summary %>%
+      stats::coef() %>%
+      as.data.frame() %>% # 1st create a data.frame (to get rownames)
+      tibble::rownames_to_column("nm") %>% # then convert to tibble
+      as_tibble()  -> coefs
+    
+    coefs %>%
+      set_names(c("study", "estimate", "std_error", "Tstat", "P")) -> coefs
+    
+    # return results
+    if(save_files){
+      order_inFiles = match(coefs$study, Files_Info$File)
+      Files_Info$multi_estimate = NA
+      Files_Info$multi_estimate[order_inFiles] = pull(coefs, .data$estimate)
+      Files_Info$multi_std_error = NA
+      Files_Info$multi_std_error[order_inFiles] = pull(coefs, .data$std_error)
+      Files_Info$multi_T = NA
+      Files_Info$multi_T[order_inFiles] = pull(coefs, .data$Tstat)
+      Files_Info$multi_P = NA
+      Files_Info$multi_P[order_inFiles] = pull(coefs, .data$P)
+    }
+    
+    tmp = paste0("Estimating adjusted R-squared: \n")
+    Log = update_log(Log, tmp, verbose)
+    
+    stats::lm(data=ZMatrix_final, formula = myFormula_final)  %>%
+      summary %>%
+      .["adj.r.squared"] %>% 
+      as.numeric() -> R2_Multi 
+    
+    tmp = paste0("- in-sample adjusted R-squared for the all-chromosomes multivariate regression is ", round(R2_Multi,4), " \n")
+    Log = update_log(Log, tmp, verbose)
+    tmp = paste0("- out-of-sample R-squared (masking one chromosome at a time), for the multivariate regression will be estimated when calculating the prior. \n")
+    Log = update_log(Log, tmp, verbose)
+    
+    
+    if(save_files) utils::write.table(Files_Info, file="PriorGWASs.tsv", sep="\t", quote=F, row.names=F )
+    
+    res=list(log_info = Log,
+             studies = significant_studies,
+             coeffs = coefs,
+             ZMat = ZMatrix_final)
+    return(res)
+    
+  }
+  
   all_uni_coefs %>%
     filter(.data$P==min(.data$P)) %>%
     pull(.data$study) -> significant_studies
