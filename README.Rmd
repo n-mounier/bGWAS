@@ -17,7 +17,7 @@ A = readRDS("inst/Data/A.RDS")
 devtools::build_manual()
 system("mv ../bGWAS_1.0.0.pdf doc/bGWAS-manual.pdf")
 #
-#remove.packages("bGWAS")
+remove.packages("bGWAS")
 ```
 
 
@@ -116,7 +116,7 @@ You can install the current version of `bGWAS` with:
 ```{r install-package, echo=TRUE, message=FALSE, results='hide'}
 # Directly install the package from github
 # install.packages("remotes")
-#remotes::install_github("n-mounier/bGWAS")
+remotes::install_github("n-mounier/bGWAS")
 library(bGWAS)
 ```
 <!--- Note: using remotes instead of devtools leads to re-build the package
