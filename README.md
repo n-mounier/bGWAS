@@ -40,7 +40,7 @@ prior effects are directly estimated from publicly available GWASs
 (currently, a set of 38 studies, last update 20-08-2019 - hereinafter
 referred to as “prior GWASs” or “risk factors”). Only prior GWASs having
 a significant causal effect on the focal phenotype, identified using a
-multivariate Mendelian Randomization (MR) approach, are used to
+multivariable Mendelian Randomization (MR) approach, are used to
 calculate the prior effects. Causal effects are estimated masking the
 focal chromosome to ensure independence, and the prior effects are
 estimated as described in the figure below.  
@@ -80,7 +80,7 @@ The principal functions available are:
     creates a Manhattan Plot from an object of class *bGWAS*
 
   - **`extract_MRcoeffs_bGWAS()`**  
-    returns multivariate MR coefficients (1 estimate using all
+    returns multivariable MR coefficients (1 estimate using all
     chromosomes + 22 estimates with 1 chromosome masked) from an object
     of class *bGWAS*
 
@@ -106,6 +106,8 @@ You can install the current version of `bGWAS` with:
 remotes::install_github("n-mounier/bGWAS")
 library(bGWAS)
 ```
+
+    ## Warning: package 'dplyr' was built under R version 3.6.2
 
 <!--- Note: using remotes instead of devtools leads to re-build the package
 and apparently, it may be a problem with R 3.4 and macOS, 
@@ -156,7 +158,7 @@ contains the Z-scores for all prior GWASs :
 <ul>
 
 *ZMatrix\_MR.csv.gz*: Z-scores (strong instruments only) used for
-multivariate MR,  
+multivariable MR,  
 *ZMatrix\_Full.csv.gz*: Z-scores (all SNPs) used to calculate the prior
 Z-scores,  
 *AvailableStudies.tsv*: A file containing information about the prior
@@ -411,8 +413,8 @@ print_log_bGWAS(A)
     ## > Performing MR  
     ## #Preparation of the MR analyses to identify significant studies... 
     ## Conventionnal GWAS of interest : GWAS
-    ## # Univariate regressions for each trait... 
-    ##   Number of trait-specific instruments per univariate regression: 
+    ## # Univariable regressions for each trait... 
+    ##   Number of trait-specific instruments per univariable regression: 
     ##   . Body Mass Index (GIANT) : 59 
     ##   . Coronary Artery Disease (CARDIoGRAM) : 6 
     ##   . Years of Schooling (SSGAC) : 83 
@@ -421,7 +423,7 @@ print_log_bGWAS(A)
     ##   . College Completion (SSGAC) : 4 
     ## Done! 
     ## # Stepwise selection (all traits)... 
-    ## Studies tested (reaching p<0.05 in univariate models) :  Years of Schooling (SSGAC)  Body Mass Index (GIANT)  Coronary Artery Disease (CARDIoGRAM)  Systolic Blood Pressure (ICBP)  Diastolic Blood Pressure (ICBP)
+    ## Studies tested (reaching p<0.05 in univariable models) :  Years of Schooling (SSGAC)  Body Mass Index (GIANT)  Coronary Artery Disease (CARDIoGRAM)  Systolic Blood Pressure (ICBP)  Diastolic Blood Pressure (ICBP)
     ## Adding the first study :Years of Schooling (SSGAC) 
     ## #Test if any study can be added with p<0.05 
     ## Adding one study :Systolic Blood Pressure (ICBP) 
@@ -449,8 +451,8 @@ print_log_bGWAS(A)
     ## - Years of Schooling (SSGAC)- Body Mass Index (GIANT)- Coronary Artery Disease (CARDIoGRAM)- Diastolic Blood Pressure (ICBP)
     ## 
     ## Estimating adjusted R-squared: 
-    ## - in-sample adjusted R-squared for the all-chromosomes multivariate regression is 0.5534 
-    ## - out-of-sample R-squared (masking one chromosome at a time), for the multivariate regression will be estimated when calculating the prior. 
+    ## - in-sample adjusted R-squared for the all-chromosomes multivariable regression is 0.5534 
+    ## - out-of-sample R-squared (masking one chromosome at a time), for the multivariable regression will be estimated when calculating the prior. 
     ## 
     ## 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
@@ -752,9 +754,9 @@ manhattan_plot_bGWAS(A, results="posterior")
 
   - **<name>.log** - log file  
   - **PriorGWASs.tsv** - contains information about all prior GWASs
-    (general info + status (used/removed) + univariate/multivariate MR
+    (general info + status (used/removed) + univariable/multivariable MR
     estimates)  
-  - **CoefficientsByChromosome.csv** - contains the multivariate MR
+  - **CoefficientsByChromosome.csv** - contains the multivariable MR
     estimates when masking the focal chromosome (22 coefficients for
     each prior GWASs used for prior estimation)  
   - **PriorBFp.csv** - contains BF and p-values, prior, posterior and

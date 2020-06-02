@@ -386,7 +386,7 @@ coefficients_plot_bGWAS <- function(obj, save_file=F, file_name=NULL){
 
    ggplot2::labs(title = "") +
    ggplot2::coord_flip() +  # flip coordinates (puts labels on y axis)
-   ggplot2::xlab("") + ggplot2::ylab("Multivariate MR causal effect estimates (95% CI)") +
+   ggplot2::xlab("") + ggplot2::ylab("Multivariable MR causal effect estimates (95% CI)") +
    apatheme  # use a white background
   
  # "coefficient estimates"
@@ -548,7 +548,7 @@ extract_results_bGWAS <- function(obj, SNPs="significant", results="BF"){
 
 #' Extract MR coefficients from bGWAS results
 #'
-#' Extracts MR coefficients (multivariate genome-wide and per-chromosome estimates)
+#' Extracts MR coefficients (multivariable genome-wide and per-chromosome estimates)
 #'
 #' @param obj an object of class bGWAS created using \code{\link{bGWAS}()}
 #'

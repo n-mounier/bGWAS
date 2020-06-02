@@ -27,7 +27,7 @@ Now, the posterior effects (`mu_posterior_estimate` - `mu_posterior_std_error`) 
 - Stepwise selection : `stepwise_threshold` and studies tested       
 
 By default, the stepwise selection threshold was set to : 0.05 / (the number of prior GWASs used). Now, we allow the user to provide a custom threshold (that could be less stringent, since some of the prior GWASs might be correlated).  
-We also changed the subset of studies included in the stepwise selection procedure: to increase the robustness of the study identification, only the ones reaching nominal significance in univariate regression are included and tested (note that this does not affect the `stepwise_threshold` value).    
+We also changed the subset of studies included in the stepwise selection procedure: to increase the robustness of the study identification, only the ones reaching nominal significance in univariable regression are included and tested (note that this does not affect the `stepwise_threshold` value).    
 If convergence is not achieved after 50 iterations in the stepwise procedure, there is probably a loop (adding/removing the same studies iteratively). In such cases, the analysis is stopped and the user is invited to relaunch the analysis with a different set of `prior_studies` to avoid this behavior.     
 
 - Update of the Z-matrices files    
@@ -37,7 +37,7 @@ We updated the Z-matrices files, to reduce the set of prior GWASs and exclude so
 
 - Minimum number of instruments for MR    
 
-Initially, all prior GWASs with at least two instruments were kept to be tested in the multivariate model. This number was arbitrary, and we now allow the user to specify the minimum number of instruments that should be used  (`MR_ninstruments`).    
+Initially, all prior GWASs with at least two instruments were kept to be tested in the multivariable model. This number was arbitrary, and we now allow the user to specify the minimum number of instruments that should be used  (`MR_ninstruments`).    
 
 - Pruning of MR instruments    
 
@@ -86,7 +86,7 @@ When only one prior GWAS is used, the previous version was using z-score > thres
 ## Changes   
 - Clarification of the out-of-sample R2 and squared correlation estimation reported 
 
-These values are estimated using only the instruments initially selected for the multivariate MR model (not all SNPs). The predicted values of the instruments obtained when masking the chromosomes they are located on are used to calculate the out-of-sample R2 and the out-of-sample squared correlation. This is now more explicitly indicated in the log file.     
+These values are estimated using only the instruments initially selected for the multivariable MR model (not all SNPs). The predicted values of the instruments obtained when masking the chromosomes they are located on are used to calculate the out-of-sample R2 and the out-of-sample squared correlation. This is now more explicitly indicated in the log file.     
 Note that the R2 and the squared correlation can differ because the regression model does not include an intercept.       
 
 - Information about the correlation between prior and observed effects    
@@ -97,10 +97,10 @@ In addition to the out-of-sample R2 and squared correlation, the correlation bet
 # bGWAS 0.3.1 (2018-10-04)
 
 ## Changes
-- Modification of the selection of traits in the multivariate MR model
+- Modification of the selection of traits in the multivariable MR model
 
 The matrix of instruments use for each model should be specific to the traits used by the model, i.e. all the models we want to compare will have a different number of observations, and we can't use AIC to compare them anymore.    
-We implemented a stepwise approach, based on p-value to decide if a trait should be included or not. We start with a model including only the most significant study (univariate), and try to add, one by one, all the remaining studies (and update the instruments used for each model). If one of the studies has a p-value < 0.05 / number of studies tested, the most significant one is added to the model (if the univariate and multivariate effect estimate are in the same direction, otherwise the study is discarded). The model is updated to include these 2 studies, and we test if any of the studies in the updated model has a p-value > 0.05 / number of studies tested. We keep adding/removing studies until we obtain a definitive set of studies (convergence).    
+We implemented a stepwise approach, based on p-value to decide if a trait should be included or not. We start with a model including only the most significant study (univariable), and try to add, one by one, all the remaining studies (and update the instruments used for each model). If one of the studies has a p-value < 0.05 / number of studies tested, the most significant one is added to the model (if the univariable and multivariable effect estimate are in the same direction, otherwise the study is discarded). The model is updated to include these 2 studies, and we test if any of the studies in the updated model has a p-value > 0.05 / number of studies tested. We keep adding/removing studies until we obtain a definitive set of studies (convergence).    
 
 - Modification of the out-of-sample R2
 

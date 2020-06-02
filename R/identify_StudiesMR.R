@@ -1,10 +1,10 @@
-###### Function to identifiy studies significantly affecting trait of interest - multivariate MR ######
+###### Function to identifiy studies significantly affecting trait of interest - multivariable MR ######
 
 
 
-# #' Identify studies for prior using multivariate MR
+# #' Identify studies for prior using multivariable MR
 # #'
-# #' From a pruned Z-matrix of strong MR instruments, performs multivariate MR
+# #' From a pruned Z-matrix of strong MR instruments, performs multivariable MR
 # #'
 # #' @inheritParams bGWAS
 # NOT EXPORTED
@@ -60,11 +60,11 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
     return(Zmat)
   }
   
-  # Compute and save the univariate regressions (used to check directionnality in multivariate regression):
-  tmp = paste0("# Univariate regressions for each trait... \n")
+  # Compute and save the univariable regressions (used to check directionnality in multivariable regression):
+  tmp = paste0("# Univariable regressions for each trait... \n")
   Log = update_log(Log, tmp, verbose)
   
-  tmp= "  Number of trait-specific instruments per univariate regression: \n"
+  tmp= "  Number of trait-specific instruments per univariable regression: \n"
   Log = update_log(Log, tmp, verbose)
   
   Zlimit = stats::qnorm(MR_threshold/2, lower.tail = F)
@@ -102,7 +102,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
     set_names(c("study", "estimate", "std_error", "Tstat", "P",
                 "adj_Rsquared", "Rsquared")) -> all_uni_coefs
   
-  if(save_files){ # add univariate coeffs
+  if(save_files){ # add univariable coeffs
     order_inFiles = match(all_uni_coefs$study, Files_Info$File)
     Files_Info$uni_estimate = NA
     Files_Info$uni_estimate[order_inFiles] = pull(all_uni_coefs, .data$estimate)
@@ -197,9 +197,9 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
       .["adj.r.squared"] %>% 
       as.numeric() -> R2_Multi 
     
-    tmp = paste0("- in-sample adjusted R-squared for the all-chromosomes multivariate regression is ", round(R2_Multi,4), " \n")
+    tmp = paste0("- in-sample adjusted R-squared for the all-chromosomes multivariable regression is ", round(R2_Multi,4), " \n")
     Log = update_log(Log, tmp, verbose)
-    tmp = paste0("- out-of-sample R-squared (masking one chromosome at a time), for the multivariate regression will be estimated when calculating the prior. \n")
+    tmp = paste0("- out-of-sample R-squared (masking one chromosome at a time), for the multivariable regression will be estimated when calculating the prior. \n")
     Log = update_log(Log, tmp, verbose)
     
     
@@ -228,7 +228,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
     filter(P<0.05) %>%
     pull(.data$study) ->  studies_to_test
   
-  tmp = paste0("Studies tested (reaching p<0.05 in univariate models) : \n ", paste(get_names(c(significant_studies,studies_to_test), Z_matrices), collapse = " \n "), "\n")
+  tmp = paste0("Studies tested (reaching p<0.05 in univariable models) : \n ", paste(get_names(c(significant_studies,studies_to_test), Z_matrices), collapse = " \n "), "\n")
   Log = update_log(Log, tmp, verbose)
   
   
@@ -324,7 +324,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
         pull(.data$Estimate) -> ratio
       
       if(ratio<0){
-        tmp = paste0("Study :", get_names(study_to_add, Z_matrices), " cannot be added, direction is not consistent between univariate and multivariate model.\n")
+        tmp = paste0("Study :", get_names(study_to_add, Z_matrices), " cannot be added, direction is not consistent between univariable and multivariable model.\n")
         Log = update_log(Log, tmp, verbose)
         
         studies_to_test[!studies_to_test == study_to_add] -> studies_to_test
@@ -387,7 +387,7 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
     Log = update_log(Log, tmp, verbose)
     
     
-    # Remove traits with multivariate p-value larger that 0.05
+    # Remove traits with multivariable p-value larger that 0.05
     coefs %>%
       arrange(desc(.data$`Pr(>|t|)`)) -> coefs
     
@@ -487,9 +487,9 @@ identify_studiesMR <- function(ZMatrix, MR_shrinkage, MR_threshold, stepwise_thr
   summary_lm["adj.r.squared"] %>% 
     as.numeric() -> R2_Multi 
   
-  tmp = paste0("- in-sample adjusted R-squared for the all-chromosomes multivariate regression is ", round(R2_Multi,4), " \n")
+  tmp = paste0("- in-sample adjusted R-squared for the all-chromosomes multivariable regression is ", round(R2_Multi,4), " \n")
   Log = update_log(Log, tmp, verbose)
-  tmp = paste0("- out-of-sample R-squared (masking one chromosome at a time), for the multivariate regression will be estimated when calculating the prior. \n")
+  tmp = paste0("- out-of-sample R-squared (masking one chromosome at a time), for the multivariable regression will be estimated when calculating the prior. \n")
   Log = update_log(Log, tmp, verbose)
   
   

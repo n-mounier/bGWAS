@@ -14,5 +14,5 @@ a \code{tibble} containing the MR coefficients (1 estimate using
 all chromosomes + 22 estimates with 1 chromosome masked)
 }
 \description{
-Extracts MR coefficients (multivariate genome-wide and per-chromosome estimates)
+Extracts MR coefficients (multivariable genome-wide and per-chromosome estimates)
 }

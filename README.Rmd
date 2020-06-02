@@ -71,7 +71,7 @@ Note: some Prior GWASs have been removed, you can find more details [here](doc/Z
 ## Overview
 [//]:*******
 
-bGWAS is an R-package to perform a Bayesian GWAS (Genome Wide Association Study), using summary statistics from a conventional GWAS as input. The aim of the approach is to increase power by leveraging information from related traits and by comparing the observed Z-scores from the focal phenotype (provided as input) to prior effects. These prior effects are directly estimated from publicly available GWASs (currently, a set of 38 studies, last update 20-08-2019 - hereinafter referred to as "prior GWASs" or "risk factors"). Only prior GWASs having a significant causal effect on the focal phenotype, identified using a multivariate Mendelian Randomization (MR) approach, are used to calculate the prior effects. Causal effects are estimated masking the focal chromosome to ensure independence, and the prior effects are estimated as described in the figure below.         
+bGWAS is an R-package to perform a Bayesian GWAS (Genome Wide Association Study), using summary statistics from a conventional GWAS as input. The aim of the approach is to increase power by leveraging information from related traits and by comparing the observed Z-scores from the focal phenotype (provided as input) to prior effects. These prior effects are directly estimated from publicly available GWASs (currently, a set of 38 studies, last update 20-08-2019 - hereinafter referred to as "prior GWASs" or "risk factors"). Only prior GWASs having a significant causal effect on the focal phenotype, identified using a multivariable Mendelian Randomization (MR) approach, are used to calculate the prior effects. Causal effects are estimated masking the focal chromosome to ensure independence, and the prior effects are estimated as described in the figure below.         
 <img src="inst/Figures/PriorEstimation.jpg" align="center" height=300/>    
 
 Observed and prior effects are compared using Bayes Factors. Significance is assessed by calculating the probability of observing a value larger than the observed BF (P-value) given the prior distribution. This is done by decomposing the analytical form of the BFs and using an approximation for most BFs to make the computation faster. Prior, posterior and direct effects, alongside BFs and p-values are returned. Note that prior, posterior and direct effects are estimated on the Z-score scale, but are automatically rescaled to beta scale if possible.  
@@ -96,7 +96,7 @@ returns results (prior, posterior and direct estimate / standard-error + p-value
 creates a Manhattan Plot from an object of class *bGWAS*  
 
 -   **`extract_MRcoeffs_bGWAS()`**    
-returns multivariate MR coefficients (1 estimate using all chromosomes + 22 estimates with 1 chromosome masked) from an object of class *bGWAS*   
+returns multivariable MR coefficients (1 estimate using all chromosomes + 22 estimates with 1 chromosome masked) from an object of class *bGWAS*   
 
 -   **`coefficients_plot_bGWAS()`**   
 creates a Coefficients Plot (causal effect of each prior GWASs on the focal phenotype) from an object of class *bGWAS*  
@@ -142,7 +142,7 @@ If you want the prior/posterior/corrected effects to be rescaled, please make su
 #### 2. Prior *GWASs* - Z-Matrix files   
    
 These files should be downloaded separately and stored in `~/ZMatrices` or in the folder specified when launching the analysis. These files contains the Z-scores for all prior GWASs :    
-<ul><ul>   *ZMatrix_MR.csv.gz*: Z-scores (strong instruments only) used for multivariate MR,   
+<ul><ul>   *ZMatrix_MR.csv.gz*: Z-scores (strong instruments only) used for multivariable MR,   
        *ZMatrix_Full.csv.gz*: Z-scores (all SNPs) used to calculate the prior Z-scores,     
        *AvailableStudies.tsv*: A file containing information about the prior GWASs available.  </ul></ul>  
 
@@ -301,8 +301,8 @@ manhattan_plot_bGWAS(A, results="posterior")
    
 ##### Aditionnaly, if `save_files=TRUE`, several files are created in the folder `./<name>/` :
 -   **<name>.log** - log file  
--   **PriorGWASs.tsv** - contains information about all prior GWASs (general info + status (used/removed) + univariate/multivariate MR estimates)   
--   **CoefficientsByChromosome.csv** - contains the multivariate MR estimates when masking the focal chromosome (22 coefficients for each prior GWASs used for prior estimation)   
+-   **PriorGWASs.tsv** - contains information about all prior GWASs (general info + status (used/removed) + univariable/multivariable MR estimates)   
+-   **CoefficientsByChromosome.csv** - contains the multivariable MR estimates when masking the focal chromosome (22 coefficients for each prior GWASs used for prior estimation)   
 -   **PriorBFp.csv** - contains BF and p-values, prior, posterior and direct effects estimates for all SNPs      
 -   **SignificantSNPs.csv** - contains BF and p-values, prior, posterior and direct effects estimates for a subset of significant SNPs (identified according to specified parameters)
 

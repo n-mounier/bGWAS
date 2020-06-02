@@ -15,23 +15,23 @@ The output files created are:
         Name : prior GWAS name  <br/>   
         Trait : phenotypical category (both Systolic and Diastiolic Blood Pressure are part of "Blood Pressure" for example)   <br/> 
         status : has the file been used to create the prior? (can be "USED", "Excluded by user", "Excluded for MR: removale reason")    <br/>
-        uni_estimate : causal effect estimate from univariate MR     <br/>
-        uni_std_error	: causal effect standard error from univariate MR    <br/>
-        uni_T	: T-statistic from univariate MR    <br/>
-        uni_P : p-value from univariate MR    <br/>
-        uni_adj_Rsquared : adjusted R squared from univariate MR     <br/>
-        uni_Rsquared : R squared from univariate MR     	<br/>
-        multi_estimate : causal effect estimate from multivariate MR     <br/>
-        multi_std_error	: causal effect standard error from multivariate MR   <br/>  
-        multi_T	: T-statistic from multivariate MR     <br/>
-        multi_P: p-value estimate from multivariate MR   <br/>  </ul>
+        uni_estimate : causal effect estimate from uniivariable MR     <br/>
+        uni_std_error	: causal effect standard error from uniivariable MR    <br/>
+        uni_T	: T-statistic from uniivariable MR    <br/>
+        uni_P : p-value from uniivariable MR    <br/>
+        uni_adj_Rsquared : adjusted R squared from uniivariable MR     <br/>
+        uni_Rsquared : R squared from uniivariable MR     	<br/>
+        multi_estimate : causal effect estimate from multivariable MR     <br/>
+        multi_std_error	: causal effect standard error from multivariable MR   <br/>  
+        multi_T	: T-statistic from multivariable MR     <br/>
+        multi_P: p-value estimate from multivariable MR   <br/>  </ul>
 
 -   **CoefficientsByChromosome.csv** : contains the MR estimates when masking the focal chromosome (22 coefficients / prior GWASs used for prior estimation)   
 <ul>    study : everything that is printed during a bGWAS analysis (if `verbose=TRUE`) <br/>     
-        estimate : causal effect estimate from multivariate MR (masking one chromosome)    <br/>
-        std_error : causal effect standard error from multivariate MR (masking one chromosome)  <br/>  
-        T : T-statistics from multivariate MR (masking one chromosome)   <br/> 
-        P : p-value from multivariate MR (masking one chromosome)  <br/>   
+        estimate : causal effect estimate from multivariable MR (masking one chromosome)    <br/>
+        std_error : causal effect standard error from multivariable MR (masking one chromosome)  <br/>  
+        T : T-statistics from multivariable MR (masking one chromosome)   <br/> 
+        P : p-value from multivariable MR (masking one chromosome)  <br/>   
         chrm : chromosome masked     <br/> </ul>
 
 -   **PriorBFp.csv** : contains BF and p-values, prior, posterior and direct effects estimates for all SNPs      
