@@ -76,7 +76,7 @@ R.utils::gzip('~/Documents/SGG/Projects/Packaging/bGWAS/inst/Data/Z_Matrices/ZMa
 
 
 ## Rdata for tests
-# last update, 2019/11/25
+# last update, 2020/06/07
 library(bGWAS)
 
 data("SmallGWAS_Timmers2019")
