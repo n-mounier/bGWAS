@@ -17,7 +17,10 @@ sticker(imgurl,
         s_x=1, s_y=.8, s_width=.75,
         filename="inst/Figures/logo.png", dpi=2000) --->
 
-:information\_source: `bGWAS` has been updated to version 1.0.1.  
+:arrow\_right: ESHG poster is available
+[here](doc/P17.051.A_NinonMounier.pdf).
+
+:information\_source: `bGWAS` has been updated to version 1.0.2.  
 :warning: 28/10/2019 : The variance of the prior effects has been
 modified. If you used a previous version of the package, please re-run
 yout analysis using this new version to get more accurate results.  
@@ -226,22 +229,22 @@ AllStudies[AllStudies$ID %in% MyStudies, ]
     ## 4 tag.evrsmk.tbl.gz                                
     ## 5 tag.former.tbl.gz                                
     ## 6 tag.logonset.tbl.gz                              
-    ##   Name       ID Trait  Consortium Reference   Download    Remarks    N_SNPs
-    ##   <chr>   <dbl> <chr>  <chr>      <chr>       <chr>       <chr>       <dbl>
-    ## 1 Body M…     1 Body … GIANT      https://ww… https://po… <NA>       6.81e6
-    ## 2 Heart …    23 Heart… HRgene     https://ww… http://wal… <NA>       6.81e6
-    ## 3 Smokin…    35 Smoki… TAG        https://ww… https://ww… Other GWA… 6.63e6
-    ## 4 Smokin…    36 Smoki… TAG        https://ww… https://ww… Other GWA… 6.78e6
-    ## 5 Smokin…    37 Smoki… TAG        https://ww… https://ww… Other GWA… 6.78e6
-    ## 6 Smokin…    38 Smoki… TAG        https://ww… https://ww… Other GWA… 6.77e6
-    ##   N_Instruments
-    ##           <dbl>
-    ## 1         10052
-    ## 2          3229
-    ## 3           558
-    ## 4            94
-    ## 5           184
-    ## 6            34
+    ##   Name                                  ID Trait           Consortium
+    ##   <chr>                              <dbl> <chr>           <chr>     
+    ## 1 Body Mass Index (GIANT)                1 Body Mass Index GIANT     
+    ## 2 Heart Rate (HRgene)                   23 Heart Rate      HRgene    
+    ## 3 Smoking - cigarettes per day (TAG)    35 Smoking         TAG       
+    ## 4 Smoking - ever smoked (TAG)           36 Smoking         TAG       
+    ## 5 Smoking - former smoker (TAG)         37 Smoking         TAG       
+    ## 6 Smoking - age of onset (TAG)          38 Smoking         TAG       
+    ##   Reference        Download               Remarks           N_SNPs N_Instruments
+    ##   <chr>            <chr>                  <chr>              <dbl>         <dbl>
+    ## 1 https://www.ncb… https://portals.broad… <NA>              6.81e6         10052
+    ## 2 https://www.ncb… http://walker05.u.hpc… <NA>              6.81e6          3229
+    ## 3 https://www.ncb… https://www.med.unc.e… Other GWAS Data … 6.63e6           558
+    ## 4 https://www.ncb… https://www.med.unc.e… Other GWAS Data … 6.78e6            94
+    ## 5 https://www.ncb… https://www.med.unc.e… Other GWAS Data … 6.78e6           184
+    ## 6 https://www.ncb… https://www.med.unc.e… Other GWAS Data … 6.77e6            34
 
 ### Analysis
 
@@ -376,7 +379,7 @@ print_log_bGWAS(A)
     ## The conventional GWAS used as input the object: "GWAS".  
     ##    SNPID column, ok - ALT column, ok - REF column, ok - BETA column, ok - SE column, ok
     ## Posterior effects will be rescaled using BETA and SE.
-    ## The analysis will be run in the folder: "/Users/nmounier/bin/annovar".  
+    ## The analysis will be run in the folder: "/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS".  
     ## The p-value threshold used for selecting MR instruments is: 1e-06.  
     ## The minimum number instruments required for each trait is: 3.  
     ## The distance used for pruning MR instruments is: 500Kb.  
@@ -610,7 +613,7 @@ print_log_bGWAS(A)
     ## 
     ## 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 2 minute(s) and 18 second(s).
+    ## Time of the analysis: 2 minute(s) and 16 second(s).
     ```
 
 </details>
@@ -642,38 +645,38 @@ hits
     ## 12 rs59613878          4   3139152 T     C      0.0206 0.00420  4.90
     ## 13 rs34348584          3  27532704 T     C      0.0201 0.00450  4.46
     ## 14 rs4762753          12  20579969 T     G      0.0259 0.00487  5.31
-    ##    mu_prior_estimate mu_prior_std_error beta_prior_estimate
-    ##                <dbl>              <dbl>               <dbl>
-    ##  1            -0.351              0.611            -0.00192
-    ##  2             0.790              0.622             0.00324
-    ##  3             2.61               0.876             0.0101 
-    ##  4            -2.34               0.680            -0.00934
-    ##  5             3.37               0.737             0.0137 
-    ##  6            -1.72               0.631            -0.0250 
-    ##  7             2.43               0.696             0.0100 
-    ##  8            -1.69               0.608            -0.00831
-    ##  9             3.12               0.630             0.0137 
-    ## 10             1.43               0.564             0.00571
-    ## 11            -2.29               0.665            -0.00891
-    ## 12             1.78               0.607             0.00750
-    ## 13             2.11               0.698             0.00950
-    ## 14             1.16               0.611             0.00564
-    ##    beta_prior_std_error      BF     BF_p
-    ##                   <dbl>   <dbl>    <dbl>
-    ##  1              0.00334 7.00e19 5.90e-37
-    ##  2              0.00255 2.11e 7 1.51e-14
-    ##  3              0.00339 4.32e 6 1.77e-13
-    ##  4              0.00271 2.27e 5 1.78e-11
-    ##  5              0.00299 1.95e 5 2.28e-11
-    ##  6              0.00915 8.63e 4 8.38e-11
-    ##  7              0.00287 1.60e 4 1.35e- 9
-    ##  8              0.00298 9.34e 3 3.36e- 9
-    ##  9              0.00278 7.60e 3 4.79e- 9
-    ## 10              0.00225 6.04e 3 7.12e- 9
-    ## 11              0.00259 5.64e 3 8.03e- 9
-    ## 12              0.00255 4.07e 3 1.42e- 8
-    ## 13              0.00314 2.72e 3 2.89e- 8
-    ## 14              0.00298 2.14e 3 4.43e- 8
+    ##    mu_prior_estimate mu_prior_std_error beta_prior_estimate beta_prior_std_error
+    ##                <dbl>              <dbl>               <dbl>                <dbl>
+    ##  1            -0.351              0.611            -0.00192              0.00334
+    ##  2             0.790              0.622             0.00324              0.00255
+    ##  3             2.61               0.876             0.0101               0.00339
+    ##  4            -2.34               0.680            -0.00934              0.00271
+    ##  5             3.37               0.737             0.0137               0.00299
+    ##  6            -1.72               0.631            -0.0250               0.00915
+    ##  7             2.43               0.696             0.0100               0.00287
+    ##  8            -1.69               0.608            -0.00831              0.00298
+    ##  9             3.12               0.630             0.0137               0.00278
+    ## 10             1.43               0.564             0.00571              0.00225
+    ## 11            -2.29               0.665            -0.00891              0.00259
+    ## 12             1.78               0.607             0.00750              0.00255
+    ## 13             2.11               0.698             0.00950              0.00314
+    ## 14             1.16               0.611             0.00564              0.00298
+    ##         BF     BF_p
+    ##      <dbl>    <dbl>
+    ##  1 7.00e19 5.90e-37
+    ##  2 2.11e 7 1.51e-14
+    ##  3 4.32e 6 1.77e-13
+    ##  4 2.27e 5 1.78e-11
+    ##  5 1.95e 5 2.28e-11
+    ##  6 8.63e 4 8.38e-11
+    ##  7 1.60e 4 1.35e- 9
+    ##  8 9.34e 3 3.36e- 9
+    ##  9 7.60e 3 4.79e- 9
+    ## 10 6.04e 3 7.12e- 9
+    ## 11 5.64e 3 8.03e- 9
+    ## 12 4.07e 3 1.42e- 8
+    ## 13 2.72e 3 2.89e- 8
+    ## 14 2.14e 3 4.43e- 8
 
 ``` r
 all_results = extract_results_bGWAS(A, SNPs = "all")
@@ -712,12 +715,12 @@ extract_MRcoeffs_bGWAS(A)[,1:12]
     ## 2 Body Mass Index (GIANT)             
     ## 3 Coronary Artery Disease (CARDIoGRAM)
     ## 4 Diastolic Blood Pressure (ICBP)     
-    ##   study    estimate std_error Tstat        P chrm1_estimate chrm1_std_error
-    ##   <chr>       <dbl>     <dbl> <dbl>    <dbl>          <dbl>           <dbl>
-    ## 1 EDUyear…    0.187    0.0255  7.33 1.32e-11          0.187          0.0258
-    ## 2 All_anc…   -0.122    0.0248 -4.93 2.12e- 6         -0.108          0.0259
-    ## 3 cardiog…   -0.439    0.0623 -7.05 6.18e-11         -0.469          0.0616
-    ## 4 DBP        -0.248    0.0623 -3.98 1.07e- 4         -0.264          0.0619
+    ##   study         estimate std_error Tstat        P chrm1_estimate chrm1_std_error
+    ##   <chr>            <dbl>     <dbl> <dbl>    <dbl>          <dbl>           <dbl>
+    ## 1 EDUyears_201…    0.187    0.0255  7.33 1.32e-11          0.187          0.0258
+    ## 2 All_ancestri…   -0.122    0.0248 -4.93 2.12e- 6         -0.108          0.0259
+    ## 3 cardiogram_g…   -0.439    0.0623 -7.05 6.18e-11         -0.469          0.0616
+    ## 4 DBP             -0.248    0.0623 -3.98 1.07e- 4         -0.264          0.0619
     ##    chrm1_P chrm2_estimate chrm2_std_error  chrm2_P
     ##      <dbl>          <dbl>           <dbl>    <dbl>
     ## 1 2.93e-11          0.186          0.0273 3.01e-10
@@ -786,8 +789,8 @@ This method has been applied to Lifespan analysis in [McDaid et
 al](https://www.ncbi.nlm.nih.gov/pubmed/28748955) and [Timmers et
 al](https://www.ncbi.nlm.nih.gov/pubmed/30642433).  
 The most recent results (obtained using `bGWAS` version 1.0.2) are
-available [here](doc/Lifespan_Analysis.md).
-<!-- and summarised in [this poster](https://doi.org/10.5281/zenodo.3403093). -->
+available [here](doc/Lifespan_Analysis.md) and summarised in [this
+poster](doc/P17.051.A_NinonMounier.pdf).
 
 <!--- ## Application to food choices
 [//]:*******

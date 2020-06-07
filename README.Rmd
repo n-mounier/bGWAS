@@ -60,7 +60,10 @@ sticker(imgurl,
         s_x=1, s_y=.8, s_width=.75,
         filename="inst/Figures/logo.png", dpi=2000) --->
 
-:information\_source: `bGWAS` has been updated to version 1.0.1.    
+
+:arrow_right: ESHG poster is available [here](doc/P17.051.A_NinonMounier.pdf).      
+
+:information\_source: `bGWAS` has been updated to version 1.0.2.    
 :warning: 28/10/2019 : The variance of the prior effects has been modified. If you used a previous version of the package, please re-run yout analysis using this new version to get more accurate results.        
 Check the [NEWS](NEWS.md) to learn more about what has been modified\!
     
@@ -325,7 +328,7 @@ Analysis using 6 prior GWASs, for a conventional GWAS containing ~ 300,000 SNPs 
 [//]:*******
 
 This method has been applied to Lifespan analysis in [McDaid et al](https://www.ncbi.nlm.nih.gov/pubmed/28748955) and [Timmers et al](https://www.ncbi.nlm.nih.gov/pubmed/30642433).     
-The most recent results (obtained using `bGWAS` version 1.0.2) are available [here](doc/Lifespan_Analysis.md). <!-- and summarised in [this poster](https://doi.org/10.5281/zenodo.3403093). -->
+The most recent results (obtained using `bGWAS` version 1.0.2) are available [here](doc/Lifespan_Analysis.md) and summarised in [this poster](doc/P17.051.A_NinonMounier.pdf). 
 
 
 <!--- ## Application to food choices
