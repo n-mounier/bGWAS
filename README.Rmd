@@ -334,13 +334,15 @@ The most recent results (obtained using `bGWAS` version 1.0.2) are available [he
 <!--- ## Application to food choices
 [//]:*******
 
-The corrected to raw ratios (CRRs) derived from this approach have been used to study the relationship between food choices and health status in [Pirastu et al](...) --->
+The corrected to raw ratios (CRRs) derived from this approach have been used to study the relationship between food choices and health status in [Pirastu et al](https://www.biorxiv.org/content/10.1101/829952v2) --->
 
 
 ## Citation
 [//]:*******
 
-Manuscript in preparation.
+If you use the `bGWAS` package, please cite:
+
+[Ninon Mounier, Zoltán Kutalik, bGWAS: an R package to perform Bayesian Genome Wide Association Studies, Bioinformatics](https://doi.org/10.1093/bioinformatics/btaa549)
 
 ## Contact
 <mounier.ninon@gmail.com>

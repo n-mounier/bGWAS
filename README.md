@@ -799,7 +799,11 @@ The corrected to raw ratios (CRRs) derived from this approach have been used to 
 
 ## Citation
 
-Manuscript in preparation.
+If you use the `bGWAS` package, please cite:
+
+[Ninon Mounier, Zoltán Kutalik, bGWAS: an R package to perform Bayesian
+Genome Wide Association Studies,
+Bioinformatics](https://doi.org/10.1093/bioinformatics/btaa549)
 
 ## Contact
 
