@@ -5,17 +5,17 @@ sudo: required
 
 matrix:
   include:
-  # UNIX, old release (3.5.3)
+  # UNIX, old release (3.6.3)
   - r: oldrel
     script:
       - R CMD build . --compact-vignettes=gs+qpdf --resave-data
       - R CMD check *tar.gz --as-cran 
   # UNIX, release (3.6.1)
-  - r: release
-    script:
-      - R CMD build . --compact-vignettes=gs+qpdf --resave-data
-      - R CMD check *tar.gz --as-cran  
-  # MACOS, old release (3.5.3)
+  #- r: release
+  #  script:
+  #    - R CMD build . --compact-vignettes=gs+qpdf --resave-data
+  #    - R CMD check *tar.gz --as-cran  
+  # MACOS, old release (3.6.1)
   - r: oldrel
     os: osx
     before_install:
@@ -30,18 +30,18 @@ matrix:
       - R CMD build . --compact-vignettes=gs+qpdf --resave-data
       - R CMD check *tar.gz --as-cran
   # MACOS, release (3.6.1)
-  - r: release
-    os: osx
-    before_install:
-      - sudo tlmgr install framed titling      
-      # deal with clang: error: unsupported option '-fopenmp'
-      # for data.table v 1.12.4
-      - brew install llvm 
-      - export PATH="/usr/local/opt/llvm/bin:$PATH" 
-      - export LDFLAGS="-L/usr/local/opt/llvm/lib" 
-      - export CFLAGS="-I/usr/local/opt/llvm/include"
-    script:
-      - R CMD build . --compact-vignettes=gs+qpdf --resave-data
-      - R CMD check *tar.gz --as-cran
+  #- r: release
+  #  os: osx
+  #  before_install:
+  #    - sudo tlmgr install framed titling      
+  #    # deal with clang: error: unsupported option '-fopenmp'
+  #    # for data.table v 1.12.4
+  #    - brew install llvm 
+  #    - export PATH="/usr/local/opt/llvm/bin:$PATH" 
+  #    - export LDFLAGS="-L/usr/local/opt/llvm/lib" 
+  #    - export CFLAGS="-I/usr/local/opt/llvm/include"
+  #  script:
+  #    - R CMD build . --compact-vignettes=gs+qpdf --resave-data
+  #    - R CMD check *tar.gz --as-cran
 
 
