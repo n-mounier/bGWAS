@@ -1,7 +1,7 @@
 # Z-Matrix files
 [//]:========================================
 
-The Z-Matrix files are essential to create the prior. They contain summary statistics of Prior GWASs.
+The Z-Matrix files are essential to create the prior. They contain summary statistics (z-scores) of Prior GWASs.
 
 ## Description
 [//]:*******
@@ -13,8 +13,8 @@ The compressed file available contains 3 files:
      
        
 The first one, **AvailableStudies.tsv**, contains descriptive information about each prior GWAS (name of the file, trait, publication and download links). The "N_SNPs" colum contains the number of well-imputed SNPs included in the Full Z-matrix, and the "N_Instruments" contains the number of SNPs reaching p<1e-5 and included in the MR Z-Matrix for each prior GWAS.     
-The second one, **ZMatrix_Full.csv.gz**, contains genome-wide summary statistics for all Prior GWASs. These summary statitics have been obtained imputing the initial summary statistics results using [SSimp](https://github.com/zkutalik/ssimp_software) version 0.1 and UK10K data as a reference panel. All SNPs with UK10K allele frequency above 0.5 \% and imputation quality higher than 0.8 for for least 20 studies have been kept. Imputed results below this threshold have been set to NA and use as 0 when calculating the prior.   
-The last file, **ZMatrix_MR.csv.gz**, is actually a subset of the previous one. It contains only SNPs with complete observations (no missing value for any of the Prior GWASs) that are strongly associated (p<1e-5) with at least one of the Prior GWASs. It is used for the stepwise selection approach, to avoid loading a big file. Once the significant studies are identified, only relevant columns (Prior GWASs) of the **ZMatrix_Full.csv.gz** will be loaded to speed up prior estimation.
+The second one, **ZMatrix_Full.csv.gz**, contains genome-wide summary statistics (z-scores) for all Prior GWASs. These summary statitics have been obtained imputing the initial summary statistics results using [SSimp](https://github.com/zkutalik/ssimp_software) version 0.1 and UK10K data as a reference panel. All SNPs with UK10K allele frequency above 0.5 \% and imputation quality higher than 0.8 for for least 20 studies have been kept. Imputed results below this threshold have been set to NA and use as 0 when calculating the prior.   
+The last file, **ZMatrix_MR.csv.gz**, is actually a subset of the previous one. It contains only SNPs with complete observations (no missing value for any of the Prior GWASs) that are strongly associated (p<1e-5 - abs(z-score)>) with at least one of the Prior GWASs. It is used for the stepwise selection approach, to avoid loading a big file. Once the significant studies are identified, only relevant columns (Prior GWASs) of the **ZMatrix_Full.csv.gz** will be loaded to speed up prior estimation.
   
   
   
@@ -39,7 +39,7 @@ tar xzvf ZMatrices.tar.gz
 
 We do not provide scripts to modify these files, but the package can accept customized Z-Matrix as long as they use the same format. Please, make sure to:   
 1. Modify the **AvailableStudies.tsv** file, to include your own files. The "File" column must correspond to the column names of the other two files, and ID should match the order of the columns in these files. The "Name"" and	"Trait"	 columns are needed, but you could leave the other ones empty.    
-2. Create the largest Z-Matrix first, by merging all your summary statistics. The first 5 columns should be "rs", "chrm", "pos", "alt" and "ref".    
+2. Create the largest Z-Matrix first, by merging all your summary statistics. The first 5 columns should be "rs", "chrm", "pos", "alt" and "ref". All following columns names should match the "File" column from the first file, and contain z-scores.   
 3. Subset this big matrix file to keep only strong instruments (p<1e-5 for at least one prior GWAS).    
 
   
