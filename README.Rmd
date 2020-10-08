@@ -134,7 +134,7 @@ To run the analysis with `bGWAS` two inputs are needed:
 #### 1. The *GWAS* results to be tested   
 Can be a regular (space/tab/comma-separated) file or a gzipped file (.gz) or a `data.frame`. Must contain the following columns, which can have alternative names:  
 <ul>   SNP-identifier:  `rs` or `rsid`, `snp`, `snpid`, `rnpid`     
-       Alternate allele:  `a1` or `alt`, `alts`    
+       Alternate (effect) allele:  `a1` or `alt`, `alts`    
        Reference allele: `a2` or `a0`, `ref`    
        Z-statistics: `z` or `Z`, `zscore`  </ul>     
 If the Z-statistics is not present, it will be automatically calculated from effect size and standard error, in which case the following columns should be provided:     
@@ -149,7 +149,7 @@ These files should be downloaded separately and stored in `~/ZMatrices` or in th
        *ZMatrix_Full.csv.gz*: Z-scores (all SNPs) used to calculate the prior Z-scores,     
        *AvailableStudies.tsv*: A file containing information about the prior GWASs available.  </ul></ul>  
 
-You can download these files using this [link](https://drive.switch.ch/index.php/s/jvSwoIxRgCKUSI8) or following the instructions below.    
+You can download these files using this [link](https://drive.switch.ch/index.php/s/jvSwoIxRgCKUSI8) or following the instructions below. Please note that your input GWAS will be merged with the Z-Matrix files (using rsid and alleles to align effects), and that the results reported will use the Z-Matrix files chr:pos information (GRCh37 - since UK10K data has been used to imputed the prior GWASs).     
 
 - On UNIX/MACOSX, from a terminal:    
 ``` bash
