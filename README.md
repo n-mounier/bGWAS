@@ -129,7 +129,7 @@ have alternative names:
 <ul>
 
 SNP-identifier: `rs` or `rsid`, `snp`, `snpid`, `rnpid`  
-Alternate allele: `a1` or `alt`, `alts`  
+Alternate (effect) allele: `a1` or `alt`, `alts`  
 Reference allele: `a2` or `a0`, `ref`  
 Z-statistics: `z` or `Z`, `zscore`
 
@@ -173,7 +173,11 @@ GWASs available.
 
 You can download these files using this
 [link](https://drive.switch.ch/index.php/s/jvSwoIxRgCKUSI8) or following
-the instructions below.
+the instructions below. Please note that your input GWAS will be merged
+with the Z-Matrix files (using rsid and alleles to align effects), and
+that the results reported will use the Z-Matrix files chr:pos
+information (GRCh37 - since UK10K data has been used to imputed the
+prior GWASs).
 
   - On UNIX/MACOSX, from a terminal:  
 
@@ -795,7 +799,7 @@ poster](doc/P17.051.A_NinonMounier.pdf).
 <!--- ## Application to food choices
 [//]:*******
 
-The corrected to raw ratios (CRRs) derived from this approach have been used to study the relationship between food choices and health status in [Pirastu et al](...) --->
+The corrected to raw ratios (CRRs) derived from this approach have been used to study the relationship between food choices and health status in [Pirastu et al](https://www.biorxiv.org/content/10.1101/829952v2) --->
 
 ## Citation
 

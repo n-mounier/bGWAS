@@ -48,8 +48,8 @@ makeFull_ZMatrix <- function(studies=NULL, GWASData, GName,  Z_matrices="~/Z_mat
     slice(match(ZMatrix$rs, .data$rsid)) %>%
     mutate(ref = toupper(ref),
            alt = toupper(alt),
-           toupper(ZMat_alt) = toupper(ZMatrix$alt),
-           toupper(Zmat_ref) = toupper(ZMatrix$ref),
+           ZMat_alt = toupper(ZMatrix$alt),
+           Zmat_ref = toupper(ZMatrix$ref),
             aligned_Z = case_when(
               (.data$alt == .data$ZMat_alt &
                  .data$ref == .data$Zmat_ref) ~ .data$z_obs,

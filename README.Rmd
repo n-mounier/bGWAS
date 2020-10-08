@@ -15,7 +15,7 @@ options(pillar.neg=F, # do no print neg number in red
 A = readRDS("inst/Data/A.RDS")
 # automatically updates manual
 devtools::build_manual()
-system("mv ../bGWAS_1.0.0.pdf doc/bGWAS-manual.pdf")
+system("mv ../bGWAS_1.0.2.pdf doc/bGWAS-manual.pdf")
 #
 remove.packages("bGWAS")
 ```
