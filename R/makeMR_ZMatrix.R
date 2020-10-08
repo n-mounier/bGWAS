@@ -48,14 +48,16 @@ makeMR_ZMatrix <- function(prior_studies=NULL, GWASData, GName,
   
   GWASData %>%
     slice(match(ZMatrix$rs, .data$rsid)) %>%
-    mutate(ZMat_alt = ZMatrix$alt,
-           Zmat_ref = ZMatrix$ref,
-            aligned_Z = case_when(
-              (.data$alt == .data$ZMat_alt &
-                 .data$ref == .data$Zmat_ref) ~ .data$z_obs,
-              (.data$ref == .data$ZMat_alt &
-                 .data$alt == .data$Zmat_ref) ~ -.data$z_obs,
-              TRUE ~ NA_real_))-> GWASData
+    mutate(ref = toupper(ref),
+           alt = toupper(alt),
+           toupper(ZMat_alt) = toupper(ZMatrix$alt),
+           toupper(Zmat_ref) = toupper(ZMatrix$ref),
+           aligned_Z = case_when(
+             (.data$alt == .data$ZMat_alt &
+                .data$ref == .data$Zmat_ref) ~ .data$z_obs,
+             (.data$ref == .data$ZMat_alt &
+                .data$alt == .data$Zmat_ref) ~ -.data$z_obs,
+             TRUE ~ NA_real_))-> GWASData
   
   ZMatrix %>%
     mutate({{GName}} := GWASData$aligned_Z) -> ZMatrix
