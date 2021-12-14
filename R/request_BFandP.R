@@ -10,7 +10,7 @@
 
 
 
-request_BFandP <- function(Prior, sign_thresh, use_permutations = F, 
+request_BFandP <- function(Prior, parent0, sign_thresh, use_permutations = F, 
                            sign_method, save_files=F, verbose=F) {
   Log = c()
   tmp = paste0("# Computing observed Bayes Factor for all SNPs... \n")
@@ -21,19 +21,16 @@ request_BFandP <- function(Prior, sign_thresh, use_permutations = F,
   # calculate BF
   Prior %>%
     mutate(BF = stats::dnorm(mean= .data$mu_prior_estimate, 
-                             sd=sqrt(1 + .data$mu_prior_std_error**2), 
-                             x = .data$z_obs) /
+                             sd= .data$mu_prior_std_error, 
+                             x = .data$std_beta) /
              stats::dnorm(mean = 0.0, 
-                   sd=sqrt(1), 
-                   x = .data$z_obs)) %>%  # and order by BF
+                   sd=.data$std_se, 
+                   x = .data$std_beta)) %>%  # and order by BF
     arrange(desc(.data$BF)) -> Prior
   
   
   tmp = "Done! \n"
   Log = update_log(Log, tmp, verbose)
-  
-  # true Z = just rs + log.bf ???
-  
   
   
   tmp = "# Computing BF p-values... \n"
@@ -282,55 +279,18 @@ request_BFandP <- function(Prior, sign_thresh, use_permutations = F,
   }
   
   
-  ### add p-values for posterior / direct effects
-  tmp = "# Estimating p-values for posterior effects... \n"
-  Log = update_log(Log, tmp, verbose)
-  
-  Prior %>%
-    mutate(p_posterior = 2 * stats::pnorm(-abs(.data$z_posterior))) -> Prior
-  
-  
-  if(sign_method == "fdr"){
-    tmp = "# Estimating FDR (Benjamini-Hochberg procedure) for posterior effects... \n"
-    Log = update_log(Log, tmp, verbose)
-    
-    Prior %>%
-      mutate(fdr_posterior = stats::p.adjust(.data$p_posterior)) -> Prior
-    
-    
-  }
-  
-  
-  tmp = "Done! \n"
-  Log = update_log(Log, tmp, verbose)
-  
-  tmp = "# Estimating p-values for direct effects... \n"
-  Log = update_log(Log, tmp, verbose)
-  
-  Prior %>%
-    mutate(p_direct = 2 * stats::pnorm(-abs(.data$z_direct))) -> Prior
-  
-  
-  if(sign_method == "fdr"){
-    tmp = "# Estimating FDR (Benjamini-Hochberg procedure) for direct effects... \n"
-    Log = update_log(Log, tmp, verbose)
-    
-    Prior %>%
-      mutate(fdr_direct = stats::p.adjust(.data$p_direct)) -> Prior
-    
-    
-  }
-  
-  
-  tmp = "Done! \n"
-  Log = update_log(Log, tmp, verbose)
-  
   
   
   if(save_files){
-    system("rm Prior.csv")
-    readr::write_csv(Prior, "PriorBFp.csv")
-    tmp = "The file Prior.csv has been updated into Prior_BFp.csv \n"
+    if(parent0=="mat0"){
+      system("rm Prior_mat0.csv")
+      readr::write_csv(path="PriorBFp_mat0.csv", x=Prior)
+      tmp = paste0("The file Prior_mat0.csv has been updated into Prior_BFp_mat0.csv. \n")
+    } else {
+      system("rm Prior_pat0.csv")
+      readr::write_csv(path="PriorBFp_pat0.csv", x=Prior)
+      tmp = paste0("The file Prior_pat0.csv has been updated into Prior_BFp_pat0.csv. \n")
+    }
     Log = update_log(Log, tmp, verbose)
     
   }
