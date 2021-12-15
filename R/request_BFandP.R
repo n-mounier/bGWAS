@@ -21,7 +21,7 @@ request_BFandP <- function(Prior, parent0, sign_thresh, use_permutations = F,
   # calculate BF
   Prior %>%
     mutate(BF = stats::dnorm(mean= .data$mu_prior_estimate, 
-                             sd= .data$mu_prior_std_error, 
+                             sd= sqrt(.data$mu_prior_std_error^2+.data$std_se^2), 
                              x = .data$std_beta) /
              stats::dnorm(mean = 0.0, 
                    sd=.data$std_se, 
