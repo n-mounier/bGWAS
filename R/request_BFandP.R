@@ -98,7 +98,7 @@ request_BFandP <- function(Prior, parent0, sign_thresh, use_permutations = F,
       #   arrange(desc(.data$BF.null))-> Prior_BF
       mySE = mean(Prior$std_se)
       Prior %>%
-        mutate(std_beta = stats::rnorm(N.one.set.of.nulls, 0, mySE),
+        mutate(std_beta = stats::rnorm(N.one.set.of.nulls, 0, 1/sqrt(.data$N)),
                BF.null =  stats::dnorm(mean= .data$mu_prior_estimate,
                                     sd=sqrt(.data$std_se^2+.data$mu_prior_std_error**2),
                                     x=.data$std_beta) /
