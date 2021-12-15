@@ -87,14 +87,24 @@ request_BFandP <- function(Prior, parent0, sign_thresh, use_permutations = F,
       # simulate z-score from normal distribution
       # ... but this does not account for the real "true distribution" (inflation?)
       # should we shuffle z-scores instead?
+      # Prior %>%
+      #   mutate(z = stats::rnorm(N.one.set.of.nulls, 0, 1),
+      #          BF.null =  stats::dnorm(mean= .data$mu_prior_estimate, 
+      #                               sd=sqrt(1+.data$mu_prior_std_error**2), 
+      #                               x=.data$z) /
+      #            stats::dnorm(mean= 0.0, 
+      #                         sd=sqrt(1),
+      #                         x=.data$z)) %>%
+      #   arrange(desc(.data$BF.null))-> Prior_BF
+      mySE = mean(Prior$std_se)
       Prior %>%
-        mutate(z = stats::rnorm(N.one.set.of.nulls, 0, 1),
-               BF.null =  stats::dnorm(mean= .data$mu_prior_estimate, 
-                                    sd=sqrt(1+.data$mu_prior_std_error**2), 
-                                    x=.data$z) /
-                 stats::dnorm(mean= 0.0, 
-                              sd=sqrt(1),
-                              x=.data$z)) %>%
+        mutate(std_beta = stats::rnorm(N.one.set.of.nulls, 0, mySE),
+               BF.null =  stats::dnorm(mean= .data$mu_prior_estimate,
+                                    sd=sqrt(.data$std_se^2+.data$mu_prior_std_error**2),
+                                    x=.data$std_beta) /
+                 stats::dnorm(mean= 0.0,
+                              sd=.data$std_se,
+                              x=.data$std_beta)) %>%
         arrange(desc(.data$BF.null))-> Prior_BF
      
       
@@ -129,16 +139,28 @@ request_BFandP <- function(Prior, parent0, sign_thresh, use_permutations = F,
     ### Functions to estimate p-value from BF/prior distribution
     ## Calculate a p-value using the non-linear quantiles
     
-    # Get p-value, for one BF value, using one vector of quantiles, one vector of weights, and one variance value
-    get_OneP <- function(myBF, perc, sigma2, weights){
-      suppressWarnings({ # warnings when p-value = NA (small BFS), deal with it below
-        pPercentiles = stats::pnorm( (-perc/sigma2) +
-                                sqrt(1+sigma2)/sigma2 *
-                                sqrt(perc**2 + 2*sigma2 * log(myBF * sqrt(1+sigma2))), lower.tail=F) +
-          stats::pnorm((-perc/sigma2) -
-                  sqrt(1+sigma2)/sigma2 *
-                  sqrt(perc**2 + 2*sigma2 * log(myBF * sqrt(1+sigma2))), lower.tail=T)
+    # Get p-value, for one BF value, using one vector of quantiles, one vector of weights, and one variance value: observed / prior
+    #d$my_p = apply(d, 1, function(x) get_OneP(x[1], quantiles, se2, sigma2, wghts))
+    
+    get_OneP <- function(myBF, perc, se2, sigma2, weights){
+      # # explicitly calculate x1 and x2 first
+      a = -1/(2*(se2+sigma2)) + 1/(2*se2)
+      b = perc / (se2+sigma2)
+      c = -perc**2 / (2*(se2+sigma2)) - log(myBF * sqrt(se2+sigma2))
+      delta = b^2 - 4*a*c
+      suppressWarnings({ # warnings when some delta are < 0 -> p=1
+      x1 = (-b + sqrt(delta)) / (2*a)
+      x2 = (-b - sqrt(delta)) / (2*a)
       })
+       
+      # stats::pnorm( x1, lower.tail=F) +
+      # stats::pnorm( x2, lower.tail=T)
+        
+      suppressWarnings({ # warnings when p-value = NA (small BFS), deal with it below
+        pPercentiles = stats::pnorm( x1, mean = 0, sd = sqrt(se2), lower.tail=F) +
+          stats::pnorm(x2, mean = 0, sd = sqrt(se2), lower.tail=T)
+      })
+      
       pPercentiles[is.na(pPercentiles)]=1
       # multiply each p-value by the according weight
       p = pPercentiles %*% weights
@@ -146,15 +168,17 @@ request_BFandP <- function(Prior, parent0, sign_thresh, use_permutations = F,
     }
     
     ## Get p-value, for one BF value, using all priors ("true value")
-    get_fullP <- function(myBF, Data){ # BF : value - Data : data.frame with prior_estimate and prior_std_error columns
+    get_fullP <- function(myBF, mySE, Data){ # BF : value - Data : data.frame with prior_estimate and prior_std_error columns
       suppressWarnings({ # warnings when p-value = NA (small BFS), deal with it below
         Data %>%
-          mutate( pSNP = stats::pnorm( (-.data$mu_prior_estimate/(.data$mu_prior_std_error**2)) +
-                                  sqrt(1+.data$mu_prior_std_error**2)/(.data$mu_prior_std_error**2) *
-                                  sqrt(.data$mu_prior_estimate**2 + 2*.data$mu_prior_std_error**2 * log(myBF * sqrt(1+.data$mu_prior_std_error**2))), lower.tail=F) +
-                    stats::pnorm((-.data$mu_prior_estimate/(.data$mu_prior_std_error**2)) -
-                            sqrt(1+.data$mu_prior_std_error**2)/(.data$mu_prior_std_error**2) *
-                            sqrt(.data$mu_prior_estimate**2 + 2*.data$mu_prior_std_error**2 * log(myBF * sqrt(1+.data$mu_prior_std_error**2))), lower.tail=T)) -> Data
+          mutate( a = -1/(2*(std_se^2+mu_prior_std_error^2)) + 1/(2*std_se^2),
+                  b = mu_prior_estimate / (std_se^2+mu_prior_std_error^2),
+                  c = -mu_prior_estimate**2 / (2*(std_se^2+mu_prior_std_error^2)) - log(myBF * sqrt(std_se^2+mu_prior_std_error^2)),
+                  delta = b^2 - 4*a*c,
+                  x1 = (-b + sqrt(delta)) / (2*a),
+                  x2 = (-b - sqrt(delta)) / (2*a),
+                  pSNP = stats::pnorm( x1, mean = 0, sd = mySE, lower.tail=F) +
+                    stats::pnorm(x2, mean = 0, sd = mySE, lower.tail=T)) -> Data
       })
       Data %>%
         mutate(pSNP = tidyr::replace_na(.data$pSNP, 1)) %>%  # if NA -> replace by 1, that means that the polynome has no real solution and Pr(allBF>BF)=1
@@ -201,9 +225,11 @@ request_BFandP <- function(Prior, parent0, sign_thresh, use_permutations = F,
       
       # get the mean prior variance from the data
       sigma2 = mean(Data$mu_prior_std_error**2)
+      se2 = mean(Data$std_se**2)
+      
       
       # apply the function to each BF, using the parameters estimated just before
-      d$my_p = apply(d, 1, function(x) get_OneP(x[1], quantiles, sigma2, wghts))
+      d$my_p = apply(d, 1, function(x) get_OneP(x[1], quantiles, se2, sigma2, wghts))
       
       tmp = "... checking p-values near significance threshold  \n"
       Log = update_log(Log, tmp, verbose)
