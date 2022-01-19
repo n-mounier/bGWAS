@@ -2,7 +2,7 @@
 
 
 
-# #' Calculate Bayes Factor and empirical p-values from observed Z-scores and priors
+# #' Calculate Bayes Factor and empirical p-values from observed effects and priors
 # #'
 # #' @inheritParams bGWAS
 # NOT EXPORTED
@@ -10,7 +10,7 @@
 
 
 
-request_BFandP_PofO <- function(Prior, parent0, n_permutations, save_files=F, verbose=F) {
+request_BFandP <- function(Prior, parent0, n_permutations, save_files=F, verbose=F) {
   Log = c()
   tmp = paste0("# Computing observed Bayes Factor for all SNPs... \n")
   Log = update_log(Log, tmp, verbose)

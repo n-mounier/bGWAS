@@ -37,7 +37,6 @@
 bGWAS <- function(name,
                   GWAS_PofO,
                   GWAS_additive,
-                  noise=0,
                   n_permutations = 1000,
                   save_files = TRUE,
                   verbose = TRUE) {
@@ -107,13 +106,13 @@ bGWAS <- function(name,
   tmp = c("", "> Computing prior for null paternal effects  \n")
   log_info = update_log(log_info, tmp, verbose)
   
-  Prior_pat0 = compute_prior_PofO(Data, "pat0", noise, verbose)
+  Prior_pat0 = compute_prior(Data, "pat0", verbose)
   log_info = c(log_info, Prior_pat0$log_info)
   
   tmp = c("", "> Computing prior for null maternal effects  \n")
   log_info = update_log(log_info, tmp, verbose)
   
-  Prior_mat0 = compute_prior_PofO(Data, "mat0", noise, verbose)
+  Prior_mat0 = compute_prior(Data, "mat0", verbose)
   log_info = c(log_info, Prior_mat0$log_info)
   
   ##### COMPUTE THE BAYES FACTOR AND THE P-VALUE #####
@@ -127,13 +126,13 @@ bGWAS <- function(name,
   tmp = c("", "> Calculating them for null maternal effects  \n")
   log_info = update_log(log_info, tmp, verbose)
   
-  PriorWithBF_mat0 = request_BFandP_PofO(Prior_mat0$prior, pa, n_permutations, save_files, verbose)
+  PriorWithBF_mat0 = request_BFandP(Prior_mat0$prior, pa, n_permutations, save_files, verbose)
   log_info = update_log(log_info, PriorWithBF_mat0$log_info, F)
   
   tmp = c("", "> Calculating them for null paternal effects  \n")
   log_info = update_log(log_info, tmp, verbose)
   
-  PriorWithBF_pat0 = request_BFandP_PofO(Prior_pat0$prior, "pat0", n_permutations, save_files, verbose)
+  PriorWithBF_pat0 = request_BFandP(Prior_pat0$prior, "pat0", n_permutations, save_files, verbose)
   log_info = update_log(log_info, PriorWithBF_pat0$log_info, F)
   
   
