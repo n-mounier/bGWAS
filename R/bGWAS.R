@@ -38,11 +38,7 @@ bGWAS <- function(name,
                   GWAS_PofO,
                   GWAS_additive,
                   noise=0,
-                  sign_method = "p",
-                  sign_thresh = 5e-8,
-                  use_permutations= FALSE,
-                  res_pruning_dist = 500,
-                  res_pruning_LD = 0,
+                  n_permutations = 1000,
                   save_files = TRUE,
                   verbose = TRUE) {
   
@@ -96,56 +92,6 @@ bGWAS <- function(name,
     log_info = update_log(log_info, tmp, verbose)
   }
   
-  
-  
-  ## sign_method -> should not be "p" or "fdr"
-  if(!sign_method %in% c("p", "fdr")) stop("sign_method : method not accepted, should be \"p\" or \"fdr\"", call. = FALSE)
-  
-  ## sign_thresh -> should be numeric and lower (or equal) to 1
-  if(!is.numeric(sign_thresh)) stop("sign_thresh : non-numeric argument", call. = FALSE)
-  if(sign_thresh>1) stop("sign_thresh : a threshold higher than 1 does not make sense", call. = FALSE)
-  if(sign_thresh<0) stop("sign_thresh : should be positive", call. = FALSE)
-  
-  
-  if(sign_method=="p"){
-    tmp = paste0("Significant SNPs will be identified according to p-value. The threshold used is :",
-                 format(sign_thresh, scientific = T), ".  \n")
-  } else if(sign_method=="fdr"){
-    tmp = paste0("Significant SNPs will be identified according to FDR. The threshold used is :",
-                 format(sign_thresh, scientific = T), ".  \n")
-  }
-  log_info = update_log(log_info, tmp, verbose)
-  
-  ## res_pruning_dist
-  if(!is.numeric(res_pruning_dist)) stop("res_pruning_dist : non-numeric argument", call. = FALSE)
-  
-  if(is.null(res_pruning_dist)){
-    tmp = "Results will not be pruned.  \n"
-    log_info = update_log(log_info, tmp, verbose)
-  } else {
-    if(res_pruning_dist<10) stop("res_pruning_dist : should be higher than 10Kb", call. = FALSE)
-    if(res_pruning_dist>1000) stop("res_pruning_dist : should be lower than 1Mb", call. = FALSE)
-    
-    
-    tmp = paste0("The distance used for pruning results is: ", res_pruning_dist, "Kb.  \n")
-    log_info = update_log(log_info, tmp, verbose)
-    
-    ## res_pruning_LD
-    if(!is.numeric(res_pruning_LD)) stop("res_pruning_LD : non-numeric argument", call. = FALSE)
-    if(res_pruning_LD<0) stop("res_pruning_LD : should be positive", call. = FALSE)
-    if(res_pruning_LD>1) stop("res_pruning_LD : should not be larger than 1", call. = FALSE)
-    
-    
-    if(res_pruning_LD>0){
-      tmp = paste0("The LD threshold used for pruning results is: ", res_pruning_LD, ".  \n")
-      log_info = update_log(log_info, tmp, verbose)
-    } else {
-      tmp = "Distance-based pruning will be used for results.  \n"
-      log_info = update_log(log_info, tmp, verbose)
-    }
-  }
-  
-  
   # Go into the analysis' directory
   if(save_files){
     dir.create(Dir)
@@ -178,14 +124,16 @@ bGWAS <- function(name,
   
   
   # This script create a file containing all SNPs in common between prior file / imputed files
-  tmp = c("", "> Calculating them for all SNPs  \n")
+  tmp = c("", "> Calculating them for null maternal effects  \n")
   log_info = update_log(log_info, tmp, verbose)
   
-  PriorWithBF_mat0 = request_BFandP(Prior_mat0$prior, "mat0", sign_thresh, use_permutations, sign_method, save_files, verbose)
+  PriorWithBF_mat0 = request_BFandP_PofO(Prior_mat0$prior, pa, n_permutations, save_files, verbose)
   log_info = update_log(log_info, PriorWithBF_mat0$log_info, F)
   
+  tmp = c("", "> Calculating them for null paternal effects  \n")
+  log_info = update_log(log_info, tmp, verbose)
   
-  PriorWithBF_pat0 = request_BFandP(Prior_pat0$prior, "pat0", sign_thresh, use_permutations, sign_method, save_files, verbose)
+  PriorWithBF_pat0 = request_BFandP_PofO(Prior_pat0$prior, "pat0", n_permutations, save_files, verbose)
   log_info = update_log(log_info, PriorWithBF_pat0$log_info, F)
   
   
@@ -193,7 +141,13 @@ bGWAS <- function(name,
   # tmp = paste0("", "> Pruning and identifying significant SNPs \n")
   # log_info = update_log(log_info, tmp, verbose)
   # 
+  # 1) we need to get correlation between the two sets of BFs to adjust the sign_thresh
   # 
+  # 2a) get significant SNPs for null maternal effects
+  # 2b) get significant SNPs for null paternal effects
+  #
+  # 3) bind them into a single data.frame, with a column for the model
+  #
   # Results = get_significantSNPs(PriorWithBF$SNPs, sign_method, sign_thresh, res_pruning_dist, res_pruning_LD, 
   #                               res_MR$studies, matrix_all$mat, save_files, verbose)
   # log_info = update_log(log_info, Results$log_info, F)
@@ -219,7 +173,6 @@ bGWAS <- function(name,
   
   results=list()
   results$log_info = log_info
-  #results$significant_SNPs = Results$SNPs
   results$all_BFs_mat0 = PriorWithBF_mat0$SNPs
   results$all_BFs_pat0 = PriorWithBF_pat0$SNPs
 

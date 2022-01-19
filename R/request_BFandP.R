@@ -10,8 +10,7 @@
 
 
 
-request_BFandP <- function(Prior, parent0, sign_thresh, use_permutations = F, 
-                           sign_method, save_files=F, verbose=F) {
+request_BFandP_PofO <- function(Prior, parent0, n_permutations, save_files=F, verbose=F) {
   Log = c()
   tmp = paste0("# Computing observed Bayes Factor for all SNPs... \n")
   Log = update_log(Log, tmp, verbose)
@@ -36,15 +35,14 @@ request_BFandP <- function(Prior, parent0, sign_thresh, use_permutations = F,
   tmp = "# Computing BF p-values... \n"
   Log = update_log(Log, tmp, verbose)
   
-  if(use_permutations){# The true one : calculate BF
-    tmp = "   using a permutation approach: \n"
-    
-    
-    # how many null z-scores should we simulate?
-    nrow(Prior) -> N.one.set.of.nulls
-    
-    # Function to count how many larger BF were observed in the simulation
-    count_larger <- Rcpp::cppFunction(' IntegerVector count_larger(NumericVector real, NumericVector null) {
+  tmp = "   using a permutation approach: \n"
+  
+  
+  # how many null z-scores should we simulate?
+  nrow(Prior) -> N.one.set.of.nulls
+  
+  # Function to count how many larger BF were observed in the simulation
+  count_larger <- Rcpp::cppFunction(' IntegerVector count_larger(NumericVector real, NumericVector null) {
                       int N_real = real.size();
                       int N_null = null.size();
                       // both files are in descending order. Make use of this
@@ -59,251 +57,77 @@ request_BFandP <- function(Prior, parent0, sign_thresh, use_permutations = F,
                       }
                       return result;
   } ', env=NULL)
+  
+  
+  
+  # counts for each SNPs : start with all 0
+  running.total = rep.int(0 , nrow(Prior))
+  
+  tmp = "# Computing null Bayes Factors (needed to obtain empirical p-values)... \n"
+  Log = update_log(Log, tmp, verbose)
+  
+  full.number.of.nulls.for.comparison = n_permutations* N.one.set.of.nulls
     
-    
-    
-    # counts for each SNPs : start with all 0
-    running.total = rep.int(0 , nrow(Prior))
-    
-    tmp = "# Computing null Bayes Factors (needed to compute empirical p-values)... \n"
-    Log = update_log(Log, tmp, verbose)
-    
-    
-    NUMBER_OF_NULLRUNS = 1000
-    full.number.of.nulls.for.comparison = NUMBER_OF_NULLRUNS* N.one.set.of.nulls
-    
-    tmp = paste0(NUMBER_OF_NULLRUNS, " random z-scores simulations for the whole set of SNPs (",
-                 format(nrow(Prior), big.mark = ",", scientific = F), ") : ", format(full.number.of.nulls.for.comparison, big.mark = ",", scientific = F), " null BFs are calculated \n")
-    Log = update_log(Log, tmp, verbose)
-    
-    for( i in 1:NUMBER_OF_NULLRUNS ) {
-      # null bf
-      if(i %% 20 == 1){
-        tmp = paste0("Simulation ",i, "... \n")
-        Log = update_log(Log, tmp, verbose)
-        
-      }
-      
-      # simulate z-score from normal distribution
-      # ... but this does not account for the real "true distribution" (inflation?)
-      # should we shuffle z-scores instead?
-      # Prior %>%
-      #   mutate(z = stats::rnorm(N.one.set.of.nulls, 0, 1),
-      #          BF.null =  stats::dnorm(mean= .data$mu_prior_estimate, 
-      #                               sd=sqrt(1+.data$mu_prior_std_error**2), 
-      #                               x=.data$z) /
-      #            stats::dnorm(mean= 0.0, 
-      #                         sd=sqrt(1),
-      #                         x=.data$z)) %>%
-      #   arrange(desc(.data$BF.null))-> Prior_BF
-      mySE = mean(Prior$std_se)
-      Prior %>%
-        mutate(std_beta = stats::rnorm(N.one.set.of.nulls, 0, 1/sqrt(.data$N)),
-               BF.null =  stats::dnorm(mean= .data$mu_prior_estimate,
-                                    sd=sqrt(.data$std_se^2+.data$mu_prior_std_error**2),
-                                    x=.data$std_beta) /
-                 stats::dnorm(mean= 0.0,
-                              sd=.data$std_se,
-                              x=.data$std_beta)) %>%
-        arrange(desc(.data$BF.null))-> Prior_BF
-     
-      
-      Prior_BF %>%
-        pull(.data$BF.null) -> nullbf
-
-      
-      count_larger(Prior$BF, nullbf) -> counts
-      stopifnot(length(counts) == nrow(Prior))
-      running.total = running.total + counts
-    }
-    
-    tmp = "Done! \n"
-    Log = update_log(Log, tmp, verbose)
-    
-    
-    tmp = "# Computing empirical p-values... \n"
-    Log = update_log(Log, tmp, verbose)
-    
-    
-    Prior$z = NULL
-    Prior$BF.null = NULL
-    
-    Prior$BF_p = (running.total+1) / full.number.of.nulls.for.comparison
-    
-    
-  } else {
-    tmp = "   using a distribution approach: \n"
-    Log = update_log(Log, tmp, verbose)
-    
-    
-    ### Functions to estimate p-value from BF/prior distribution
-    ## Calculate a p-value using the non-linear quantiles
-    
-    # Get p-value, for one BF value, using one vector of quantiles, one vector of weights, and one variance value: observed / prior
-    #d$my_p = apply(d, 1, function(x) get_OneP(x[1], quantiles, se2, sigma2, wghts))
-    
-    get_OneP <- function(myBF, perc, se2, sigma2, weights){
-      # # explicitly calculate x1 and x2 first
-      a = -1/(2*(se2+sigma2)) + 1/(2*se2)
-      b = perc / (se2+sigma2)
-      c = -perc**2 / (2*(se2+sigma2)) - log(myBF * sqrt(se2+sigma2))
-      delta = b^2 - 4*a*c
-      suppressWarnings({ # warnings when some delta are < 0 -> p=1
-      x1 = (-b + sqrt(delta)) / (2*a)
-      x2 = (-b - sqrt(delta)) / (2*a)
-      })
-       
-      # stats::pnorm( x1, lower.tail=F) +
-      # stats::pnorm( x2, lower.tail=T)
-        
-      suppressWarnings({ # warnings when p-value = NA (small BFS), deal with it below
-        pPercentiles = stats::pnorm( x1, mean = 0, sd = sqrt(se2), lower.tail=F) +
-          stats::pnorm(x2, mean = 0, sd = sqrt(se2), lower.tail=T)
-      })
-      
-      pPercentiles[is.na(pPercentiles)]=1
-      # multiply each p-value by the according weight
-      p = pPercentiles %*% weights
-      return(p)
-    }
-    
-    ## Get p-value, for one BF value, using all priors ("true value")
-    get_fullP <- function(myBF, mySE, Data){ # BF : value - Data : data.frame with prior_estimate and prior_std_error columns
-      suppressWarnings({ # warnings when p-value = NA (small BFS), deal with it below
-        Data %>%
-          mutate( a = -1/(2*(std_se^2+mu_prior_std_error^2)) + 1/(2*std_se^2),
-                  b = mu_prior_estimate / (std_se^2+mu_prior_std_error^2),
-                  c = -mu_prior_estimate**2 / (2*(std_se^2+mu_prior_std_error^2)) - log(myBF * sqrt(std_se^2+mu_prior_std_error^2)),
-                  delta = b^2 - 4*a*c,
-                  x1 = (-b + sqrt(delta)) / (2*a),
-                  x2 = (-b - sqrt(delta)) / (2*a),
-                  pSNP = stats::pnorm( x1, mean = 0, sd = mySE, lower.tail=F) +
-                    stats::pnorm(x2, mean = 0, sd = mySE, lower.tail=T)) -> Data
-      })
-      Data %>%
-        mutate(pSNP = tidyr::replace_na(.data$pSNP, 1)) %>%  # if NA -> replace by 1, that means that the polynome has no real solution and Pr(allBF>BF)=1
-        summarize(mean(.data$pSNP)) %>% as.numeric() -> p # here, we use all the prior values, so we can use an unweighted mean
-      return(p)
-    }
-    
-    # Get all p-values for a vector of BFs, return a list with 2 elements : "pValue" & "log_info"
-    get_pValue<- function(myBFs, Data, sign_thr=5e-8, verbose=F){ # BF : vector of values - Data : data.frame with prior_estimate and prior_std_error columns
-      Log=c()
-      
-      tmp = "... getting approximated p-values using non-linear quantiles  \n"
+  tmp = paste0(n_permutations, " random standardised effects simulations for the whole set of SNPs (",
+               format(nrow(Prior), big.mark = ",", scientific = F), ") : ", format(full.number.of.nulls.for.comparison, big.mark = ",", scientific = F), " null BFs are calculated \n")
+  Log = update_log(Log, tmp, verbose)
+  
+  #all_null_BFs = matrix(NA, nrow=N.one.set.of.nulls, ncol=n_permutations)
+  
+  for( i in 1:n_permutations ) {
+    # null bf
+    if(i %% 20 == 1){
+      tmp = paste0("Simulation ",i, "... \n")
       Log = update_log(Log, tmp, verbose)
       
-      d=data.frame(BF=myBFs)
-      d$my_p=NA
-      
-      # here, we define quantiles on the 10^... scale
-      # from 0 to 0.5, and then from 0.5 to 1
-      quant = c(0, 10^(seq(-10, 0, 0.1))/2  , 1-rev(10^(seq(-10, 0, 0.1))/2)[-1], 1)
-      
-      
-      #c(0, 10^(seq(-10, 0, 10/49))/2  , 1-rev(10^(seq(-10, 0, 10/49))/2)[-1])
-      
-      
-      # for the weights, we take quant[x] - quant[x-1] to get the "size" of the intervals
-      # and then, set the weight of a "quantile value" as half of the "size" of the interval before 
-      #                                                 + half of the "size" of the interval after
-      sizes = quant[-1]-quant[-length(quant)]
-      wghts = numeric(length(quant))
-      for(i in 1:length(quant)){
-        if(i==1){
-          wghts[i] = sizes[i]/2
-        } else if(i==length(quant)){
-          wghts[i] = sizes[i-1]/2
-        } else {
-          wghts[i] = sizes[i]/2 + sizes[i-1]/2
-        }
-      }
-      
-      # get the quantiles from the data
-      #quantUsed = quantile(Data$prior_estimate, quant[-c(length(quant))])
-      quantiles = stats::quantile(Data$mu_prior_estimate, quant)
-      
-      # get the mean prior variance from the data
-      sigma2 = mean(Data$mu_prior_std_error**2)
-      se2 = mean(Data$std_se**2)
-      
-      
-      # apply the function to each BF, using the parameters estimated just before
-      d$my_p = apply(d, 1, function(x) get_OneP(x[1], quantiles, se2, sigma2, wghts))
-      
-      tmp = "... checking p-values near significance threshold  \n"
-      Log = update_log(Log, tmp, verbose)
-      
-      # check if we have some false positive / false negative
-      count_corrected=0
-      # Identify last non-significant SNP
-      snp = min(which(d$my_p>sign_thr))
-      p_true = get_fullP(d$BF[snp], Data)
-      NeedToCorrect = T
-      while(NeedToCorrect){
-        if(p_true<sign_thr){
-          d$my_p[snp] = p_true
-          count_corrected = count_corrected+1
-          snp=snp+1
-          p_true = get_fullP(d$BF[snp], Data)
-        } else {
-          NeedToCorrect=F
-        }
-      }
-      
-      
-      # Identify first significant SNP
-      if(any(d$my_p<sign_thr)){
-      snp = max(which(d$my_p<sign_thr))
-      p_true = get_fullP(d$BF[snp], Data)
-      NeedToCorrect = T
-      while(NeedToCorrect){
-        if(p_true>sign_thr){
-          d$my_p[snp] = p_true
-          count_corrected = count_corrected+1
-          snp=snp-1
-          p_true = get_fullP(d$BF[snp], Data)
-        } else {
-          NeedToCorrect=F
-        }
-      }
-      
-      if(count_corrected==0) tmp = "    everything is ok!  \n"
-      if(count_corrected==1)  tmp = paste0("   ", count_corrected," p-value has been re-estimated using the exact formula.  \n")
-      if(count_corrected>1)  tmp = paste0("   ", count_corrected, " p-values have been re-estimated using the exact formula.  \n")
-      
-      Log = update_log(Log, tmp, verbose)
-      }
-      res = list()
-      res$pValue = d$my_p
-      res$log_info = Log
-      
-      return(res)
-      
-      
     }
     
-    
-    PVal = get_pValue(Prior$BF, Prior, sign_thresh, verbose)
+    # simulate z-score from normal distribution
+    # ... but this does not account for the real "true distribution" (inflation?)
+    # should we shuffle z-scores instead?
+    # Prior %>%
+    #   mutate(z = stats::rnorm(N.one.set.of.nulls, 0, 1),
+    #          BF.null =  stats::dnorm(mean= .data$mu_prior_estimate, 
+    #                               sd=sqrt(1+.data$mu_prior_std_error**2), 
+    #                               x=.data$z) /
+    #            stats::dnorm(mean= 0.0, 
+    #                         sd=sqrt(1),
+    #                         x=.data$z)) %>%
+    #   arrange(desc(.data$BF.null))-> Prior_BF
+    mySE = mean(Prior$std_se)
     Prior %>%
-      mutate(BF_p = PVal$pValue) -> Prior
-    Log=c(Log, PVal$log_info)
+      mutate(std_beta = stats::rnorm(N.one.set.of.nulls, 0, 1/sqrt(.data$N)),
+             BF.null =  stats::dnorm(mean= .data$mu_prior_estimate,
+                                     sd=sqrt(.data$std_se^2+.data$mu_prior_std_error**2),
+                                     x=.data$std_beta) /
+               stats::dnorm(mean= 0.0,
+                            sd=.data$std_se,
+                            x=.data$std_beta)) -> Prior_BF
     
+    all_null_BFs[,i] = Prior_BF$BF.null
+    
+    Prior_BF %>%
+      arrange(desc(.data$BF.null)) %>%
+      pull(.data$BF.null) -> nullbf
+    
+    
+    count_larger(Prior$BF, nullbf) -> counts
+    stopifnot(length(counts) == nrow(Prior))
+    running.total = running.total + counts
   }
   
+  tmp = "Done! \n"
+  Log = update_log(Log, tmp, verbose)
   
-  if(sign_method == "fdr"){
-    tmp = "# Estimating FDR (Benjamini-Hochberg procedure)... \n"
-    Log = update_log(Log, tmp, verbose)
-    
-    Prior %>%
-      mutate(BF_fdr = stats::p.adjust(.data$BF_p)) -> Prior
-    
-    tmp = "Done! \n"
-    Log = update_log(Log, tmp, verbose)
-    
-  }
   
+  tmp = "# Computing empirical p-values... \n"
+  Log = update_log(Log, tmp, verbose)
+  
+  
+  Prior$z = NULL
+  Prior$BF.null = NULL
+  
+  Prior$BF_p = (running.total+1) / full.number.of.nulls.for.comparison
   
   
   
