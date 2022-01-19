@@ -6,7 +6,7 @@
 # #' 
 # NOT EXPORTED
 
-compute_prior_PofO <- function(Data, parent0, verbose){ # Data is output of tidy_inputGWAS
+compute_prior <- function(Data, parent0, verbose){ # Data is output of tidy_inputGWAS
   Log = c()
   #rs,chrm,pos,alt,ref,observed_Z,prior_estimate,prior_std_error,posterior_estimate,posterior_std_error
   if(parent0 == "mat0"){
