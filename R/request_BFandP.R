@@ -72,8 +72,7 @@ request_BFandP <- function(Prior, parent0, n_permutations, save_files=F, verbose
                format(nrow(Prior), big.mark = ",", scientific = F), ") : ", format(full.number.of.nulls.for.comparison, big.mark = ",", scientific = F), " null BFs are calculated \n")
   Log = update_log(Log, tmp, verbose)
   
-  #all_null_BFs = matrix(NA, nrow=N.one.set.of.nulls, ncol=n_permutations)
-  
+
   for( i in 1:n_permutations ) {
     # null bf
     if(i %% 20 == 1){
@@ -103,9 +102,7 @@ request_BFandP <- function(Prior, parent0, n_permutations, save_files=F, verbose
                stats::dnorm(mean= 0.0,
                             sd=.data$std_se,
                             x=.data$std_beta)) -> Prior_BF
-    
-    all_null_BFs[,i] = Prior_BF$BF.null
-    
+
     Prior_BF %>%
       arrange(desc(.data$BF.null)) %>%
       pull(.data$BF.null) -> nullbf
