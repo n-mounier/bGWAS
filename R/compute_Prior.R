@@ -25,11 +25,11 @@ compute_prior <- function(Data, parent0, verbose){ # Data is output of tidy_inpu
   
   
   if(parent0=="mat0"){
-    readr::write_csv(path="Prior_mat0.csv", x=Results)
-    tmp = paste0("The file Prior_mat0.csv had been successfully written. \n")
+    data.table::fwrite(Results, "Prior_mat0.csv", sep = ",", compress="gzip")
+        tmp = paste0("The file Prior_mat0.csv.gz had been successfully written. \n")
   } else {
-    readr::write_csv(path="Prior_pat0.csv", x=Results)
-    tmp = paste0("The file Prior_pat0.csv had been successfully written. \n")
+    data.table::fwrite(Results, "Prior_pat0.csv", sep = ",", compress="gzip")
+    tmp = paste0("The file Prior_pat0.csv.gz had been successfully written. \n")
   }
   Log = bGWAS:::update_log(Log, tmp, verbose)
   

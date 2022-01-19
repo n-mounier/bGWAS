@@ -131,12 +131,12 @@ request_BFandP <- function(Prior, parent0, n_permutations, save_files=F, verbose
   if(save_files){
     if(parent0=="mat0"){
       system("rm Prior_mat0.csv")
-      readr::write_csv(path="PriorBFp_mat0.csv", x=Prior)
-      tmp = paste0("The file Prior_mat0.csv has been updated into Prior_BFp_mat0.csv. \n")
+      data.table::fwrite(Prior, "PriorBFp_mat0.csv", sep = ",", compress="gzip")
+      tmp = paste0("The file Prior_mat0.csv.gz has been updated into Prior_BFp_mat0.csv.gz. \n")
     } else {
       system("rm Prior_pat0.csv")
-      readr::write_csv(path="PriorBFp_pat0.csv", x=Prior)
-      tmp = paste0("The file Prior_pat0.csv has been updated into Prior_BFp_pat0.csv. \n")
+      data.table::fwrite(Prior, "PriorBFp_pat0.csv", sep = ",", compress="gzip")
+      tmp = paste0("The file Prior_pat0.csv.gz has been updated into Prior_BFp_pat0.csv.gz. \n")
     }
     Log = update_log(Log, tmp, verbose)
     
