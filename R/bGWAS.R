@@ -123,13 +123,13 @@ bGWAS <- function(name,
   
   
   # This script create a file containing all SNPs in common between prior file / imputed files
-  tmp = c("", "> Calculating them for null maternal effects  \n")
+  tmp = c("", "> Calculating BFs for null maternal effects  \n")
   log_info = update_log(log_info, tmp, verbose)
   
-  PriorWithBF_mat0 = request_BFandP(Prior_mat0$prior, pa, n_permutations, save_files, verbose)
+  PriorWithBF_mat0 = request_BFandP(Prior_mat0$prior, "mat0", n_permutations, save_files, verbose)
   log_info = update_log(log_info, PriorWithBF_mat0$log_info, F)
   
-  tmp = c("", "> Calculating them for null paternal effects  \n")
+  tmp = c("", "> Calculating BFs for null paternal effects  \n")
   log_info = update_log(log_info, tmp, verbose)
   
   PriorWithBF_pat0 = request_BFandP(Prior_pat0$prior, "pat0", n_permutations, save_files, verbose)
