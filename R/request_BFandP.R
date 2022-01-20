@@ -117,10 +117,6 @@ request_BFandP <- function(Prior, parent0, n_permutations, save_files=F, verbose
   Log = update_log(Log, tmp, verbose)
   
   
-  tmp = "# Computing empirical p-values... \n"
-  Log = update_log(Log, tmp, verbose)
-  
-  
   Prior$z = NULL
   Prior$BF.null = NULL
   
