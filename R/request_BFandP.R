@@ -126,11 +126,11 @@ request_BFandP <- function(Prior, parent0, n_permutations, save_files=F, verbose
   
   if(save_files){
     if(parent0=="mat0"){
-      system("rm Prior_mat0.csv")
+      system("rm Prior_mat0.csv.gz")
       data.table::fwrite(Prior, "PriorBFp_mat0.csv.gz", sep = ",", compress="gzip")
       tmp = paste0("The file Prior_mat0.csv.gz has been updated into Prior_BFp_mat0.csv.gz. \n")
     } else {
-      system("rm Prior_pat0.csv")
+      system("rm Prior_pat0.csv.gz")
       data.table::fwrite(Prior, "PriorBFp_pat0.csv.gz", sep = ",", compress="gzip")
       tmp = paste0("The file Prior_pat0.csv.gz has been updated into Prior_BFp_pat0.csv.gz. \n")
     }
