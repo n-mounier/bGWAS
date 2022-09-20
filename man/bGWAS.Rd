@@ -4,12 +4,21 @@
 \alias{bGWAS}
 \title{bGWAS - main function}
 \usage{
-bGWAS(name, GWAS, Z_matrices = "~/ZMatrices/", prior_studies = NULL,
-  MR_threshold = 1e-06, MR_ninstruments = 3, MR_pruning_dist = 500,
-  MR_pruning_LD = 0, MR_shrinkage = 1, stepwise_threshold = NULL,
-  prior_shrinkage = NULL, sign_method = "p", sign_thresh = 5e-08,
-  use_permutations = FALSE, res_pruning_dist = 500,
-  res_pruning_LD = 0, save_files = FALSE, verbose = TRUE)
+bGWAS(
+  name,
+  GWAS,
+  Z_matrices = "~/ZMatrices/",
+  prior_studies = NULL,
+  MR_threshold = 1e-06,
+  MR_ninstruments = 3,
+  MR_pruning_dist = 500,
+  MR_pruning_LD = 0,
+  MR_shrinkage = 1,
+  stepwise_threshold = NULL,
+  prior_shrinkage = NULL,
+  save_files = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{name}{The name of the analysis (character)}
@@ -45,21 +54,6 @@ divided by the number of Prior GWASs tested (numeric)}
 \item{prior_shrinkage}{The p-value threshold used for shrinkage before calculating the prior,
 should be between \code{MR_threshold} and 1, \code{default=NULL} will use \code{MR_shrinkage} (numeric)}
 
-\item{sign_method}{The method used to identify significant SNPs, should be \code{"p"} for
-p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)}
-
-\item{sign_thresh}{The threshold used to identify significant SNPs, \code{default="5e-8"}
-(numeric)}
-
-\item{use_permutations}{A logical indicating if BF p-values should be estimated using the permutation
-approach,  \code{default=FALSE}}
-
-\item{res_pruning_dist}{The distance used for pruning results (in Kb), should be between 10 and 1000,
-(if set to NULL, no pruning is done), \code{default=500} (numeric)}
-
-\item{res_pruning_LD}{The LD threshold used for pruning results, should be between 0 and 1
-(if 0, distance-based pruning is used), \code{default=0} (numeric)}
-
 \item{save_files}{A logical indicating if the results should be saved as files,
 \code{default=FALSE}}
 
@@ -75,13 +69,12 @@ Additionnaly, if \code{save_files=T}, several files are created in the folder \c
 \item "CoefficientsByChromosome.csv" - contains the MR estimates when masking the focal
 chromosome (22 coefficients / prior GWASs used for prior estimation)
 \item "PriorBFp.csv" - contains BF and p-values, prior, posterior and direct effects estimates for all SNPs
-\item "SignificantSNPs.csv" - contains BF and p-values, prior, posterior and direct effects estimates for 
-a subset of significant SNPs
 }
 }
 \description{
 Performs a Bayesian GWAS from Summary Statistics, using publicly available results
 to calculate the prior effects of the SNPs and compare it to observed z-scores
+GEMINI version
 }
 \details{
 \code{Name} and \code{GWAS} are required arguments.
@@ -107,33 +100,4 @@ remove it from the list of prior GWASs used to build the prior.
 
 Use \link{select_priorGWASs}() to automatically select the prior GWASs to
 be included/excluded when building the prior (argument \code{prior_studies}).
-}
-\examples{
-# Permorm bGWAS, using a small conventional GWAS included in the package (data.frame) 
-# and selecting a subset of studies for the prior
-\dontrun{top
-data("SmallGWAS_Timmers2019")
-MyStudies = select_priorGWASs(include_traits=c("Blood Pressure", "Education"),  
-                              include_files=c("cardiogram_gwas_results.txt", 
-                                             "All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq.gz"))
-# 6 Prior GWASs used
-list_priorGWASs(MyStudies) 
-
- A = bGWAS(name="Test_UsingSmallDataFrame",
-          GWAS = SmallGWAS_Timmers2019,
-          prior_studies=MyStudies,
-          MR_threshold = 1e-6,
-          stepwise_threshold=0.05,
-          save_files=T)
-          }
-          
-# Permorm bGWAS, using a conventional GWAS from the list of prior GWASs
-\dontrun{MyGWAS = 3
-list_priorGWASs(MyGWAS)
-# Coronary Artery Disease GWAS (CARDIoGRAM)
-B = bGWAS(name = "Test_UsingGWASfromPriorGWASs",
-         GWAS = MyGWAS)
-         }
-         
-         
 }

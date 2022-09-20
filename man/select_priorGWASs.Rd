@@ -4,9 +4,14 @@
 \alias{select_priorGWASs}
 \title{Select prior GWASs}
 \usage{
-select_priorGWASs(include_files = NULL, include_traits = NULL,
-  exclude_files = NULL, exclude_traits = NULL,
-  Z_matrices = "~/ZMatrices/", verbose = F)
+select_priorGWASs(
+  include_files = NULL,
+  include_traits = NULL,
+  exclude_files = NULL,
+  exclude_traits = NULL,
+  Z_matrices = "~/ZMatrices/",
+  verbose = F
+)
 }
 \arguments{
 \item{include_files}{list of file names (see \code{\link{list_files}()}) (character)}

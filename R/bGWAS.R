@@ -4,6 +4,7 @@
 #'
 #' Performs a Bayesian GWAS from Summary Statistics, using publicly available results
 #' to calculate the prior effects of the SNPs and compare it to observed z-scores
+#' - GEMINI version
 #'
 #'
 #' @param name The name of the analysis (character)
@@ -28,16 +29,6 @@
 #' @param stepwise_threshold The p-value threshold used for inclusion/exclusion of Prior GWASs during the
 #'        stepwise selection approach, should be between 0.05 and 0.0005, \code{default=NULL} will use 0.05 
 #'        divided by the number of Prior GWASs tested (numeric)
-#' @param sign_method The method used to identify significant SNPs, should be \code{"p"} for
-#'        p-value or \code{"fdr"} for false discovery rate, \code{default="p"} (character)
-#' @param sign_thresh The threshold used to identify significant SNPs, \code{default="5e-8"}
-#'        (numeric)
-#' @param use_permutations  A logical indicating if BF p-values should be estimated using the permutation
-#'        approach,  \code{default=FALSE}
-#' @param res_pruning_dist The distance used for pruning results (in Kb), should be between 10 and 1000,
-#'        (if set to NULL, no pruning is done), \code{default=500} (numeric)
-#' @param res_pruning_LD The LD threshold used for pruning results, should be between 0 and 1
-#'        (if 0, distance-based pruning is used), \code{default=0} (numeric)
 #' @param save_files A logical indicating if the results should be saved as files,
 #'        \code{default=FALSE}
 #' @param verbose  A logical indicating if information on progress should be reported,
@@ -77,37 +68,8 @@
 #' \item "CoefficientsByChromosome.csv" - contains the MR estimates when masking the focal
 #' chromosome (22 coefficients / prior GWASs used for prior estimation)
 #' \item "PriorBFp.csv" - contains BF and p-values, prior, posterior and direct effects estimates for all SNPs
-#' \item "SignificantSNPs.csv" - contains BF and p-values, prior, posterior and direct effects estimates for 
-#' a subset of significant SNPs
 #' }
 #'
-#' @examples
-#' # Permorm bGWAS, using a small conventional GWAS included in the package (data.frame) 
-#' # and selecting a subset of studies for the prior
-#'\dontrun{top
-#' data("SmallGWAS_Timmers2019")
-#' MyStudies = select_priorGWASs(include_traits=c("Blood Pressure", "Education"),  
-#'                               include_files=c("cardiogram_gwas_results.txt", 
-#'                                              "All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq.gz"))
-#' # 6 Prior GWASs used
-#' list_priorGWASs(MyStudies) 
-#'
-#'  A = bGWAS(name="Test_UsingSmallDataFrame",
-#'           GWAS = SmallGWAS_Timmers2019,
-#'           prior_studies=MyStudies,
-#'           MR_threshold = 1e-6,
-#'           stepwise_threshold=0.05,
-#'           save_files=T)
-#'           }
-#'           
-#' # Permorm bGWAS, using a conventional GWAS from the list of prior GWASs
-#' \dontrun{MyGWAS = 3
-#' list_priorGWASs(MyGWAS)
-#' # Coronary Artery Disease GWAS (CARDIoGRAM)
-#' B = bGWAS(name = "Test_UsingGWASfromPriorGWASs",
-#'          GWAS = MyGWAS)
-#'          }
-#'          
 #'          
 #' @import dplyr
 #' @import magrittr
@@ -128,11 +90,6 @@ bGWAS <- function(name,
                   MR_shrinkage = 1,
                   stepwise_threshold = NULL,
                   prior_shrinkage = NULL,
-                  sign_method = "p",
-                  sign_thresh = 5e-8,
-                  use_permutations= FALSE,
-                  res_pruning_dist = 500,
-                  res_pruning_LD = 0,
                   save_files = FALSE,
                   verbose = TRUE) {
   
@@ -316,20 +273,20 @@ bGWAS <- function(name,
   if(MR_shrinkage>1) stop("MR_shrinkage : should not be higher than 1", call. = FALSE)
   
   if(MR_shrinkage==1){
-    tmp = "No shrinkage applied before performing MR."
+    tmp = "No shrinkage applied before performing MR. \n"
     log_info = update_log(log_info, tmp, verbose)
   } else {
     tmp = paste0("All p-values lower than ",format(MR_shrinkage, scientific = T), " will be shrunk to 0 before performing MR.  \n")
     log_info = update_log(log_info, tmp, verbose)
   }
   
-  ## stepwise_threshold, should be between 0.05 and 0.0005 or NULL
+  ## stepwise_threshold, should be between 0.1 and 0.0005 or NULL
   if(is.null(stepwise_threshold)){
     tmp = "The p-value threshold used for stepwise selection will be derived according to the number of Prior GWASs used.  \n"
     log_info = update_log(log_info, tmp, verbose)
   } else if(is.numeric(stepwise_threshold)){
     if(stepwise_threshold<0.0005) stop("stepwise_threshold : should not be lower than 0.0005", call. = FALSE)
-    if(stepwise_threshold>0.05) stop("stepwise_threshold : should not be higher 0.05", call. = FALSE)
+    if(stepwise_threshold>0.1) stop("stepwise_threshold : should not be higher 0.1", call. = FALSE)
     tmp = paste0("The p-value threshold used for stepwise selection is ", format(stepwise_threshold, scientific = F), ".  \n")
     log_info = update_log(log_info, tmp, verbose)
   } else{
@@ -357,68 +314,6 @@ bGWAS <- function(name,
   }
 
   
-  
-  
-  ## stepwise_threshold, should be between 0.05 and 0.0005 or NULL
-  if(is.null(stepwise_threshold)){
-    tmp = "The p-value threshold used for stepwise selection will be derived according to the number of Prior GWASs used.  \n"
-    log_info = update_log(log_info, tmp, verbose)
-  } else if(is.numeric(stepwise_threshold)){
-    if(stepwise_threshold<0.0005) stop("stepwise_threshold : should not be lower than 0.0005", call. = FALSE)
-    if(stepwise_threshold>0.05) stop("stepwise_threshold : should not be higher 0.05", call. = FALSE)
-    tmp = paste0("The p-value threshold used for stepwise selection is ", format(stepwise_threshold, scientific = F), ".  \n")
-    log_info = update_log(log_info, tmp, verbose)
-  } else{
-    stop("stepwise_threshold : should be numeric or NULL", call. = FALSE)
-  }
-  
-
-  ## sign_method -> should not be "p" or "fdr"
-  if(!sign_method %in% c("p", "fdr")) stop("sign_method : method not accepted, should be \"p\" or \"fdr\"", call. = FALSE)
-  
-  ## sign_thresh -> should be numeric and lower (or equal) to 1
-  if(!is.numeric(sign_thresh)) stop("sign_thresh : non-numeric argument", call. = FALSE)
-  if(sign_thresh>1) stop("sign_thresh : a threshold higher than 1 does not make sense", call. = FALSE)
-  if(sign_thresh<0) stop("sign_thresh : should be positive", call. = FALSE)
-  
-  
-  if(sign_method=="p"){
-    tmp = paste0("Significant SNPs will be identified according to p-value. The threshold used is :",
-                 format(sign_thresh, scientific = T), ".  \n")
-  } else if(sign_method=="fdr"){
-    tmp = paste0("Significant SNPs will be identified according to FDR. The threshold used is :",
-                 format(sign_thresh, scientific = T), ".  \n")
-  }
-  log_info = update_log(log_info, tmp, verbose)
-  
-  ## res_pruning_dist
-  if(!is.numeric(res_pruning_dist)) stop("res_pruning_dist : non-numeric argument", call. = FALSE)
-  
-  if(is.null(res_pruning_dist)){
-    tmp = "Results will not be pruned.  \n"
-    log_info = update_log(log_info, tmp, verbose)
-  } else {
-    if(res_pruning_dist<10) stop("res_pruning_dist : should be higher than 10Kb", call. = FALSE)
-    if(res_pruning_dist>1000) stop("res_pruning_dist : should be lower than 1Mb", call. = FALSE)
-    
-    
-    tmp = paste0("The distance used for pruning results is: ", res_pruning_dist, "Kb.  \n")
-    log_info = update_log(log_info, tmp, verbose)
-    
-    ## res_pruning_LD
-    if(!is.numeric(res_pruning_LD)) stop("res_pruning_LD : non-numeric argument", call. = FALSE)
-    if(res_pruning_LD<0) stop("res_pruning_LD : should be positive", call. = FALSE)
-    if(res_pruning_LD>1) stop("res_pruning_LD : should not be larger than 1", call. = FALSE)
-    
-    
-    if(res_pruning_LD>0){
-      tmp = paste0("The LD threshold used for pruning results is: ", res_pruning_LD, ".  \n")
-      log_info = update_log(log_info, tmp, verbose)
-    } else {
-      tmp = "Distance-based pruning will be used for results.  \n"
-      log_info = update_log(log_info, tmp, verbose)
-    }
-  }
   
   
   # Go into the analysis' directory
@@ -508,30 +403,30 @@ bGWAS <- function(name,
   
   
   ##### COMPUTE THE BAYES FACTOR AND THE P-VALUE #####
-  log_info = update_log(log_info, c("", ""), F)
-  tmp = c("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n",
-          "<<< Calculation of Bayes Factors and p-values >>>  \n")
-  log_info = update_log(log_info, tmp, verbose)
-  
-  
-  # This script create a file containing all SNPs in common between prior file / imputed files
-  tmp = c("", "> Calculating them for all SNPs  \n")
-  log_info = update_log(log_info, tmp, verbose)
-  
-  PriorWithBF = request_BFandP(Prior$prior, sign_thresh, use_permutations, sign_method, save_files, verbose)
-  log_info = update_log(log_info, PriorWithBF$log_info, F)
-  
+  # log_info = update_log(log_info, c("", ""), F)
+  # tmp = c("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n",
+  #         "<<< Calculation of Bayes Factors and p-values >>>  \n")
+  # log_info = update_log(log_info, tmp, verbose)
+  # 
+  # 
+  # # This script create a file containing all SNPs in common between prior file / imputed files
+  # tmp = c("", "> Calculating them for all SNPs  \n")
+  # log_info = update_log(log_info, tmp, verbose)
+  # 
+  # PriorWithBF = request_BFandP(Prior$prior, sign_thresh, use_permutations, sign_method, save_files, verbose)
+  # log_info = update_log(log_info, PriorWithBF$log_info, F)
+  # 
   
   ##### IDENTIFY SIGNIFICANT SNPS + PRUNING #####
-  tmp = paste0("", "> Pruning and identifying significant SNPs \n")
-  log_info = update_log(log_info, tmp, verbose)
-  
-  
-  Results = get_significantSNPs(PriorWithBF$SNPs, sign_method, sign_thresh, res_pruning_dist, res_pruning_LD, 
-                                res_MR$studies, matrix_all$mat, save_files, verbose)
-  log_info = update_log(log_info, Results$log_info, F)
-  
-  
+  # tmp = paste0("", "> Pruning and identifying significant SNPs \n")
+  # log_info = update_log(log_info, tmp, verbose)
+  # 
+  # 
+  # Results = get_significantSNPs(PriorWithBF$SNPs, sign_method, sign_thresh, res_pruning_dist, res_pruning_LD, 
+  #                               res_MR$studies, matrix_all$mat, save_files, verbose)
+  # log_info = update_log(log_info, Results$log_info, F)
+  # 
+  # 
   
   ### go back to inital folder ###
   log_info = update_log(log_info, c("", ""), F)
@@ -553,11 +448,12 @@ bGWAS <- function(name,
   
   results=list()
   results$log_info = log_info
-  results$significant_SNPs = Results$SNPs
-  results$posterior_SNPs = Results$posterior
-  results$direct_SNPs = Results$direct
-  results$all_BFs = PriorWithBF$SNPs
-  results$matrix_heatmap = Results$mat
+  #results$significant_SNPs = Results$SNPs
+  #results$posterior_SNPs = Results$posterior
+  #results$direct_SNPs = Results$direct
+  #results$all_BFs = PriorWithBF$SNPs
+  #results$matrix_heatmap = Results$mat
+  results$res = Prior$prior
   results$significant_studies = res_MR$coeffs
   results$all_MRcoeffs = Prior$all_coeffs
   

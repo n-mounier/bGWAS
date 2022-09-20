@@ -4,8 +4,14 @@
 \alias{manhattan_plot_bGWAS}
 \title{Manhattan Plot from bGWAS results}
 \usage{
-manhattan_plot_bGWAS(obj, save_file = F, file_name = NULL,
-  annotate = T, SNPs = NULL, results = "BF")
+manhattan_plot_bGWAS(
+  obj,
+  save_file = F,
+  file_name = NULL,
+  annotate = T,
+  SNPs = NULL,
+  results = "BF"
+)
 }
 \arguments{
 \item{obj}{an object of class bGWAS created using \code{\link{bGWAS}()}}
