@@ -1,19 +1,6 @@
 
-    ## ✔ Setting active project to '/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS'
-    ## ✖ The 'origin' remote is configured, but we can't determine its default branch.
-    ##   Possible reasons:
-    ##   - The remote repo no longer exists, suggesting the local remote should
-    ##     be deleted.
-    ##   - We are offline or that specific Git server is down.
-    ##   - You don't have the necessary permission or something is wrong with
-    ##     your credentials.
-    ## ✖ The 'origin' remote is configured, but we can't determine its default branch.
-    ##   Possible reasons:
-    ##   - The remote repo no longer exists, suggesting the local remote should
-    ##     be deleted.
-    ##   - We are offline or that specific Git server is down.
-    ##   - You don't have the necessary permission or something is wrong with
-    ##     your credentials.
+    ## ✔ Setting active project to
+    ## '/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS'
 
 [![](https://travis-ci.org/n-mounier/bGWAS.svg?branch=master)](https://travis-ci.org/n-mounier/bGWAS)
 [![](https://img.shields.io/badge/version-1.0.3-informational.svg)](https://github.com/n-mounier/bGWAS)
