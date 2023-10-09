@@ -4,12 +4,14 @@
 \alias{all.equal.bGWAS}
 \title{Equality test for bGWAS objects}
 \usage{
-\method{all}{equal.bGWAS}(obj1, obj2)
+\method{all}{equal.bGWAS}(target, current, ...)
 }
 \arguments{
-\item{obj1}{an object of class bGWAS}
+\item{target}{an object of class bGWAS}
 
-\item{obj2}{an object of class bGWAS}
+\item{current}{an object of class bGWAS}
+
+\item{...}{further arguments}
 }
 \value{
 all.equal

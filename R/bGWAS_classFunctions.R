@@ -52,22 +52,23 @@ print.bGWAS <- function(x,...) {
 
 
 #' Equality test for bGWAS objects
-#' @param obj1 an object of class bGWAS
-#' @param obj2 an object of class bGWAS
-#'
+#' @param target an object of class bGWAS
+#' @param current an object of class bGWAS
+#' @param ... further arguments
+#' 
 #' @return all.equal
 #' @export
-all.equal.bGWAS <- function(obj1, obj2) {
-  if(length(obj1)!= length(obj2)) return(FALSE)
+all.equal.bGWAS <- function(target, current, ...) {
+  if(length(target)!= length(current)) return(FALSE)
   # log - we don't care.
   # significant SNPs
-  if(!all.equal(obj1$significant_SNPs,obj2$significant_SNPs)) return(FALSE)
+  if(!all.equal(target$significant_SNPs,current$significant_SNPs)) return(FALSE)
   # all BFs
-  if(!all.equal(obj1$all_BFs,obj2$all_BFs, tolerance=0.0001)) return(FALSE)
+  if(!all.equal(target$all_BFs,current$all_BFs, tolerance=0.0001)) return(FALSE)
   # significant studies
-  if(!all.equal(obj1$significant_studies,obj2$significant_studies, tolerance=0.0001)) return(FALSE)
+  if(!all.equal(target$significant_studies,current$significant_studies, tolerance=0.0001)) return(FALSE)
   # all MR coeffs
-  if(!all.equal(obj1$all_MRcoeffs,obj2$all_MRcoeffs, tolerance=0.0001)) return(FALSE)
+  if(!all.equal(target$all_MRcoeffs,current$all_MRcoeffs, tolerance=0.0001)) return(FALSE)
 
   return(TRUE)
 }

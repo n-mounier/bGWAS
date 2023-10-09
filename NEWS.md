@@ -1,3 +1,10 @@
+# bGWAS 1.0.3 (2023-10-09)
+
+## Changes
+- Compatibility issues   
+
+The package has been updated to work with more recent versions of R and packages.
+
 # bGWAS 1.0.2 (2019-11-04)
 
 ## Changes

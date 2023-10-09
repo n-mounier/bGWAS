@@ -1,7 +1,23 @@
 
+    ## ✔ Setting active project to '/Users/nmounier/Documents/SGG/Projects/Packaging/bGWAS'
+    ## ✖ The 'origin' remote is configured, but we can't determine its default branch.
+    ##   Possible reasons:
+    ##   - The remote repo no longer exists, suggesting the local remote should
+    ##     be deleted.
+    ##   - We are offline or that specific Git server is down.
+    ##   - You don't have the necessary permission or something is wrong with
+    ##     your credentials.
+    ## ✖ The 'origin' remote is configured, but we can't determine its default branch.
+    ##   Possible reasons:
+    ##   - The remote repo no longer exists, suggesting the local remote should
+    ##     be deleted.
+    ##   - We are offline or that specific Git server is down.
+    ##   - You don't have the necessary permission or something is wrong with
+    ##     your credentials.
+
 [![](https://travis-ci.org/n-mounier/bGWAS.svg?branch=master)](https://travis-ci.org/n-mounier/bGWAS)
-[![](https://img.shields.io/badge/version-1.0.2-informational.svg)](https://github.com/n-mounier/bGWAS)
-[![](https://img.shields.io/badge/lifecycle-maturing-9cf.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+[![](https://img.shields.io/badge/version-1.0.3-informational.svg)](https://github.com/n-mounier/bGWAS)
+[![](https://img.shields.io/badge/lifecycle-maturing-9cf.svg)](https://lifecycle.r-lib.org/articles/stages.html#maturing)
 [![](https://img.shields.io/github/last-commit/n-mounier/bGWAS.svg)](https://github.com/n-mounier/bGWAS/commits/master)
 [![](https://img.shields.io/badge/license-GPL--2.0-lightgrey.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
@@ -20,11 +36,15 @@ sticker(imgurl,
 :arrow\_right: ESHG poster is available
 [here](doc/P17.051.A_NinonMounier.pdf).
 
-:information\_source: `bGWAS` has been updated to version 1.0.2.  
+:information\_source: `bGWAS` has been updated to version 1.0.3.  
+This update should solve the compatibility issues that arose with more
+recent R versions, but does not affect the analyses results. Note that
+you might need to update some packages to be able to continue using
+`bGWAS`.  
 :warning: 28/10/2019 : The variance of the prior effects has been
 modified. If you used a previous version of the package, please re-run
-yout analysis using this new version to get more accurate results.  
-Check the [NEWS](NEWS.md) to learn more about what has been modified\!
+your analysis using this new version to get more accurate results.  
+Check the [NEWS](NEWS.md) to learn more about what has been modified!
 
 :warning: If you downloaded the Z-Matrix files before 20/08/2019, they
 are now obsolete and you will not be able to use them with the newest
@@ -61,37 +81,37 @@ possible.
 
 The principal functions available are:
 
-  - **`bGWAS()`**  
+-   **`bGWAS()`**  
     main function that calculates prior effects from prior GWASs,
     compares them to observed Z-scores and returns an object of class
     *bGWAS*
 
-  - **`list_priorGWASs()`**  
+-   **`list_priorGWASs()`**  
     directly returns information about the prior GWASs that can be used
     to calculate prior effects
 
-  - **`select_priorGWASs()`**  
+-   **`select_priorGWASs()`**  
     allows a quick selection of prior GWASs (to include/exclude specific
     studies when calculating prior effects)
 
-  - **`extract_results_bGWAS()`**  
+-   **`extract_results_bGWAS()`**  
     returns results (prior, posterior and direct estimate /
     standard-error + p-value from BF for SNPs) from an object of class
     *bGWAS*
 
-  - **`manhattan_plot_bGWAS()`**  
+-   **`manhattan_plot_bGWAS()`**  
     creates a Manhattan Plot from an object of class *bGWAS*
 
-  - **`extract_MRcoeffs_bGWAS()`**  
+-   **`extract_MRcoeffs_bGWAS()`**  
     returns multivariable MR coefficients (1 estimate using all
     chromosomes + 22 estimates with 1 chromosome masked) from an object
     of class *bGWAS*
 
-  - **`coefficients_plot_bGWAS()`**  
+-   **`coefficients_plot_bGWAS()`**  
     creates a Coefficients Plot (causal effect of each prior GWASs on
     the focal phenotype) from an object of class *bGWAS*
 
-  - **`heatmap_bGWAS()`**  
+-   **`heatmap_bGWAS()`**  
     creates a heatmap to represent, for each significant SNP, the
     contribution of each prior GWAS to the estimated prior effect from
     an object of class *bGWAS*
@@ -110,8 +130,6 @@ remotes::install_github("n-mounier/bGWAS")
 library(bGWAS)
 ```
 
-    ## Warning: package 'dplyr' was built under R version 3.6.2
-
 <!--- Note: using remotes instead of devtools leads to re-build the package
 and apparently, it may be a problem with R 3.4 and macOS, 
 see https://stackoverflow.com/questions/43595457/alternate-compiler-for-installing-r-packages-clang-error-unsupported-option/43943631#43943631 --->
@@ -120,55 +138,43 @@ see https://stackoverflow.com/questions/43595457/alternate-compiler-for-installi
 
 To run the analysis with `bGWAS` two inputs are needed:
 
-#### 1\. The *GWAS* results to be tested
+#### 1. The *GWAS* results to be tested
 
 Can be a regular (space/tab/comma-separated) file or a gzipped file
 (.gz) or a `data.frame`. Must contain the following columns, which can
 have alternative names:  
-
 <ul>
-
 SNP-identifier: `rs` or `rsid`, `snp`, `snpid`, `rnpid`  
 Alternate (effect) allele: `a1` or `alt`, `alts`  
 Reference allele: `a2` or `a0`, `ref`  
 Z-statistics: `z` or `Z`, `zscore`
-
 </ul>
-
 If the Z-statistics is not present, it will be automatically calculated
 from effect size and standard error, in which case the following columns
 should be provided:  
-
 <ul>
-
 Effect-size: `b` or `beta`, `beta1`  
 Standard error: `se` or `std`
-
 </ul>
 
 If you want the prior/posterior/corrected effects to be rescaled, please
 make sure to provide effect sizes and standard errors instead of (or in
 addition to) Z-statistics.
 
-#### 2\. Prior *GWASs* - Z-Matrix files
+#### 2. Prior *GWASs* - Z-Matrix files
 
 These files should be downloaded separately and stored in `~/ZMatrices`
 or in the folder specified when launching the analysis. These files
 contains the Z-scores for all prior GWASs :  
-
 <ul>
-
 <ul>
-
 *ZMatrix\_MR.csv.gz*: Z-scores (strong instruments only) used for
 multivariable MR,  
 *ZMatrix\_Full.csv.gz*: Z-scores (all SNPs) used to calculate the prior
 Z-scores,  
 *AvailableStudies.tsv*: A file containing information about the prior
 GWASs available.
-
 </ul>
-
 </ul>
 
 You can download these files using this
@@ -179,9 +185,7 @@ that the results reported will use the Z-Matrix files chr:pos
 information (GRCh37 - since UK10K data has been used to imputed the
 prior GWASs).
 
-  - On UNIX/MACOSX, from a terminal:  
-
-<!-- end list -->
+-   On UNIX/MACOSX, from a terminal:  
 
 ``` bash
 wget https://drive.switch.ch/index.php/s/jvSwoIxRgCKUSI8/download -O ZMatrices.tar.gz
@@ -224,7 +228,7 @@ MyStudies = select_priorGWASs(include_traits=c("Heart Rate", "Body Mass Index", 
 AllStudies[AllStudies$ID %in% MyStudies, ]
 ```
 
-    ## # A tibble: 6 x 10
+    ## # A tibble: 6 × 10
     ##   File                                             
     ##   <chr>                                            
     ## 1 All_ancestries_SNP_gwas_mc_merge_nogc.tbl.uniq.gz
@@ -241,20 +245,18 @@ AllStudies[AllStudies$ID %in% MyStudies, ]
     ## 4 Smoking - ever smoked (TAG)           36 Smoking         TAG       
     ## 5 Smoking - former smoker (TAG)         37 Smoking         TAG       
     ## 6 Smoking - age of onset (TAG)          38 Smoking         TAG       
-    ##   Reference        Download               Remarks           N_SNPs N_Instruments
-    ##   <chr>            <chr>                  <chr>              <dbl>         <dbl>
-    ## 1 https://www.ncb… https://portals.broad… <NA>              6.81e6         10052
-    ## 2 https://www.ncb… http://walker05.u.hpc… <NA>              6.81e6          3229
-    ## 3 https://www.ncb… https://www.med.unc.e… Other GWAS Data … 6.63e6           558
-    ## 4 https://www.ncb… https://www.med.unc.e… Other GWAS Data … 6.78e6            94
-    ## 5 https://www.ncb… https://www.med.unc.e… Other GWAS Data … 6.78e6           184
-    ## 6 https://www.ncb… https://www.med.unc.e… Other GWAS Data … 6.77e6            34
+    ##   Reference                                Download Remarks N_SNPs N_Instruments
+    ##   <chr>                                    <chr>    <chr>    <dbl>         <dbl>
+    ## 1 https://www.ncbi.nlm.nih.gov/pubmed/256… https:/… <NA>    6.81e6         10052
+    ## 2 https://www.ncbi.nlm.nih.gov/pubmed/235… http://… <NA>    6.81e6          3229
+    ## 3 https://www.ncbi.nlm.nih.gov/pubmed/204… https:/… Other … 6.63e6           558
+    ## 4 https://www.ncbi.nlm.nih.gov/pubmed/204… https:/… Other … 6.78e6            94
+    ## 5 https://www.ncbi.nlm.nih.gov/pubmed/204… https:/… Other … 6.78e6           184
+    ## 6 https://www.ncbi.nlm.nih.gov/pubmed/204… https:/… Other … 6.77e6            34
 
 ### Analysis
 
-  - **Example A**
-
-<!-- end list -->
+-   **Example A**
 
 ``` r
 # Using a small GWAS (400,000 SNPs, Timmers et al data - stored as a data.frame)
@@ -268,7 +270,7 @@ include_files=c("cardiogram_gwas_results.txt", "All_ancestries_SNP_gwas_mc_merge
 list_priorGWASs(MyStudies)[,c("Name", "Trait", "Reference")]
 ```
 
-    ## # A tibble: 6 x 3
+    ## # A tibble: 6 × 3
     ##   Name                                 Trait                  
     ##   <chr>                                <chr>                  
     ## 1 Body Mass Index (GIANT)              Body Mass Index        
@@ -298,9 +300,7 @@ A = bGWAS(name="Test_UsingSmallDataFrame",
 # No file will be saved.
 ```
 
-  - **Example B**
-
-<!-- end list -->
+-   **Example B**
 
 ``` r
 # Using a GWAS from our list our prior GWASs
@@ -309,7 +309,7 @@ MyGWAS = 3
 list_priorGWASs(MyGWAS)[, c("Name", "Trait", "Reference")]
 ```
 
-    ## # A tibble: 1 x 3
+    ## # A tibble: 1 × 3
     ##   Name                                 Trait                  
     ##   <chr>                                <chr>                  
     ## 1 Coronary Artery Disease (CARDIoGRAM) Coronary Artery Disease
@@ -350,7 +350,7 @@ print(A)
     ## -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_ 
     ##  
     ## 4 studies used to build the prior : 
-    ## # A tibble: 4 x 3
+    ## # A tibble: 4 × 3
     ##   study                                             estimate std_error
     ##   <chr>                                                <dbl>     <dbl>
     ## 1 EDUyears_2016_sumstat.txt                            0.187    0.0255
@@ -370,8 +370,9 @@ print_log_bGWAS(A)
 ```
 
 <details>
-
-<summary>Show log</summary>
+<summary>
+Show log
+</summary>
 
     ```
     ## <<< Preparation of analysis >>> 
@@ -617,14 +618,12 @@ print_log_bGWAS(A)
     ## 
     ## 
     ## <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>
-    ## Time of the analysis: 2 minute(s) and 16 second(s).
+    ## Time of the analysis: 1 minute(s) and 54 second(s).
     ```
 
 </details>
 
-  - Functions to extract results from an object of class *bGWAS*:
-
-<!-- end list -->
+-   Functions to extract results from an object of class *bGWAS*:
 
 ``` r
 # by default, extract "BF" results...
@@ -632,7 +631,7 @@ hits = extract_results_bGWAS(A, SNPs = "significant")
 hits
 ```
 
-    ## # A tibble: 14 x 14
+    ## # A tibble: 14 × 14
     ##    rsid       chrm_UK10K pos_UK10K alt   ref      beta      se z_obs
     ##    <chr>           <dbl>     <dbl> <chr> <chr>   <dbl>   <dbl> <dbl>
     ##  1 rs429358           19  45411941 T     C      0.106  0.00546 19.3 
@@ -694,7 +693,7 @@ nrow(all_results)
 extract_results_bGWAS(A, SNPs = "significant", results = "direct")
 ```
 
-    ## # A tibble: 2 x 15
+    ## # A tibble: 2 × 15
     ##   rsid       chrm_UK10K pos_UK10K alt   ref      beta      se z_obs
     ##   <chr>           <dbl>     <dbl> <chr> <chr>   <dbl>   <dbl> <dbl>
     ## 1 rs429358           19  45411941 T     C      0.106  0.00546  19.3
@@ -712,29 +711,27 @@ extract_results_bGWAS(A, SNPs = "significant", results = "direct")
 extract_MRcoeffs_bGWAS(A)[,1:12]
 ```
 
-    ## # A tibble: 4 x 12
-    ##   name                                
-    ##   <chr>                               
-    ## 1 Years of Schooling (SSGAC)          
-    ## 2 Body Mass Index (GIANT)             
-    ## 3 Coronary Artery Disease (CARDIoGRAM)
-    ## 4 Diastolic Blood Pressure (ICBP)     
-    ##   study         estimate std_error Tstat        P chrm1_estimate chrm1_std_error
-    ##   <chr>            <dbl>     <dbl> <dbl>    <dbl>          <dbl>           <dbl>
-    ## 1 EDUyears_201…    0.187    0.0255  7.33 1.32e-11          0.187          0.0258
-    ## 2 All_ancestri…   -0.122    0.0248 -4.93 2.12e- 6         -0.108          0.0259
-    ## 3 cardiogram_g…   -0.439    0.0623 -7.05 6.18e-11         -0.469          0.0616
-    ## 4 DBP             -0.248    0.0623 -3.98 1.07e- 4         -0.264          0.0619
-    ##    chrm1_P chrm2_estimate chrm2_std_error  chrm2_P
-    ##      <dbl>          <dbl>           <dbl>    <dbl>
-    ## 1 2.93e-11          0.186          0.0273 3.01e-10
-    ## 2 5.55e- 5         -0.124          0.0268 8.72e- 6
-    ## 3 4.27e-12         -0.439          0.0685 2.24e- 9
-    ## 4 3.78e- 5         -0.250          0.0653 1.93e- 4
+    ## # A tibble: 4 × 12
+    ##   name                                 study                                    
+    ##   <chr>                                <chr>                                    
+    ## 1 Years of Schooling (SSGAC)           EDUyears_2016_sumstat.txt                
+    ## 2 Body Mass Index (GIANT)              All_ancestries_SNP_gwas_mc_merge_nogc.tb…
+    ## 3 Coronary Artery Disease (CARDIoGRAM) cardiogram_gwas_results.txt              
+    ## 4 Diastolic Blood Pressure (ICBP)      DBP                                      
+    ##   estimate std_error Tstat        P chrm1_estimate chrm1_std_error  chrm1_P
+    ##      <dbl>     <dbl> <dbl>    <dbl>          <dbl>           <dbl>    <dbl>
+    ## 1    0.187    0.0255  7.33 1.32e-11          0.187          0.0258 2.93e-11
+    ## 2   -0.122    0.0248 -4.93 2.12e- 6         -0.108          0.0259 5.55e- 5
+    ## 3   -0.439    0.0623 -7.05 6.18e-11         -0.469          0.0616 4.27e-12
+    ## 4   -0.248    0.0623 -3.98 1.07e- 4         -0.264          0.0619 3.78e- 5
+    ##   chrm2_estimate chrm2_std_error  chrm2_P
+    ##            <dbl>           <dbl>    <dbl>
+    ## 1          0.186          0.0273 3.01e-10
+    ## 2         -0.124          0.0268 8.72e- 6
+    ## 3         -0.439          0.0685 2.24e- 9
+    ## 4         -0.250          0.0653 1.93e- 4
 
-  - Functions for graphic representations:
-
-<!-- end list -->
+-   Functions for graphic representations:
 
 ``` r
 # Coefficients plot
@@ -759,16 +756,16 @@ manhattan_plot_bGWAS(A, results="posterior")
 
 ##### Aditionnaly, if `save_files=TRUE`, several files are created in the folder `./<name>/` :
 
-  - **<name>.log** - log file  
-  - **PriorGWASs.tsv** - contains information about all prior GWASs
+-   **<name>.log** - log file  
+-   **PriorGWASs.tsv** - contains information about all prior GWASs
     (general info + status (used/removed) + univariable/multivariable MR
     estimates)  
-  - **CoefficientsByChromosome.csv** - contains the multivariable MR
+-   **CoefficientsByChromosome.csv** - contains the multivariable MR
     estimates when masking the focal chromosome (22 coefficients for
     each prior GWASs used for prior estimation)  
-  - **PriorBFp.csv** - contains BF and p-values, prior, posterior and
+-   **PriorBFp.csv** - contains BF and p-values, prior, posterior and
     direct effects estimates for all SNPs  
-  - **SignificantSNPs.csv** - contains BF and p-values, prior, posterior
+-   **SignificantSNPs.csv** - contains BF and p-values, prior, posterior
     and direct effects estimates for a subset of significant SNPs
     (identified according to specified parameters)
 
@@ -795,11 +792,6 @@ al](https://www.ncbi.nlm.nih.gov/pubmed/30642433).
 The most recent results (obtained using `bGWAS` version 1.0.2) are
 available [here](doc/Lifespan_Analysis.md) and summarised in [this
 poster](doc/P17.051.A_NinonMounier.pdf).
-
-<!--- ## Application to food choices
-[//]:*******
-
-The corrected to raw ratios (CRRs) derived from this approach have been used to study the relationship between food choices and health status in [Pirastu et al](https://www.biorxiv.org/content/10.1101/829952v2) --->
 
 ## Citation
 

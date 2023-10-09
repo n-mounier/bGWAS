@@ -15,7 +15,7 @@ options(pillar.neg=F, # do no print neg number in red
 A = readRDS("inst/Data/A.RDS")
 # automatically updates manual
 devtools::build_manual()
-system("mv ../bGWAS_1.0.2.pdf doc/bGWAS-manual.pdf")
+system("mv ../bGWAS_1.0.3.pdf doc/bGWAS-manual.pdf")
 #
 remove.packages("bGWAS")
 ```
@@ -63,8 +63,9 @@ sticker(imgurl,
 
 :arrow_right: ESHG poster is available [here](doc/P17.051.A_NinonMounier.pdf).      
 
-:information\_source: `bGWAS` has been updated to version 1.0.2.    
-:warning: 28/10/2019 : The variance of the prior effects has been modified. If you used a previous version of the package, please re-run yout analysis using this new version to get more accurate results.        
+:information\_source: `bGWAS` has been updated to version 1.0.3.    
+This update should solve the compatibility issues that arose with more recent R versions, but does not affect the analyses results. Note that you might need to update some packages to be able to continue using `bGWAS`.   
+:warning: 28/10/2019 : The variance of the prior effects has been modified. If you used a previous version of the package, please re-run your analysis using this new version to get more accurate results.        
 Check the [NEWS](NEWS.md) to learn more about what has been modified\!
     
     
@@ -330,11 +331,6 @@ Analysis using 6 prior GWASs, for a conventional GWAS containing ~ 300,000 SNPs 
 This method has been applied to Lifespan analysis in [McDaid et al](https://www.ncbi.nlm.nih.gov/pubmed/28748955) and [Timmers et al](https://www.ncbi.nlm.nih.gov/pubmed/30642433).     
 The most recent results (obtained using `bGWAS` version 1.0.2) are available [here](doc/Lifespan_Analysis.md) and summarised in [this poster](doc/P17.051.A_NinonMounier.pdf). 
 
-
-<!--- ## Application to food choices
-[//]:*******
-
-The corrected to raw ratios (CRRs) derived from this approach have been used to study the relationship between food choices and health status in [Pirastu et al](https://www.biorxiv.org/content/10.1101/829952v2) --->
 
 
 ## Citation

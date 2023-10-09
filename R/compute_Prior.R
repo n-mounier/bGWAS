@@ -139,7 +139,7 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, GWASData, r
 
     
     d_test %>%
-      bind_rows(all.priors, .data$.) -> all.priors
+      bind_rows(all.priors, .) -> all.priors
     
   
     # subset - MR instruments only
@@ -149,7 +149,7 @@ compute_prior <- function(selected_studies, MR_ZMatrix, All_ZMatrix, GWASData, r
       select(Obs=6,
              Pred=7) %>%
       mutate(Res=.data$Obs-.data$Pred) %>%
-      bind_rows(OutOfSample, .data$.) -> OutOfSample
+      bind_rows(OutOfSample, .) -> OutOfSample
     
   }
   

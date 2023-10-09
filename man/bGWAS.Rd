@@ -4,12 +4,26 @@
 \alias{bGWAS}
 \title{bGWAS - main function}
 \usage{
-bGWAS(name, GWAS, Z_matrices = "~/ZMatrices/", prior_studies = NULL,
-  MR_threshold = 1e-06, MR_ninstruments = 3, MR_pruning_dist = 500,
-  MR_pruning_LD = 0, MR_shrinkage = 1, stepwise_threshold = NULL,
-  prior_shrinkage = NULL, sign_method = "p", sign_thresh = 5e-08,
-  use_permutations = FALSE, res_pruning_dist = 500,
-  res_pruning_LD = 0, save_files = FALSE, verbose = TRUE)
+bGWAS(
+  name,
+  GWAS,
+  Z_matrices = "~/ZMatrices/",
+  prior_studies = NULL,
+  MR_threshold = 1e-06,
+  MR_ninstruments = 3,
+  MR_pruning_dist = 500,
+  MR_pruning_LD = 0,
+  MR_shrinkage = 1,
+  stepwise_threshold = NULL,
+  prior_shrinkage = NULL,
+  sign_method = "p",
+  sign_thresh = 5e-08,
+  use_permutations = FALSE,
+  res_pruning_dist = 500,
+  res_pruning_LD = 0,
+  save_files = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{name}{The name of the analysis (character)}
